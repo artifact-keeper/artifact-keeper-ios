@@ -4,42 +4,63 @@ struct LoginView: View {
     @EnvironmentObject var authManager: AuthManager
     @State private var username = ""
     @State private var password = ""
-
+    
     var body: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 32) {
             Spacer()
-
-            Image(systemName: "shield.checkered")
-                .font(.system(size: 64))
-                .foregroundStyle(.blue)
-
-            Text("Artifact Keeper")
-                .font(.largeTitle.bold())
-
+            
+            VStack(spacing: 16) {
+                Image(systemName: "shield.checkered")
+                    .font(.system(size: 72, weight: .thin))
+                    .foregroundStyle(.blue.gradient)
+                
+                Text("Artifact Keeper")
+                    .font(.largeTitle.bold())
+                
+                Text("Sign in to your account")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+            
             VStack(spacing: 16) {
                 TextField("Username", text: $username)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
+                    #if os(iOS)
                     .textInputAutocapitalization(.never)
-
+                    #endif
+                
                 SecureField("Password", text: $password)
                     .textFieldStyle(.roundedBorder)
-
-                Button("Sign In") {
+                
+                if let error = authManager.errorMessage {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+                
+                Button {
                     Task {
-                        try? await authManager.login(
-                            username: username,
-                            password: password
-                        )
+                        await authManager.login(username: username, password: password)
+                    }
+                } label: {
+                    if authManager.isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Text("Sign In")
+                            .frame(maxWidth: .infinity)
                     }
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
+                .disabled(username.isEmpty || password.isEmpty || authManager.isLoading)
             }
-            .padding(.horizontal, 32)
-
+            .frame(maxWidth: 320)
+            
             Spacer()
             Spacer()
         }
+        .padding()
     }
 }

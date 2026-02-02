@@ -1,0 +1,42 @@
+import Foundation
+
+struct Repository: Codable, Identifiable, Sendable {
+    let id: String
+    let key: String
+    let name: String
+    let format: String
+    let repoType: String
+    let isPublic: Bool
+    let description: String?
+    let storageUsedBytes: Int64
+    let artifactCount: Int
+    let createdAt: String
+    let updatedAt: String
+    
+    enum CodingKeys: String, CodingKey {
+        case id, key, name, format, description
+        case repoType = "repo_type"
+        case isPublic = "is_public"
+        case storageUsedBytes = "storage_used_bytes"
+        case artifactCount = "artifact_count"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+}
+
+struct RepositoryListResponse: Codable, Sendable {
+    let items: [Repository]
+    let pagination: Pagination?
+}
+
+struct Pagination: Codable, Sendable {
+    let page: Int
+    let perPage: Int
+    let total: Int
+    
+    enum CodingKeys: String, CodingKey {
+        case page
+        case perPage = "per_page"
+        case total
+    }
+}

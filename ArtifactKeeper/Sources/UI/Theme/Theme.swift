@@ -4,8 +4,13 @@ enum AppTheme {
     // MARK: - Colors
     static let primary = Color.blue
     static let secondary = Color.indigo
+    #if os(iOS)
     static let background = Color(.systemBackground)
     static let surface = Color(.secondarySystemBackground)
+    #else
+    static let background = Color(nsColor: .windowBackgroundColor)
+    static let surface = Color(nsColor: .controlBackgroundColor)
+    #endif
     static let error = Color.red
     static let warning = Color.orange
     static let success = Color.green
