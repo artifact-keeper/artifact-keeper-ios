@@ -1,0 +1,362 @@
+# =============================================================================
+# ArtifactKeeper iOS/macOS CI/CD Pipeline
+# =============================================================================
+#
+# Required GitHub Secrets:
+#
+#   APPLE_CERTIFICATE_BASE64        - Base64-encoded .p12 distribution certificate
+#   APPLE_CERTIFICATE_PASSWORD      - Password for the .p12 file
+#   APPLE_PROVISIONING_PROFILE_BASE64 - Base64-encoded .mobileprovision
+#   APPLE_TEAM_ID                   - Apple Developer Team ID
+#   APPSTORE_API_KEY_ID             - App Store Connect API Key ID (for upload)
+#   APPSTORE_API_ISSUER_ID          - App Store Connect API Issuer ID
+#   APPSTORE_API_PRIVATE_KEY        - App Store Connect API Private Key (.p8 contents)
+#
+# To encode a file as base64 for secrets:
+#   base64 -i Certificates.p12 | pbcopy
+#   base64 -i App.mobileprovision | pbcopy
+#
+# =============================================================================
+
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      upload_to_appstore:
+        description: "Upload to App Store Connect"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XCODE_PATH: /Applications/Xcode_16.2.app
+  SCHEME: ArtifactKeeper
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Build (Swift Package)
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build (Swift Package)
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Resolve dependencies
+        run: swift package resolve
+
+      - name: Build
+        run: swift build
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Test
+  # ---------------------------------------------------------------------------
+  test:
+    name: Test
+    runs-on: macos-15
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: .build
+          key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
+      - name: Run tests
+        run: swift test
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Build for iOS Simulator
+  # ---------------------------------------------------------------------------
+  build-ios:
+    name: Build (iOS Simulator)
+    runs-on: macos-15
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/Library/Developer/Xcode/DerivedData
+          key: ios-spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            ios-spm-${{ runner.os }}-
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild \
+            -scheme "$SCHEME" \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
+            -skipPackagePluginValidation \
+            build \
+            | xcpretty --color || true
+          # Check the actual exit code from xcodebuild (not xcpretty)
+          exit ${PIPESTATUS[0]}
+
+  # ---------------------------------------------------------------------------
+  # Job 4: Archive & Release (tags or workflow_dispatch)
+  # ---------------------------------------------------------------------------
+  archive-release:
+    name: Archive & Release
+    runs-on: macos-15
+    if: >-
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
+      github.event_name == 'workflow_dispatch'
+    needs: [build, test]
+    env:
+      KEYCHAIN_NAME: build.keychain-db
+      KEYCHAIN_PASSWORD: temporary-ci-password
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Cache Swift packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            .build
+            ~/Library/Developer/Xcode/DerivedData
+          key: archive-spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
+          restore-keys: |
+            archive-spm-${{ runner.os }}-
+
+      # --- Signing Setup ---
+
+      - name: Import signing certificate
+        env:
+          APPLE_CERTIFICATE_BASE64: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          # Decode certificate
+          CERTIFICATE_PATH="$RUNNER_TEMP/certificate.p12"
+          echo "$APPLE_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
+
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_NAME"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+
+          # Import certificate into keychain
+          security import "$CERTIFICATE_PATH" \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12 \
+            -k "$KEYCHAIN_NAME"
+
+          # Allow codesign to access the keychain
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_NAME"
+
+          # Add keychain to search list
+          security list-keychains -d user -s "$KEYCHAIN_NAME" login.keychain-db
+
+      - name: Install provisioning profile
+        env:
+          APPLE_PROVISIONING_PROFILE_BASE64: ${{ secrets.APPLE_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PROFILE_PATH="$RUNNER_TEMP/profile.mobileprovision"
+          echo "$APPLE_PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PROFILE_PATH"
+
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PROFILE_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      # --- iOS Archive ---
+
+      - name: Archive for iOS
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild archive \
+            -scheme "$SCHEME" \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/ArtifactKeeper-iOS.xcarchive" \
+            -skipPackagePluginValidation \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            | xcpretty --color || true
+          exit ${PIPESTATUS[0]}
+
+      - name: Export iOS IPA
+        run: |
+          # Create export options plist
+          cat > "$RUNNER_TEMP/ExportOptions-iOS.plist" << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>uploadSymbols</key>
+            <true/>
+            <key>uploadBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          PLIST
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/ArtifactKeeper-iOS.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions-iOS.plist" \
+            -exportPath "$RUNNER_TEMP/ios-export"
+
+      - name: Upload iOS IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArtifactKeeper-iOS
+          path: ${{ runner.temp }}/ios-export/*.ipa
+          if-no-files-found: error
+
+      # --- macOS Archive ---
+
+      - name: Archive for macOS
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcodebuild archive \
+            -scheme "$SCHEME" \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$RUNNER_TEMP/ArtifactKeeper-macOS.xcarchive" \
+            -skipPackagePluginValidation \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            | xcpretty --color || true
+          exit ${PIPESTATUS[0]}
+
+      - name: Export macOS App
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions-macOS.plist" << 'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+            "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>developer-id</string>
+          </dict>
+          </plist>
+          PLIST
+
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/ArtifactKeeper-macOS.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions-macOS.plist" \
+            -exportPath "$RUNNER_TEMP/macos-export"
+
+      - name: Upload macOS App artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArtifactKeeper-macOS
+          path: ${{ runner.temp }}/macos-export/*
+          if-no-files-found: error
+
+      # --- Upload to App Store Connect (optional) ---
+
+      - name: Upload to App Store Connect
+        if: >-
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.upload_to_appstore == 'true') ||
+          (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v'))
+        env:
+          APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
+          APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          APPSTORE_API_PRIVATE_KEY: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+        run: |
+          # Write API key to file
+          mkdir -p ~/private_keys
+          echo "$APPSTORE_API_PRIVATE_KEY" > ~/private_keys/AuthKey_${APPSTORE_API_KEY_ID}.p8
+
+          # Upload iOS IPA
+          IPA_PATH=$(find "$RUNNER_TEMP/ios-export" -name "*.ipa" -print -quit)
+          if [ -n "$IPA_PATH" ]; then
+            echo "Uploading iOS IPA to App Store Connect..."
+            xcrun altool --upload-app \
+              --file "$IPA_PATH" \
+              --type ios \
+              --apiKey "$APPSTORE_API_KEY_ID" \
+              --apiIssuer "$APPSTORE_API_ISSUER_ID"
+          fi
+
+          # Notarize macOS app
+          MACOS_APP=$(find "$RUNNER_TEMP/macos-export" -name "*.app" -print -quit)
+          if [ -n "$MACOS_APP" ]; then
+            echo "Creating zip for notarization..."
+            ditto -c -k --keepParent "$MACOS_APP" "$RUNNER_TEMP/ArtifactKeeper-macOS.zip"
+
+            echo "Submitting macOS app for notarization..."
+            xcrun notarytool submit "$RUNNER_TEMP/ArtifactKeeper-macOS.zip" \
+              --key ~/private_keys/AuthKey_${APPSTORE_API_KEY_ID}.p8 \
+              --key-id "$APPSTORE_API_KEY_ID" \
+              --issuer "$APPSTORE_API_ISSUER_ID" \
+              --wait
+          fi
+
+      # --- GitHub Release ---
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            ${{ runner.temp }}/ios-export/*.ipa
+            ${{ runner.temp }}/macos-export/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # --- Cleanup ---
+
+      - name: Clean up keychain and credentials
+        if: always()
+        run: |
+          security delete-keychain "$KEYCHAIN_NAME" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/certificate.p12"
+          rm -f "$RUNNER_TEMP/profile.mobileprovision"
+          rm -rf ~/private_keys
