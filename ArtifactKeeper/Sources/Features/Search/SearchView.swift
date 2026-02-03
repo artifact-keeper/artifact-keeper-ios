@@ -10,17 +10,51 @@ struct SearchContentView: View {
     private let apiClient = APIClient.shared
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
+            // Inline search field
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(.secondary)
+                TextField("Search packages...", text: $searchText)
+                    .textFieldStyle(.plain)
+                    .autocorrectionDisabled()
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
+                    #endif
+                if !searchText.isEmpty {
+                    Button {
+                        searchText = ""
+                        results = []
+                        errorMessage = nil
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(10)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+
+            Divider()
+
+            // Results area
             if searchText.isEmpty && results.isEmpty {
                 ContentUnavailableView(
                     "Search Packages",
                     systemImage: "magnifyingglass",
                     description: Text("Search across all repositories by name, format, or version")
                 )
+                .frame(maxHeight: .infinity)
             } else if isSearching {
+                Spacer()
                 ProgressView("Searching...")
+                Spacer()
             } else if results.isEmpty && !searchText.isEmpty {
                 ContentUnavailableView.search(text: searchText)
+                    .frame(maxHeight: .infinity)
             } else {
                 List(results) { pkg in
                     NavigationLink {
@@ -32,7 +66,6 @@ struct SearchContentView: View {
                 .listStyle(.plain)
             }
         }
-        .searchable(text: $searchText, prompt: "Search packages...")
         .onChange(of: searchText) { _, newValue in
             searchTask?.cancel()
 

@@ -91,6 +91,11 @@ actor APIClient {
         return try decoder.decode(T.self, from: data)
     }
 
+    func buildURL(_ path: String) -> URL? {
+        guard !baseURL.isEmpty else { return nil }
+        return URL(string: "\(baseURL)\(path)")
+    }
+
     func buildDownloadURL(repoKey: String, artifactPath: String) -> URL? {
         let encoded = artifactPath.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? artifactPath
         return URL(string: "\(baseURL)/api/v1/repositories/\(repoKey)/artifacts/\(encoded)/download")

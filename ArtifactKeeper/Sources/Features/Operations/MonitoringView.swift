@@ -1,8 +1,9 @@
 import SwiftUI
 
 struct MonitoringView: View {
-    @State private var health: SystemHealth?
-    @State private var storage: StorageInfo?
+    @State private var health: HealthResponse?
+    @State private var healthLog: [HealthLogEntry] = []
+    @State private var alerts: [AlertState] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
 
@@ -23,67 +24,70 @@ struct MonitoringView: View {
                     if let health = health {
                         Section("System Health") {
                             LabeledContent("Status") {
-                                HStack(spacing: 6) {
-                                    Circle()
-                                        .fill(health.status == "ok" || health.status == "healthy" ? .green : .red)
-                                        .frame(width: 8, height: 8)
-                                    Text(health.status.capitalized)
-                                }
+                                StatusDot(status: health.status)
                             }
                             if let version = health.version {
                                 LabeledContent("Version", value: version)
                             }
-                            if let uptime = health.uptime {
-                                LabeledContent("Uptime", value: uptime)
-                            }
                         }
 
-                        if let db = health.database {
-                            Section("Database") {
-                                LabeledContent("Status") {
-                                    HStack(spacing: 6) {
-                                        Circle()
-                                            .fill(db.status == "ok" || db.status == "healthy" ? .green : .red)
-                                            .frame(width: 8, height: 8)
-                                        Text(db.status.capitalized)
+                        if let checks = health.checks, !checks.isEmpty {
+                            Section("Services") {
+                                ForEach(checks.sorted(by: { $0.key < $1.key }), id: \.key) { name, check in
+                                    LabeledContent(name.capitalized) {
+                                        StatusDot(status: check.status)
                                     }
-                                }
-                                if let msg = db.message {
-                                    LabeledContent("Info", value: msg)
-                                }
-                            }
-                        }
-
-                        if let stor = health.storage {
-                            Section("Storage Service") {
-                                LabeledContent("Status") {
-                                    HStack(spacing: 6) {
-                                        Circle()
-                                            .fill(stor.status == "ok" || stor.status == "healthy" ? .green : .red)
-                                            .frame(width: 8, height: 8)
-                                        Text(stor.status.capitalized)
-                                    }
-                                }
-                                if let msg = stor.message {
-                                    LabeledContent("Info", value: msg)
                                 }
                             }
                         }
                     }
 
-                    if let storage = storage {
-                        Section("Disk Usage") {
-                            LabeledContent("Total", value: formatBytes(storage.totalBytes))
-                            LabeledContent("Used", value: formatBytes(storage.usedBytes))
-                            LabeledContent("Available", value: formatBytes(storage.availableBytes))
-                            if storage.totalBytes > 0 {
-                                let pct = Double(storage.usedBytes) / Double(storage.totalBytes)
-                                ProgressView(value: pct) {
-                                    Text("\(Int(pct * 100))% used")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                    if !alerts.isEmpty {
+                        Section("Alerts") {
+                            ForEach(alerts) { alert in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(alert.serviceName.capitalized)
+                                            .font(.body.weight(.medium))
+                                        Spacer()
+                                        StatusDot(status: alert.currentStatus)
+                                    }
+                                    if alert.consecutiveFailures > 0 {
+                                        Text("\(alert.consecutiveFailures) consecutive failures")
+                                            .font(.caption)
+                                            .foregroundStyle(.red)
+                                    }
                                 }
-                                .tint(pct > 0.9 ? .red : pct > 0.7 ? .orange : .green)
+                            }
+                        }
+                    }
+
+                    if !healthLog.isEmpty {
+                        Section("Recent Health Checks") {
+                            ForEach(healthLog.prefix(20)) { entry in
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack {
+                                        Text(entry.serviceName.capitalized)
+                                            .font(.body.weight(.medium))
+                                        Spacer()
+                                        StatusDot(status: entry.status)
+                                    }
+                                    HStack(spacing: 12) {
+                                        Text("\(entry.responseTimeMs)ms")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                        if let msg = entry.message {
+                                            Text(msg)
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                                .lineLimit(1)
+                                        }
+                                        Spacer()
+                                        Text(formatDate(entry.checkedAt))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
                             }
                         }
                     }
@@ -99,31 +103,65 @@ struct MonitoringView: View {
         var gotData = false
 
         do {
-            health = try await apiClient.request("/api/v1/system/health")
+            health = try await apiClient.request("/health")
             gotData = true
-        } catch {
-            // health endpoint may not exist
-        }
+        } catch {}
 
         do {
-            storage = try await apiClient.request("/api/v1/system/storage")
+            alerts = try await apiClient.request("/api/v1/admin/monitoring/alerts")
             gotData = true
-        } catch {
-            // storage endpoint may not exist
-        }
+        } catch {}
 
-        if !gotData && health == nil {
-            errorMessage = "Could not load system status. This feature may not be available on your server."
+        do {
+            healthLog = try await apiClient.request("/api/v1/admin/monitoring/health-log?limit=20")
+            gotData = true
+        } catch {}
+
+        if !gotData {
+            errorMessage = "Could not load monitoring data."
         } else {
             errorMessage = nil
         }
-
         isLoading = false
     }
 
-    private func formatBytes(_ bytes: Int64) -> String {
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .file
-        return formatter.string(fromByteCount: bytes)
+    private func formatDate(_ isoString: String) -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = isoFormatter.date(from: isoString) {
+            let relative = RelativeDateTimeFormatter()
+            relative.unitsStyle = .abbreviated
+            return relative.localizedString(for: date, relativeTo: Date())
+        }
+        isoFormatter.formatOptions = [.withInternetDateTime]
+        if let date = isoFormatter.date(from: isoString) {
+            let relative = RelativeDateTimeFormatter()
+            relative.unitsStyle = .abbreviated
+            return relative.localizedString(for: date, relativeTo: Date())
+        }
+        return isoString
+    }
+}
+
+struct StatusDot: View {
+    let status: String
+
+    var color: Color {
+        switch status {
+        case "healthy", "ok": return .green
+        case "degraded", "warning": return .orange
+        case "unhealthy", "critical": return .red
+        default: return .secondary
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Circle()
+                .fill(color)
+                .frame(width: 8, height: 8)
+            Text(status.capitalized)
+                .font(.caption)
+        }
     }
 }

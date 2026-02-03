@@ -3,6 +3,7 @@ import SwiftUI
 struct WelcomeView: View {
     var onComplete: () -> Void
 
+    @EnvironmentObject var serverManager: ServerManager
     @AppStorage(APIClient.serverURLKey) private var savedServerURL: String = ""
     @State private var serverURL: String = ""
     @State private var isConnecting = false
@@ -160,6 +161,9 @@ struct WelcomeView: View {
                 try await apiClient.testConnection(to: cleaned)
                 await apiClient.updateBaseURL(cleaned)
                 await MainActor.run {
+                    let host = URL(string: cleaned)?.host ?? "Server"
+                    let name = (host == "localhost" || host == "127.0.0.1") ? "Local" : host
+                    serverManager.addServer(name: name, url: cleaned)
                     savedServerURL = cleaned
                     onComplete()
                 }
