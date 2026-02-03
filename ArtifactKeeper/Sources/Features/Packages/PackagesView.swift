@@ -35,7 +35,9 @@ struct PackagesView: View {
                     }
                 } else {
                     List(filteredPackages) { pkg in
-                        NavigationLink(value: pkg.id) {
+                        NavigationLink {
+                            PackageDetailView(package: pkg)
+                        } label: {
                             PackageListItem(package: pkg)
                         }
                     }
@@ -50,11 +52,8 @@ struct PackagesView: View {
             .task {
                 await loadPackages()
             }
-            .navigationDestination(for: String.self) { packageId in
-                if let pkg = packages.first(where: { $0.id == packageId }) {
-                    PackageDetailView(package: pkg)
-                }
-            }
+
+
         }
     }
 

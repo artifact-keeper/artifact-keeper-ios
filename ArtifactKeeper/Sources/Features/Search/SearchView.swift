@@ -24,7 +24,11 @@ struct SearchView: View {
                     ContentUnavailableView.search(text: searchText)
                 } else {
                     List(results) { pkg in
-                        SearchResultRow(package: pkg)
+                        NavigationLink {
+                            PackageDetailView(package: pkg)
+                        } label: {
+                            SearchResultRow(package: pkg)
+                        }
                     }
                     .listStyle(.plain)
                 }
