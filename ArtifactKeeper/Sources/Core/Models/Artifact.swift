@@ -1,6 +1,6 @@
 import Foundation
 
-struct Artifact: Codable, Identifiable, Sendable {
+struct Artifact: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let repositoryId: String
     let name: String

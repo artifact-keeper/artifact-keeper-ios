@@ -54,7 +54,7 @@ struct ScanListResponse: Codable, Sendable {
     let total: Int
 }
 
-struct RepoSecurityScore: Codable, Identifiable, Sendable {
+struct RepoSecurityScore: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let repositoryId: String
     let grade: String

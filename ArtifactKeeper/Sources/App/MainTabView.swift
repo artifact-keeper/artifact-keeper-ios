@@ -25,14 +25,21 @@ struct MainTabView: View {
                     Label("Builds", systemImage: "hammer")
                 }
 
-            SecurityView()
-                .tabItem {
-                    Label("Security", systemImage: "shield.checkered")
-                }
+            if authManager.isAuthenticated {
+                SecurityView()
+                    .tabItem {
+                        Label("Security", systemImage: "shield.checkered")
+                    }
+            }
 
             SearchView()
                 .tabItem {
                     Label("Search", systemImage: "magnifyingglass")
+                }
+
+            SettingsView()
+                .tabItem {
+                    Label("Settings", systemImage: "gear")
                 }
         }
     }
