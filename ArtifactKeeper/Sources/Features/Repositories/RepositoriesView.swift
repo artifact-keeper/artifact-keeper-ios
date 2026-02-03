@@ -101,6 +101,7 @@ struct RepositoryDetailView: View {
     @State private var repo: Repository?
     @State private var artifacts: [Artifact] = []
     @State private var isLoading = true
+    @State private var errorMessage: String?
     @State private var selectedArtifact: Artifact?
 
     private let apiClient = APIClient.shared
@@ -114,7 +115,13 @@ struct RepositoryDetailView: View {
     var body: some View {
         Group {
             if isLoading {
-                ProgressView()
+                ProgressView("Loading...")
+            } else if let error = errorMessage, repo == nil {
+                ContentUnavailableView(
+                    "Failed to Load",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text(error)
+                )
             } else if let repo = repo {
                 List {
                     Section("Details") {
@@ -166,16 +173,21 @@ struct RepositoryDetailView: View {
 
     private func loadData() async {
         isLoading = artifacts.isEmpty && repo == nil
-        do {
-            async let repoResult: Repository = apiClient.request("/api/v1/repositories/\(repoKey)")
-            async let artifactResult: ArtifactListResponse = apiClient.request("/api/v1/repositories/\(repoKey)/artifacts?per_page=100")
 
-            let (r, a) = try await (repoResult, artifactResult)
+        do {
+            let r: Repository = try await apiClient.request("/api/v1/repositories/\(repoKey)")
             repo = r
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        do {
+            let a: ArtifactListResponse = try await apiClient.request("/api/v1/repositories/\(repoKey)/artifacts?per_page=100")
             artifacts = a.items
         } catch {
-            // handle error
+            // Artifacts may fail separately — that's OK
         }
+
         isLoading = false
     }
 

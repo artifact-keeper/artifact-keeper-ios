@@ -2,7 +2,7 @@ import Foundation
 
 struct Artifact: Codable, Identifiable, Hashable, Sendable {
     let id: String
-    let repositoryId: String
+    let repositoryKey: String
     let name: String
     let path: String
     let version: String?
@@ -11,10 +11,10 @@ struct Artifact: Codable, Identifiable, Hashable, Sendable {
     let downloadCount: Int
     let checksumSha256: String
     let createdAt: String
-    
+
     enum CodingKeys: String, CodingKey {
         case id, name, path, version
-        case repositoryId = "repository_id"
+        case repositoryKey = "repository_key"
         case contentType = "content_type"
         case sizeBytes = "size_bytes"
         case downloadCount = "download_count"
