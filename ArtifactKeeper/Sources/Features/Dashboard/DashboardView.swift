@@ -69,6 +69,7 @@ struct DashboardView: View {
                 }
             }
             .navigationTitle("Dashboard")
+            .accountToolbar()
             .refreshable {
                 await loadData()
             }

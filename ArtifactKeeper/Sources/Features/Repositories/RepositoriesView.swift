@@ -35,6 +35,7 @@ struct RepositoriesView: View {
                 }
             }
             .navigationTitle("Repositories")
+            .accountToolbar()
             .searchable(text: $searchText, prompt: "Search repositories")
             .refreshable {
                 await loadRepos()

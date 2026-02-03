@@ -31,6 +31,7 @@ struct SecurityView: View {
                 }
             }
             .navigationTitle("Security")
+            .accountToolbar()
             .refreshable {
                 await loadData()
             }

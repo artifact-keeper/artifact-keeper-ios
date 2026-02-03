@@ -53,6 +53,7 @@ struct BuildsView: View {
                 }
             }
             .navigationTitle("Builds")
+            .accountToolbar()
             .searchable(text: $searchText, prompt: "Search builds")
             .toolbar {
                 ToolbarItem(placement: .automatic) {

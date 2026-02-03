@@ -34,6 +34,7 @@ struct SearchView: View {
                 }
             }
             .navigationTitle("Search")
+            .accountToolbar()
             .searchable(text: $searchText, prompt: "Search packages...")
             .onChange(of: searchText) { _, newValue in
                 // Cancel any pending search

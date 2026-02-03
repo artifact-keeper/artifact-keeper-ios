@@ -45,6 +45,7 @@ struct PackagesView: View {
                 }
             }
             .navigationTitle("Packages")
+            .accountToolbar()
             .searchable(text: $searchText, prompt: "Search packages")
             .refreshable {
                 await loadPackages()
