@@ -9,16 +9,16 @@ struct Repository: Codable, Identifiable, Sendable {
     let isPublic: Bool
     let description: String?
     let storageUsedBytes: Int64
-    let artifactCount: Int
+    let quotaBytes: Int64?
     let createdAt: String
     let updatedAt: String
-    
+
     enum CodingKeys: String, CodingKey {
         case id, key, name, format, description
         case repoType = "repo_type"
         case isPublic = "is_public"
         case storageUsedBytes = "storage_used_bytes"
-        case artifactCount = "artifact_count"
+        case quotaBytes = "quota_bytes"
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }

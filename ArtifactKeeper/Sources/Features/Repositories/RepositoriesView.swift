@@ -63,6 +63,12 @@ struct RepositoriesView: View {
 struct RepoListItem: View {
     let repo: Repository
 
+    private func formatBytes(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: bytes)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
@@ -80,8 +86,8 @@ struct RepoListItem: View {
             }
 
             HStack(spacing: 12) {
-                Label("\(repo.artifactCount) artifacts", systemImage: "doc")
                 Label(repo.repoType, systemImage: repo.repoType == "local" ? "internaldrive" : "globe")
+                Label(formatBytes(repo.storageUsedBytes), systemImage: "externaldrive")
             }
             .font(.caption)
             .foregroundStyle(.secondary)

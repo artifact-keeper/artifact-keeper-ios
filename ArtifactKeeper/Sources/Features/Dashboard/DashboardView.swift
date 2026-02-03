@@ -81,18 +81,22 @@ struct DashboardView: View {
     private func loadData() async {
         isLoading = repos.isEmpty
         errorMessage = nil
-        
+
         do {
-            async let repoResponse: RepositoryListResponse = apiClient.request("/api/v1/repositories?per_page=100")
-            async let scoresResponse: [RepoSecurityScore] = apiClient.request("/api/v1/security/scores")
-            
-            let (repoResult, scoresResult) = try await (repoResponse, scoresResponse)
+            let repoResult: RepositoryListResponse = try await apiClient.request("/api/v1/repositories?per_page=100")
             repos = repoResult.items
-            scores = scoresResult
         } catch {
             errorMessage = error.localizedDescription
         }
-        
+
+        // Security scores require auth — load separately and ignore failures
+        do {
+            let scoresResult: [RepoSecurityScore] = try await apiClient.request("/api/v1/security/scores")
+            scores = scoresResult
+        } catch {
+            scores = []
+        }
+
         isLoading = false
     }
 }
@@ -162,11 +166,7 @@ struct RepoRow: View {
             }
             
             Spacer()
-            
-            Text("\(repo.artifactCount)")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-            
+
             Image(systemName: "chevron.right")
                 .font(.caption)
                 .foregroundStyle(.tertiary)
