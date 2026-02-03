@@ -8,12 +8,14 @@ struct LoginRequest: Codable, Sendable {
 struct LoginResponse: Codable, Sendable {
     let accessToken: String
     let refreshToken: String
-    let user: UserInfo
-    
+    let expiresIn: Int
+    let tokenType: String
+
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
-        case user
+        case expiresIn = "expires_in"
+        case tokenType = "token_type"
     }
 }
 
@@ -22,9 +24,11 @@ struct UserInfo: Codable, Sendable, Identifiable {
     let username: String
     let email: String?
     let isAdmin: Bool
-    
+
     enum CodingKeys: String, CodingKey {
-        case id, username, email
+        case id = "sub"
+        case username
+        case email
         case isAdmin = "is_admin"
     }
 }
