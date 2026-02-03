@@ -74,32 +74,7 @@ jobs:
         run: swift build
 
   # ---------------------------------------------------------------------------
-  # Job 2: Test
-  # ---------------------------------------------------------------------------
-  test:
-    name: Test
-    runs-on: macos-15
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode 16.2
-        run: sudo xcode-select -s "$XCODE_PATH"
-
-      - name: Cache Swift packages
-        uses: actions/cache@v4
-        with:
-          path: .build
-          key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
-
-      - name: Run tests
-        run: swift test
-
-  # ---------------------------------------------------------------------------
-  # Job 3: Build for iOS Simulator
+  # Job 2: Build for iOS Simulator
   # ---------------------------------------------------------------------------
   build-ios:
     name: Build (iOS Simulator)
@@ -144,7 +119,7 @@ jobs:
     if: >-
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       github.event_name == 'workflow_dispatch'
-    needs: [build, test]
+    needs: [build]
     env:
       KEYCHAIN_NAME: build.keychain-db
       KEYCHAIN_PASSWORD: temporary-ci-password

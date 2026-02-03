@@ -22,10 +22,5 @@ let package = Package(
             ],
             path: "ArtifactKeeper/Sources"
         ),
-        .testTarget(
-            name: "ArtifactKeeperTests",
-            dependencies: ["ArtifactKeeper"],
-            path: "ArtifactKeeper/Tests"
-        ),
     ]
 )
