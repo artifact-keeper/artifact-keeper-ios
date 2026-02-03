@@ -2,82 +2,81 @@ import SwiftUI
 
 struct SettingsContentView: View {
     @EnvironmentObject var authManager: AuthManager
-    @AppStorage(APIClient.serverURLKey) private var serverURL: String = ""
-    @State private var editingURL: String = ""
-    @State private var urlValidationError: String?
-    @State private var showingSaveConfirmation = false
+    @EnvironmentObject var serverManager: ServerManager
+    @State private var showingAddServer = false
+    @State private var serverToDelete: SavedServer?
     @State private var showingLoginSheet = false
-    @State private var showingDisconnectConfirmation = false
-
-    private let apiClient = APIClient.shared
 
     var body: some View {
         List {
-            // Server Section
+            // Servers Section
             Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Server URL")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    TextField("https://artifacts.example.com", text: $editingURL)
-                        .textFieldStyle(.roundedBorder)
-                        .autocorrectionDisabled()
-                        #if os(iOS)
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
-                        #endif
-                        .onChange(of: editingURL) { _, newValue in
-                            validateURL(newValue)
+                ForEach(serverManager.servers) { server in
+                    HStack(spacing: 12) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 6) {
+                                Text(server.name)
+                                    .font(.body.weight(.medium))
+                                if server.id == serverManager.activeServerId {
+                                    Text("Active")
+                                        .font(.caption2.weight(.bold))
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(.green.opacity(0.15), in: Capsule())
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                            Text(server.url)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
                         }
 
-                    if let error = urlValidationError {
-                        Text(error)
-                            .font(.caption)
-                            .foregroundStyle(.red)
+                        Spacer()
+
+                        if server.id != serverManager.activeServerId {
+                            Button("Connect") {
+                                serverManager.switchTo(server)
+                                authManager.logout()
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                    .padding(.vertical, 2)
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            serverToDelete = server
+                        } label: {
+                            Label("Remove", systemImage: "trash")
+                        }
+                    }
+                    .contextMenu {
+                        if server.id != serverManager.activeServerId {
+                            Button {
+                                serverManager.switchTo(server)
+                                authManager.logout()
+                            } label: {
+                                Label("Connect", systemImage: "arrow.right.circle")
+                            }
+                        }
+                        Button(role: .destructive) {
+                            serverToDelete = server
+                        } label: {
+                            Label("Remove", systemImage: "trash")
+                        }
                     }
                 }
-                .padding(.vertical, 4)
 
                 Button {
-                    saveServerURL()
+                    showingAddServer = true
                 } label: {
-                    HStack {
-                        Image(systemName: "checkmark.circle")
-                        Text("Save Server URL")
-                    }
-                }
-                .disabled(urlValidationError != nil || editingURL == serverURL)
-
-                if showingSaveConfirmation {
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                        Text("Server URL updated")
-                            .font(.caption)
-                            .foregroundStyle(.green)
-                    }
-                }
-
-                Button(role: .destructive) {
-                    showingDisconnectConfirmation = true
-                } label: {
-                    HStack {
-                        Image(systemName: "xmark.circle")
-                        Text("Disconnect Server")
-                    }
-                }
-                .alert("Disconnect Server", isPresented: $showingDisconnectConfirmation) {
-                    Button("Cancel", role: .cancel) {}
-                    Button("Disconnect", role: .destructive) {
-                        disconnectServer()
-                    }
-                } message: {
-                    Text("This will clear the server URL and return you to the setup screen. You can reconnect at any time.")
+                    Label("Add Server", systemImage: "plus.circle")
                 }
             } header: {
-                Text("Server")
+                Text("Servers")
             } footer: {
-                Text("The base URL of your Artifact Keeper server. Changes require restarting data loads.")
+                Text("Manage your Artifact Keeper server connections. Swipe to remove.")
             }
 
             // Account Section
@@ -126,8 +125,37 @@ struct SettingsContentView: View {
                 LabeledContent("Platform", value: platformName)
             }
         }
-        .task {
-            editingURL = serverURL
+        .alert("Remove Server", isPresented: Binding(
+            get: { serverToDelete != nil },
+            set: { if !$0 { serverToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) { serverToDelete = nil }
+            Button("Remove", role: .destructive) {
+                if let server = serverToDelete {
+                    serverManager.removeServer(server)
+                    serverToDelete = nil
+                }
+            }
+        } message: {
+            if let server = serverToDelete {
+                Text("Remove \"\(server.name)\" (\(server.url))? You can add it back later.")
+            }
+        }
+        .sheet(isPresented: $showingAddServer) {
+            NavigationStack {
+                AddServerView()
+                    .navigationTitle("Add Server")
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") {
+                                showingAddServer = false
+                            }
+                        }
+                    }
+            }
         }
         .sheet(isPresented: $showingLoginSheet) {
             NavigationStack {
@@ -168,47 +196,6 @@ struct SettingsContentView: View {
         #else
         return "Unknown"
         #endif
-    }
-
-    private func validateURL(_ urlString: String) {
-        if urlString.isEmpty {
-            urlValidationError = "URL cannot be empty"
-            return
-        }
-
-        guard let url = URL(string: urlString),
-              let scheme = url.scheme,
-              (scheme == "http" || scheme == "https"),
-              url.host != nil else {
-            urlValidationError = "Enter a valid URL (http:// or https://)"
-            return
-        }
-
-        urlValidationError = nil
-    }
-
-    private func disconnectServer() {
-        serverURL = ""
-        editingURL = ""
-        Task {
-            await apiClient.updateBaseURL("")
-        }
-        authManager.logout()
-    }
-
-    private func saveServerURL() {
-        let trimmed = editingURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleaned = trimmed.hasSuffix("/") ? String(trimmed.dropLast()) : trimmed
-        editingURL = cleaned
-        serverURL = cleaned
-        Task {
-            await apiClient.updateBaseURL(cleaned)
-        }
-        showingSaveConfirmation = true
-        Task { @MainActor in
-            try? await Task.sleep(for: .seconds(3))
-            showingSaveConfirmation = false
-        }
     }
 }
 
