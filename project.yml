@@ -1,0 +1,49 @@
+name: ArtifactKeeper
+options:
+  bundleIdPrefix: com.artifactkeeper
+  deploymentTarget:
+    iOS: "17.0"
+    macOS: "14.0"
+  xcodeVersion: "16.2"
+  generateEmptyDirectories: true
+
+packages:
+  Alamofire:
+    url: https://github.com/Alamofire/Alamofire.git
+    from: "5.9.0"
+  Kingfisher:
+    url: https://github.com/onevcat/Kingfisher.git
+    from: "7.0.0"
+  swift-dependencies:
+    url: https://github.com/pointfreeco/swift-dependencies.git
+    from: "1.0.0"
+
+targets:
+  ArtifactKeeper:
+    type: application
+    platform: [iOS, macOS]
+    sources:
+      - ArtifactKeeper/Sources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.artifactkeeper.ios
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "6.0"
+        INFOPLIST_KEY_CFBundleDisplayName: "Artifact Keeper"
+        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.developer-tools"
+        GENERATE_INFOPLIST_FILE: YES
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+      configs:
+        debug:
+          CODE_SIGN_IDENTITY: "-"
+          CODE_SIGNING_REQUIRED: NO
+        release:
+          CODE_SIGN_STYLE: Manual
+    dependencies:
+      - package: Alamofire
+      - package: Kingfisher
+      - package: swift-dependencies
+        product: Dependencies
+    entitlements:
+      path: ArtifactKeeper.entitlements

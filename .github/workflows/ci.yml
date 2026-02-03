@@ -43,7 +43,6 @@ concurrency:
 
 env:
   XCODE_PATH: /Applications/Xcode_16.2.app
-  SCHEME: ArtifactKeeper
 
 jobs:
   build:
@@ -81,6 +80,12 @@ jobs:
 
       - name: Select Xcode
         run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
 
       - name: Cache Swift packages
         uses: actions/cache@v4
@@ -126,7 +131,8 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
-            -scheme "$SCHEME" \
+            -project ArtifactKeeper.xcodeproj \
+            -scheme ArtifactKeeper_iOS \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/ArtifactKeeper-iOS.xcarchive" \
             -skipPackagePluginValidation \
@@ -166,7 +172,8 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild archive \
-            -scheme "$SCHEME" \
+            -project ArtifactKeeper.xcodeproj \
+            -scheme ArtifactKeeper_macOS \
             -destination 'generic/platform=macOS' \
             -archivePath "$RUNNER_TEMP/ArtifactKeeper-macOS.xcarchive" \
             -skipPackagePluginValidation \
