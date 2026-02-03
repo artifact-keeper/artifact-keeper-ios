@@ -1,5 +1,62 @@
 import SwiftUI
 
+struct RepositoriesContentView: View {
+    @State private var repos: [Repository] = []
+    @State private var isLoading = true
+    @State private var searchText = ""
+
+    private let apiClient = APIClient.shared
+
+    var filteredRepos: [Repository] {
+        if searchText.isEmpty {
+            return repos
+        }
+        return repos.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.key.localizedCaseInsensitiveContains(searchText) ||
+            $0.format.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading repositories...")
+            } else if filteredRepos.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            } else {
+                List(filteredRepos) { repo in
+                    NavigationLink(value: repo.key) {
+                        RepoListItem(repo: repo)
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search repositories")
+        .refreshable {
+            await loadRepos()
+        }
+        .task {
+            await loadRepos()
+        }
+        .navigationDestination(for: String.self) { key in
+            RepositoryDetailView(repoKey: key)
+        }
+    }
+
+    private func loadRepos() async {
+        isLoading = repos.isEmpty
+        do {
+            let response: RepositoryListResponse = try await apiClient.request("/api/v1/repositories?per_page=100")
+            repos = response.items
+        } catch {
+            // silent for now
+        }
+        isLoading = false
+    }
+}
+
 struct RepositoriesView: View {
     @State private var repos: [Repository] = []
     @State private var isLoading = true

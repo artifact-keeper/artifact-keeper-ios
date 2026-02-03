@@ -1,5 +1,71 @@
 import SwiftUI
 
+struct PackagesContentView: View {
+    @State private var packages: [PackageItem] = []
+    @State private var isLoading = true
+    @State private var searchText = ""
+
+    private let apiClient = APIClient.shared
+
+    var filteredPackages: [PackageItem] {
+        if searchText.isEmpty {
+            return packages
+        }
+        return packages.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.format.localizedCaseInsensitiveContains(searchText) ||
+            $0.repositoryKey.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading packages...")
+            } else if filteredPackages.isEmpty {
+                if searchText.isEmpty {
+                    ContentUnavailableView(
+                        "No Packages",
+                        systemImage: "shippingbox",
+                        description: Text("No packages have been published yet.")
+                    )
+                } else {
+                    ContentUnavailableView.search(text: searchText)
+                }
+            } else {
+                List(filteredPackages) { pkg in
+                    NavigationLink {
+                        PackageDetailView(package: pkg)
+                    } label: {
+                        PackageListItem(package: pkg)
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search packages")
+        .refreshable {
+            await loadPackages()
+        }
+        .task {
+            await loadPackages()
+        }
+    }
+
+    private func loadPackages() async {
+        isLoading = packages.isEmpty
+        do {
+            let response: PackageListResponse = try await apiClient.request(
+                "/api/v1/packages?per_page=100"
+            )
+            packages = response.items
+        } catch {
+            // silent for now
+        }
+        isLoading = false
+    }
+}
+
 struct PackagesView: View {
     @State private var packages: [PackageItem] = []
     @State private var isLoading = true

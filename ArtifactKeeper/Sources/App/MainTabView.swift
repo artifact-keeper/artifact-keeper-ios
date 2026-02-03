@@ -5,41 +5,29 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            DashboardView()
+            ArtifactsSectionView()
                 .tabItem {
-                    Label("Dashboard", systemImage: "chart.bar")
+                    Label("Artifacts", systemImage: "shippingbox")
                 }
 
-            RepositoriesView()
+            IntegrationSectionView()
                 .tabItem {
-                    Label("Repos", systemImage: "folder")
+                    Label("Integration", systemImage: "link")
                 }
 
-            PackagesView()
+            SecuritySectionView()
                 .tabItem {
-                    Label("Packages", systemImage: "shippingbox")
+                    Label("Security", systemImage: "shield.checkered")
                 }
 
-            BuildsView()
+            OperationsSectionView()
                 .tabItem {
-                    Label("Builds", systemImage: "hammer")
+                    Label("Operations", systemImage: "chart.bar")
                 }
 
-            if authManager.isAuthenticated {
-                SecurityView()
-                    .tabItem {
-                        Label("Security", systemImage: "shield.checkered")
-                    }
-            }
-
-            SearchView()
+            AdminSectionView()
                 .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
-                }
-
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
+                    Label("Admin", systemImage: "gearshape.2")
                 }
         }
     }

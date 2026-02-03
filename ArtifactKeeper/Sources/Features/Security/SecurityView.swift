@@ -1,5 +1,113 @@
 import SwiftUI
 
+struct SecurityDashboardContentView: View {
+    @State private var scores: [RepoSecurityScore] = []
+    @State private var repoNames: [String: String] = [:]
+    @State private var isLoading = true
+
+    private let apiClient = APIClient.shared
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading security data...")
+            } else if scores.isEmpty {
+                ContentUnavailableView(
+                    "No Security Data",
+                    systemImage: "shield.slash",
+                    description: Text("Enable scanning on repositories to see security scores")
+                )
+            } else {
+                List(scores) { score in
+                    NavigationLink(value: score) {
+                        SecurityScoreRow(
+                            score: score,
+                            repoName: repoNames[score.repositoryId]
+                        )
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .refreshable {
+            await loadData()
+        }
+        .task {
+            await loadData()
+        }
+        .navigationDestination(for: RepoSecurityScore.self) { score in
+            ScanResultsView(
+                repositoryId: score.repositoryId,
+                repositoryName: repoNames[score.repositoryId] ?? score.repositoryId
+            )
+        }
+    }
+
+    private func loadData() async {
+        isLoading = scores.isEmpty
+        do {
+            async let scoresResult: [RepoSecurityScore] = apiClient.request("/api/v1/security/scores")
+            async let reposResult: RepositoryListResponse = apiClient.request("/api/v1/repositories?per_page=200")
+
+            let (s, r) = try await (scoresResult, reposResult)
+            scores = s
+            repoNames = Dictionary(uniqueKeysWithValues: r.items.map { ($0.id, $0.name) })
+        } catch {
+            // silent
+        }
+        isLoading = false
+    }
+}
+
+struct SecurityScansContentView: View {
+    @State private var scans: [ScanResult] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String?
+
+    private let apiClient = APIClient.shared
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading scans...")
+            } else if let error = errorMessage {
+                ContentUnavailableView(
+                    "Scans Unavailable",
+                    systemImage: "doc.text.magnifyingglass",
+                    description: Text(error)
+                )
+            } else if scans.isEmpty {
+                ContentUnavailableView(
+                    "No Scans",
+                    systemImage: "doc.text.magnifyingglass",
+                    description: Text("No scans have been run yet.")
+                )
+            } else {
+                List(scans) { scan in
+                    ScanResultRow(scan: scan)
+                }
+                .listStyle(.plain)
+            }
+        }
+        .refreshable { await loadScans() }
+        .task { await loadScans() }
+    }
+
+    private func loadScans() async {
+        isLoading = scans.isEmpty
+        do {
+            let response: ScanListResponse = try await apiClient.request("/api/v1/security/scans?per_page=100")
+            scans = response.items
+            errorMessage = nil
+        } catch {
+            if scans.isEmpty {
+                errorMessage = "Could not load scans. You may need to be authenticated."
+            }
+        }
+        isLoading = false
+    }
+}
+
 struct SecurityView: View {
     @State private var scores: [RepoSecurityScore] = []
     @State private var repoNames: [String: String] = [:]

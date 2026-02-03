@@ -1,5 +1,104 @@
 import SwiftUI
 
+struct BuildsContentView: View {
+    @State private var builds: [BuildItem] = []
+    @State private var isLoading = true
+    @State private var searchText = ""
+    @State private var statusFilter = "all"
+
+    private let apiClient = APIClient.shared
+
+    private let statusOptions = ["all", "success", "failed", "running", "pending"]
+
+    var filteredBuilds: [BuildItem] {
+        var result = builds
+
+        if statusFilter != "all" {
+            result = result.filter { $0.status == statusFilter }
+        }
+
+        if !searchText.isEmpty {
+            result = result.filter {
+                $0.name.localizedCaseInsensitiveContains(searchText) ||
+                ($0.vcsBranch?.localizedCaseInsensitiveContains(searchText) ?? false) ||
+                ($0.vcsMessage?.localizedCaseInsensitiveContains(searchText) ?? false)
+            }
+        }
+
+        return result
+    }
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading builds...")
+            } else if filteredBuilds.isEmpty {
+                if searchText.isEmpty && statusFilter == "all" {
+                    ContentUnavailableView(
+                        "No Builds",
+                        systemImage: "hammer",
+                        description: Text("No builds have been recorded yet.")
+                    )
+                } else {
+                    ContentUnavailableView.search(text: searchText)
+                }
+            } else {
+                List(filteredBuilds) { build in
+                    NavigationLink(value: build.id) {
+                        BuildListItem(build: build)
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .searchable(text: $searchText, prompt: "Search builds")
+        .toolbar {
+            ToolbarItem(placement: .automatic) {
+                Menu {
+                    ForEach(statusOptions, id: \.self) { option in
+                        Button {
+                            statusFilter = option
+                        } label: {
+                            HStack {
+                                Text(option.capitalized)
+                                if statusFilter == option {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                }
+            }
+        }
+        .refreshable {
+            await loadBuilds()
+        }
+        .task {
+            await loadBuilds()
+        }
+        .navigationDestination(for: String.self) { buildId in
+            if let build = builds.first(where: { $0.id == buildId }) {
+                BuildDetailView(build: build)
+            }
+        }
+    }
+
+    private func loadBuilds() async {
+        isLoading = builds.isEmpty
+        do {
+            let response: BuildListResponse = try await apiClient.request(
+                "/api/v1/builds?per_page=100&sort_by=created_at&sort_order=desc"
+            )
+            builds = response.items
+        } catch {
+            // silent for now
+        }
+        isLoading = false
+    }
+}
+
 struct BuildsView: View {
     @State private var builds: [BuildItem] = []
     @State private var isLoading = true
