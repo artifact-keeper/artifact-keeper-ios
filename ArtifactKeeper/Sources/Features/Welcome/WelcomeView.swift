@@ -65,22 +65,12 @@ struct WelcomeView: View {
 
     @ViewBuilder
     private var logoSection: some View {
-        ZStack {
-            Circle()
-                .fill(
-                    LinearGradient(
-                        colors: [AppTheme.primary, AppTheme.secondary],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 100, height: 100)
-                .shadow(color: AppTheme.primary.opacity(0.3), radius: 16, y: 8)
-
-            Image(systemName: "shippingbox.fill")
-                .font(.system(size: 44))
-                .foregroundStyle(.white)
-        }
+        Image("Logo")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 120, height: 120)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.2), radius: 16, y: 8)
     }
 
     // MARK: - Connection Form

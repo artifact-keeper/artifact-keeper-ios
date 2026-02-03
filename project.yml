@@ -30,9 +30,6 @@ targets:
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "6.0"
-        INFOPLIST_KEY_CFBundleDisplayName: "Artifact Keeper"
-        INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.developer-tools"
-        GENERATE_INFOPLIST_FILE: YES
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
       configs:
         debug:
@@ -40,6 +37,11 @@ targets:
           CODE_SIGNING_REQUIRED: NO
         release:
           CODE_SIGN_STYLE: Manual
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: "Artifact Keeper"
+        LSApplicationCategoryType: "public.app-category.developer-tools"
     dependencies:
       - package: Alamofire
       - package: Kingfisher
