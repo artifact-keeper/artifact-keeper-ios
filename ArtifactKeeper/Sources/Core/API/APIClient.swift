@@ -4,7 +4,7 @@ actor APIClient {
     static let shared = APIClient()
 
     static let serverURLKey = "serverURL"
-    static let defaultServerURL = "http://localhost:30080"
+    static let defaultServerURL = ""
 
     private var baseURL: String
     private let session: URLSession
@@ -32,12 +32,37 @@ actor APIClient {
         return baseURL
     }
 
+    var isConfigured: Bool {
+        let url = UserDefaults.standard.string(forKey: Self.serverURLKey) ?? ""
+        return !url.isEmpty
+    }
+
+    func testConnection(to urlString: String) async throws {
+        guard let url = URL(string: "\(urlString)/api/v1/repositories?per_page=1") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.timeoutInterval = 10
+
+        let (_, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(statusCode: httpResponse.statusCode, data: Data())
+        }
+    }
+
     func request<T: Decodable & Sendable>(
         _ endpoint: String,
         method: String = "GET",
         body: (any Encodable)? = nil
     ) async throws -> T {
-        guard let url = URL(string: "\(baseURL)\(endpoint)") else {
+        guard !baseURL.isEmpty, let url = URL(string: "\(baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
 

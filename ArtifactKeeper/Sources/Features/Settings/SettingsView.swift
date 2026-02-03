@@ -2,11 +2,12 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject var authManager: AuthManager
-    @AppStorage(APIClient.serverURLKey) private var serverURL: String = APIClient.defaultServerURL
+    @AppStorage(APIClient.serverURLKey) private var serverURL: String = ""
     @State private var editingURL: String = ""
     @State private var urlValidationError: String?
     @State private var showingSaveConfirmation = false
     @State private var showingLoginSheet = false
+    @State private var showingDisconnectConfirmation = false
 
     private let apiClient = APIClient.shared
 
@@ -49,7 +50,7 @@ struct SettingsView: View {
                 Text("Server URL")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                TextField("https://example.com", text: $editingURL)
+                TextField("https://artifacts.example.com", text: $editingURL)
                     .textFieldStyle(.roundedBorder)
                     .autocorrectionDisabled()
                     #if os(iOS)
@@ -86,6 +87,23 @@ struct SettingsView: View {
                         .font(.caption)
                         .foregroundStyle(.green)
                 }
+            }
+
+            Button(role: .destructive) {
+                showingDisconnectConfirmation = true
+            } label: {
+                HStack {
+                    Image(systemName: "xmark.circle")
+                    Text("Disconnect Server")
+                }
+            }
+            .alert("Disconnect Server", isPresented: $showingDisconnectConfirmation) {
+                Button("Cancel", role: .cancel) {}
+                Button("Disconnect", role: .destructive) {
+                    disconnectServer()
+                }
+            } message: {
+                Text("This will clear the server URL and return you to the setup screen. You can reconnect at any time.")
             }
         } header: {
             Text("Server")
@@ -183,6 +201,15 @@ struct SettingsView: View {
         }
 
         urlValidationError = nil
+    }
+
+    private func disconnectServer() {
+        serverURL = ""
+        editingURL = ""
+        Task {
+            await apiClient.updateBaseURL("")
+        }
+        authManager.logout()
     }
 
     private func saveServerURL() {
