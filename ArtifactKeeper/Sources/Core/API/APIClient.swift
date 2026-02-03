@@ -91,6 +91,39 @@ actor APIClient {
         return try decoder.decode(T.self, from: data)
     }
 
+    /// Fire a request where the response body is empty or can be ignored.
+    func requestVoid(
+        _ endpoint: String,
+        method: String = "POST",
+        body: (any Encodable)? = nil
+    ) async throws {
+        guard !baseURL.isEmpty, let url = URL(string: "\(baseURL)\(endpoint)") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        if let body = body {
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.invalidResponse
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
+        }
+    }
+
     func buildURL(_ path: String) -> URL? {
         guard !baseURL.isEmpty else { return nil }
         return URL(string: "\(baseURL)\(path)")

@@ -63,6 +63,8 @@ struct SecurityScansContentView: View {
     @State private var scans: [ScanResult] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var isTriggering = false
+    @State private var scanMessage: (success: Bool, text: String)?
 
     private let apiClient = APIClient.shared
 
@@ -76,17 +78,57 @@ struct SecurityScansContentView: View {
                     systemImage: "doc.text.magnifyingglass",
                     description: Text(error)
                 )
-            } else if scans.isEmpty {
-                ContentUnavailableView(
-                    "No Scans",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: Text("No scans have been run yet.")
-                )
             } else {
-                List(scans) { scan in
-                    ScanResultRow(scan: scan)
+                VStack(spacing: 0) {
+                    if scans.isEmpty {
+                        Spacer()
+                        ContentUnavailableView(
+                            "No Scans",
+                            systemImage: "doc.text.magnifyingglass",
+                            description: Text("No scans have been run yet.")
+                        )
+                        Spacer()
+                    } else {
+                        List(scans) { scan in
+                            ScanResultRow(scan: scan)
+                        }
+                        .listStyle(.plain)
+                    }
+
+                    Divider()
+                    VStack(spacing: 8) {
+                        if let msg = scanMessage {
+                            HStack(spacing: 6) {
+                                Image(systemName: msg.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                    .foregroundStyle(msg.success ? .green : .red)
+                                    .font(.caption)
+                                Text(msg.text)
+                                    .font(.caption)
+                                    .foregroundStyle(msg.success ? .green : .red)
+                            }
+                            .transition(.opacity)
+                        }
+
+                        Button {
+                            Task { await triggerScan() }
+                        } label: {
+                            HStack(spacing: 6) {
+                                if isTriggering {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                }
+                                Label(
+                                    isTriggering ? "Scanning..." : "Trigger Scan",
+                                    systemImage: "magnifyingglass"
+                                )
+                                .font(.body.weight(.medium))
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .disabled(isTriggering)
+                    }
+                    .padding(.vertical, 16)
                 }
-                .listStyle(.plain)
             }
         }
         .refreshable { await loadScans() }
@@ -105,6 +147,34 @@ struct SecurityScansContentView: View {
             }
         }
         isLoading = false
+    }
+
+    private func triggerScan() async {
+        isTriggering = true
+        scanMessage = nil
+        do {
+            let body: [String: String?] = [:]  // empty body — scan all
+            let response: TriggerScanResponse = try await apiClient.request(
+                "/api/v1/security/scan",
+                method: "POST",
+                body: body
+            )
+            withAnimation {
+                scanMessage = (success: true, text: response.message)
+            }
+            // Refresh the scan list after a short delay
+            try? await Task.sleep(for: .seconds(2))
+            await loadScans()
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { scanMessage = nil }
+        } catch {
+            withAnimation {
+                scanMessage = (success: false, text: "Failed to trigger scan: \(error.localizedDescription)")
+            }
+            try? await Task.sleep(for: .seconds(5))
+            withAnimation { scanMessage = nil }
+        }
+        isTriggering = false
     }
 }
 
