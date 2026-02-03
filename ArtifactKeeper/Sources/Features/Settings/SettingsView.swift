@@ -38,6 +38,11 @@ struct SettingsView: View {
                         }
                 }
             }
+            .onChange(of: authManager.isAuthenticated) { _, isAuth in
+                if isAuth {
+                    showingLoginSheet = false
+                }
+            }
         }
     }
 
