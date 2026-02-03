@@ -33,10 +33,12 @@ struct Pagination: Codable, Sendable {
     let page: Int
     let perPage: Int
     let total: Int
-    
+    let totalPages: Int?
+
     enum CodingKeys: String, CodingKey {
         case page
         case perPage = "per_page"
         case total
+        case totalPages = "total_pages"
     }
 }
