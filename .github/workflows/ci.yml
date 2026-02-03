@@ -101,9 +101,10 @@ jobs:
 
       - name: Build for iOS Simulator
         run: |
+          # Use generic iOS Simulator destination to avoid specific device/OS version issues
           xcodebuild \
             -scheme "$SCHEME" \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=18.2' \
+            -destination 'generic/platform=iOS Simulator' \
             -skipPackagePluginValidation \
             build \
             | xcpretty --color || true
