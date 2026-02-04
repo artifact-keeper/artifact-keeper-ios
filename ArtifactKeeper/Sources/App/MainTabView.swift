@@ -3,6 +3,9 @@ import SwiftUI
 struct MainTabView: View {
     @EnvironmentObject var authManager: AuthManager
 
+    private var isLoggedIn: Bool { authManager.isAuthenticated }
+    private var isAdmin: Bool { authManager.currentUser?.isAdmin == true }
+
     var body: some View {
         TabView {
             ArtifactsSectionView()
@@ -10,25 +13,29 @@ struct MainTabView: View {
                     Label("Artifacts", systemImage: "shippingbox")
                 }
 
-            IntegrationSectionView()
-                .tabItem {
-                    Label("Integration", systemImage: "link")
-                }
+            if isLoggedIn {
+                IntegrationSectionView()
+                    .tabItem {
+                        Label("Integration", systemImage: "link")
+                    }
 
-            SecuritySectionView()
-                .tabItem {
-                    Label("Security", systemImage: "shield.checkered")
-                }
+                SecuritySectionView()
+                    .tabItem {
+                        Label("Security", systemImage: "shield.checkered")
+                    }
 
-            OperationsSectionView()
-                .tabItem {
-                    Label("Operations", systemImage: "chart.bar")
-                }
+                OperationsSectionView()
+                    .tabItem {
+                        Label("Operations", systemImage: "chart.bar")
+                    }
+            }
 
-            AdminSectionView()
-                .tabItem {
-                    Label("Admin", systemImage: "gearshape.2")
-                }
+            if isAdmin {
+                AdminSectionView()
+                    .tabItem {
+                        Label("Admin", systemImage: "gearshape.2")
+                    }
+            }
         }
     }
 }
