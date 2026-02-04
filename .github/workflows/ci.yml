@@ -67,6 +67,74 @@ jobs:
       - name: Build
         run: swift build
 
+  nightly:
+    name: Nightly Release
+    runs-on: macos-15
+    needs: [build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s "$XCODE_PATH"
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build macOS app
+        run: |
+          xcodebuild build \
+            -project ArtifactKeeper.xcodeproj \
+            -scheme ArtifactKeeper_macOS \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package macOS app
+        run: |
+          APP_PATH=$(find build -name "ArtifactKeeper.app" -path "*/Release/*" | head -1)
+          ditto -c -k --keepParent "$APP_PATH" ArtifactKeeper-macOS.zip
+
+      - name: Build iOS simulator app
+        run: |
+          xcodebuild build \
+            -project ArtifactKeeper.xcodeproj \
+            -scheme ArtifactKeeper_iOS \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -derivedDataPath build-ios \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package iOS simulator app
+        run: |
+          APP_PATH=$(find build-ios -name "ArtifactKeeper.app" -path "*/Release-iphonesimulator/*" | head -1)
+          ditto -c -k --keepParent "$APP_PATH" ArtifactKeeper-iOS-Simulator.zip
+
+      - name: Update nightly release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: nightly
+          name: "Nightly Build"
+          body: |
+            Latest development build from `main` branch.
+
+            **macOS App** — Unsigned, right-click > Open to bypass Gatekeeper.
+            **iOS Simulator App** — Install with `xcrun simctl install booted ArtifactKeeper.app`
+
+            > Updated on every push to main. Not a stable release.
+          prerelease: true
+          make_latest: false
+          files: |
+            ArtifactKeeper-macOS.zip
+            ArtifactKeeper-iOS-Simulator.zip
+
   archive-release:
     name: Archive & Release
     runs-on: macos-15
