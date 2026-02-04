@@ -69,70 +69,74 @@ struct SecurityScansContentView: View {
     private let apiClient = APIClient.shared
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView("Loading scans...")
-            } else if let error = errorMessage {
-                ContentUnavailableView(
-                    "Scans Unavailable",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: Text(error)
-                )
-            } else {
-                VStack(spacing: 0) {
-                    if scans.isEmpty {
-                        Spacer()
-                        ContentUnavailableView(
-                            "No Scans",
-                            systemImage: "doc.text.magnifyingglass",
-                            description: Text("No scans have been run yet.")
-                        )
-                        Spacer()
-                    } else {
-                        List(scans) { scan in
-                            ScanResultRow(scan: scan)
-                        }
-                        .listStyle(.plain)
-                    }
-
-                    Divider()
-                    VStack(spacing: 8) {
-                        if let msg = scanMessage {
-                            HStack(spacing: 6) {
-                                Image(systemName: msg.success ? "checkmark.circle.fill" : "xmark.circle.fill")
-                                    .foregroundStyle(msg.success ? .green : .red)
-                                    .font(.caption)
-                                Text(msg.text)
-                                    .font(.caption)
-                                    .foregroundStyle(msg.success ? .green : .red)
-                            }
-                            .transition(.opacity)
-                        }
-
-                        Button {
-                            Task { await triggerScan() }
-                        } label: {
-                            HStack(spacing: 6) {
-                                if isTriggering {
-                                    ProgressView()
-                                        .controlSize(.small)
+        NavigationStack {
+            Group {
+                if isLoading {
+                    ProgressView("Loading scans...")
+                } else if let error = errorMessage {
+                    ContentUnavailableView(
+                        "Scans Unavailable",
+                        systemImage: "doc.text.magnifyingglass",
+                        description: Text(error)
+                    )
+                } else {
+                    VStack(spacing: 0) {
+                        if scans.isEmpty {
+                            Spacer()
+                            ContentUnavailableView(
+                                "No Scans",
+                                systemImage: "doc.text.magnifyingglass",
+                                description: Text("No scans have been run yet.")
+                            )
+                            Spacer()
+                        } else {
+                            List(scans) { scan in
+                                NavigationLink(destination: ScanFindingsView(scan: scan)) {
+                                    ScanResultRow(scan: scan)
                                 }
-                                Label(
-                                    isTriggering ? "Scanning..." : "Trigger Scan",
-                                    systemImage: "magnifyingglass"
-                                )
-                                .font(.body.weight(.medium))
                             }
+                            .listStyle(.plain)
                         }
-                        .buttonStyle(.bordered)
-                        .disabled(isTriggering)
+
+                        Divider()
+                        VStack(spacing: 8) {
+                            if let msg = scanMessage {
+                                HStack(spacing: 6) {
+                                    Image(systemName: msg.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                                        .foregroundStyle(msg.success ? .green : .red)
+                                        .font(.caption)
+                                    Text(msg.text)
+                                        .font(.caption)
+                                        .foregroundStyle(msg.success ? .green : .red)
+                                }
+                                .transition(.opacity)
+                            }
+
+                            Button {
+                                Task { await triggerScan() }
+                            } label: {
+                                HStack(spacing: 6) {
+                                    if isTriggering {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    }
+                                    Label(
+                                        isTriggering ? "Scanning..." : "Trigger Scan",
+                                        systemImage: "magnifyingglass"
+                                    )
+                                    .font(.body.weight(.medium))
+                                }
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(isTriggering)
+                        }
+                        .padding(.vertical, 16)
                     }
-                    .padding(.vertical, 16)
                 }
             }
+            .refreshable { await loadScans() }
+            .task { await loadScans() }
         }
-        .refreshable { await loadScans() }
-        .task { await loadScans() }
     }
 
     private func loadScans() async {
@@ -315,7 +319,9 @@ struct ScanResultsView: View {
                 )
             } else {
                 List(scans) { scan in
-                    ScanResultRow(scan: scan)
+                    NavigationLink(destination: ScanFindingsView(scan: scan)) {
+                        ScanResultRow(scan: scan)
+                    }
                 }
                 .listStyle(.plain)
             }
@@ -347,7 +353,6 @@ struct ScanResultsView: View {
 
 struct ScanResultRow: View {
     let scan: ScanResult
-    @State private var isExpanded = false
 
     var statusColor: Color {
         switch scan.status {
@@ -401,37 +406,24 @@ struct ScanResultRow: View {
             }
 
             // Timestamps
-            if isExpanded {
-                VStack(alignment: .leading, spacing: 4) {
-                    if let started = scan.startedAt {
-                        LabeledContent("Started", value: formatScanDate(started))
-                            .font(.caption)
-                    }
-                    if let completed = scan.completedAt {
-                        LabeledContent("Completed", value: formatScanDate(completed))
-                            .font(.caption)
-                    }
-                    if let error = scan.errorMessage {
-                        HStack(alignment: .top) {
-                            Text("Error:")
-                                .font(.caption.weight(.medium))
-                                .foregroundStyle(.red)
-                            Text(error)
-                                .font(.caption)
-                                .foregroundStyle(.red)
-                        }
-                    }
+            if let completed = scan.completedAt {
+                Text(formatScanDate(completed))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            if let error = scan.errorMessage {
+                HStack(alignment: .top) {
+                    Text("Error:")
+                        .font(.caption.weight(.medium))
+                        .foregroundStyle(.red)
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
-                .padding(.top, 4)
             }
         }
         .padding(.vertical, 4)
-        .contentShape(Rectangle())
-        .onTapGesture {
-            withAnimation(.easeInOut(duration: 0.2)) {
-                isExpanded.toggle()
-            }
-        }
     }
 
     private var scanTypeIcon: String {
@@ -499,5 +491,197 @@ struct SeverityPill: View {
             .padding(.vertical, 2)
             .background(color.opacity(0.15), in: Capsule())
             .foregroundStyle(color)
+    }
+}
+
+// MARK: - Scan Findings View
+
+struct ScanFindingsView: View {
+    let scan: ScanResult
+
+    @State private var findings: [ScanFinding] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String?
+
+    private let apiClient = APIClient.shared
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading findings...")
+            } else if let error = errorMessage {
+                ContentUnavailableView(
+                    "Failed to Load",
+                    systemImage: "exclamationmark.triangle",
+                    description: Text(error)
+                )
+            } else if findings.isEmpty {
+                ContentUnavailableView(
+                    "No Findings",
+                    systemImage: "checkmark.shield",
+                    description: Text("This scan did not produce any findings.")
+                )
+            } else {
+                List {
+                    Section {
+                        scanSummaryHeader
+                    }
+
+                    Section("Findings (\(findings.count))") {
+                        ForEach(findings) { finding in
+                            FindingRow(finding: finding)
+                        }
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .navigationTitle(scan.scanType.replacingOccurrences(of: "_", with: " ").capitalized)
+        .refreshable {
+            await loadFindings()
+        }
+        .task {
+            await loadFindings()
+        }
+    }
+
+    private var scanSummaryHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let name = scan.artifactName {
+                HStack(spacing: 4) {
+                    Text(name)
+                        .font(.headline)
+                    if let version = scan.artifactVersion {
+                        Text("v\(version)")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
+            HStack(spacing: 8) {
+                if scan.criticalCount > 0 {
+                    SeverityPill(count: scan.criticalCount, label: "Critical", color: .red)
+                }
+                if scan.highCount > 0 {
+                    SeverityPill(count: scan.highCount, label: "High", color: .orange)
+                }
+                if scan.mediumCount > 0 {
+                    SeverityPill(count: scan.mediumCount, label: "Medium", color: .yellow)
+                }
+                if scan.lowCount > 0 {
+                    SeverityPill(count: scan.lowCount, label: "Low", color: .blue)
+                }
+            }
+
+            Text("\(scan.findingsCount) total findings")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func loadFindings() async {
+        isLoading = findings.isEmpty
+        do {
+            let response: ScanFindingListResponse = try await apiClient.request(
+                "/api/v1/security/scans/\(scan.id)/findings?per_page=200"
+            )
+            findings = response.items
+            errorMessage = nil
+        } catch {
+            if findings.isEmpty {
+                errorMessage = error.localizedDescription
+            }
+        }
+        isLoading = false
+    }
+}
+
+// MARK: - Finding Row
+
+struct FindingRow: View {
+    let finding: ScanFinding
+
+    private var severityColor: Color {
+        switch finding.severity.lowercased() {
+        case "critical": return .red
+        case "high": return .orange
+        case "medium": return .yellow
+        case "low": return .blue
+        default: return .gray
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            // Severity badge + title
+            HStack(alignment: .top, spacing: 8) {
+                Text(finding.severity.uppercased())
+                    .font(.caption2.weight(.bold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(severityColor.opacity(0.15), in: Capsule())
+                    .foregroundStyle(severityColor)
+
+                Text(finding.title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(2)
+            }
+
+            // CVE ID as tappable link
+            if let cveId = finding.cveId, !cveId.isEmpty {
+                Link(cveId, destination: URL(string: "https://nvd.nist.gov/vuln/detail/\(cveId)")!)
+                    .font(.caption.weight(.medium))
+            }
+
+            // Affected component and versions
+            if let component = finding.affectedComponent, !component.isEmpty {
+                HStack(spacing: 4) {
+                    Text(component)
+                        .font(.caption)
+                        .foregroundStyle(.primary)
+
+                    if let affected = finding.affectedVersion, !affected.isEmpty {
+                        Text(affected)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.red)
+                    }
+
+                    if let fixed = finding.fixedVersion, !fixed.isEmpty {
+                        Image(systemName: "arrow.right")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(fixed)
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(.green)
+                    }
+                }
+            }
+
+            // Description
+            if let description = finding.description, !description.isEmpty {
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+            }
+
+            // Acknowledged badge
+            if finding.isAcknowledged {
+                HStack(spacing: 4) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption2)
+                    Text("Acknowledged")
+                        .font(.caption2.weight(.medium))
+                    if let reason = finding.acknowledgedReason, !reason.isEmpty {
+                        Text("— \(reason)")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .foregroundStyle(.green)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
