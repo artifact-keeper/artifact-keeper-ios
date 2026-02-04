@@ -158,6 +158,13 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Install iOS platform
+        run: |
+          for i in 1 2 3; do
+            xcodebuild -downloadPlatform iOS && break
+            echo "Retry $i..." && sleep 10
+          done
+
       - name: Cache Swift packages
         uses: actions/cache@v4
         with:
