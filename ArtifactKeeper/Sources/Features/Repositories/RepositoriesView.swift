@@ -323,19 +323,21 @@ struct ArtifactDetailSheet: View {
                     if let version = artifact.version {
                         LabeledContent("Version", value: version)
                     }
-                    LabeledContent("Content Type", value: artifact.contentType)
+                    LabeledContent("Content Type", value: artifact.contentType ?? "unknown")
                     LabeledContent("Size", value: formatBytes(artifact.sizeBytes))
                     LabeledContent("Downloads", value: "\(artifact.downloadCount)")
                 }
 
-                Section("Checksums") {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("SHA-256")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(artifact.checksumSha256)
-                            .font(.system(.caption, design: .monospaced))
-                            .textSelection(.enabled)
+                if let checksum = artifact.checksumSha256, !checksum.isEmpty {
+                    Section("Checksums") {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("SHA-256")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            Text(checksum)
+                                .font(.system(.caption, design: .monospaced))
+                                .textSelection(.enabled)
+                        }
                     }
                 }
 

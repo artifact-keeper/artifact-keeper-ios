@@ -2,14 +2,14 @@ import Foundation
 
 struct Artifact: Codable, Identifiable, Hashable, Sendable {
     let id: String
-    let repositoryKey: String
+    let repositoryKey: String?
     let name: String
     let path: String
     let version: String?
-    let contentType: String
+    let contentType: String?
     let sizeBytes: Int64
     let downloadCount: Int
-    let checksumSha256: String
+    let checksumSha256: String?
     let createdAt: String
 
     enum CodingKeys: String, CodingKey {

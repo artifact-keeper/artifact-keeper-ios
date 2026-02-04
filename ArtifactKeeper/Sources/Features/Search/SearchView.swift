@@ -2,7 +2,8 @@ import SwiftUI
 
 struct SearchContentView: View {
     @State private var searchText = ""
-    @State private var results: [PackageItem] = []
+    @State private var repoResults: [Repository] = []
+    @State private var artifactResults: [Artifact] = []
     @State private var isSearching = false
     @State private var searchTask: Task<Void, Never>?
     @State private var errorMessage: String?
@@ -15,7 +16,7 @@ struct SearchContentView: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField("Search packages...", text: $searchText)
+                TextField("Search repositories & artifacts...", text: $searchText)
                     .textFieldStyle(.plain)
                     .autocorrectionDisabled()
                     #if os(iOS)
@@ -24,7 +25,8 @@ struct SearchContentView: View {
                 if !searchText.isEmpty {
                     Button {
                         searchText = ""
-                        results = []
+                        repoResults = []
+                        artifactResults = []
                         errorMessage = nil
                     } label: {
                         Image(systemName: "xmark.circle.fill")
@@ -41,26 +43,39 @@ struct SearchContentView: View {
             Divider()
 
             // Results area
-            if searchText.isEmpty && results.isEmpty {
+            if searchText.isEmpty && repoResults.isEmpty && artifactResults.isEmpty {
                 ContentUnavailableView(
-                    "Search Packages",
+                    "Search",
                     systemImage: "magnifyingglass",
-                    description: Text("Search across all repositories by name, format, or version")
+                    description: Text("Search across repositories and artifacts by name, key, or format")
                 )
                 .frame(maxHeight: .infinity)
             } else if isSearching {
                 Spacer()
                 ProgressView("Searching...")
                 Spacer()
-            } else if results.isEmpty && !searchText.isEmpty {
+            } else if repoResults.isEmpty && artifactResults.isEmpty && !searchText.isEmpty {
                 ContentUnavailableView.search(text: searchText)
                     .frame(maxHeight: .infinity)
             } else {
-                List(results) { pkg in
-                    NavigationLink {
-                        PackageDetailView(package: pkg)
-                    } label: {
-                        SearchResultRow(package: pkg)
+                List {
+                    if !repoResults.isEmpty {
+                        Section("Repositories") {
+                            ForEach(repoResults) { repo in
+                                NavigationLink {
+                                    RepositoryDetailView(repoKey: repo.key)
+                                } label: {
+                                    RepoSearchResultRow(repo: repo)
+                                }
+                            }
+                        }
+                    }
+                    if !artifactResults.isEmpty {
+                        Section("Artifacts") {
+                            ForEach(artifactResults) { artifact in
+                                ArtifactSearchResultRow(artifact: artifact)
+                            }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -70,7 +85,8 @@ struct SearchContentView: View {
             searchTask?.cancel()
 
             guard !newValue.trimmingCharacters(in: .whitespaces).isEmpty else {
-                results = []
+                repoResults = []
+                artifactResults = []
                 isSearching = false
                 errorMessage = nil
                 return
@@ -99,27 +115,44 @@ struct SearchContentView: View {
         isSearching = true
         errorMessage = nil
 
-        do {
-            let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-            let response: PackageListResponse = try await apiClient.request(
-                "/api/v1/packages?search=\(encoded)&per_page=50"
-            )
+        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
 
-            guard !Task.isCancelled else { return }
+        // Search repositories and artifacts in parallel
+        async let repoSearch: RepositoryListResponse? = {
+            do {
+                return try await apiClient.request("/api/v1/repositories?search=\(encoded)&per_page=20")
+            } catch {
+                return nil
+            }
+        }()
 
-            results = response.items
-        } catch {
-            guard !Task.isCancelled else { return }
-            errorMessage = error.localizedDescription
-            results = []
+        async let artifactSearch: ArtifactListResponse? = {
+            do {
+                return try await apiClient.request("/api/v1/packages?search=\(encoded)&per_page=20")
+            } catch {
+                return nil
+            }
+        }()
+
+        let (repos, artifacts) = await (repoSearch, artifactSearch)
+
+        guard !Task.isCancelled else { return }
+
+        repoResults = repos?.items ?? []
+        artifactResults = artifacts?.items ?? []
+
+        if repoResults.isEmpty && artifactResults.isEmpty {
+            // Both failed or empty — no error shown, just empty state
         }
+
         isSearching = false
     }
 }
 
 struct SearchView: View {
     @State private var searchText = ""
-    @State private var results: [PackageItem] = []
+    @State private var repoResults: [Repository] = []
+    @State private var artifactResults: [Artifact] = []
     @State private var isSearching = false
     @State private var searchTask: Task<Void, Never>?
     @State private var errorMessage: String?
@@ -129,22 +162,35 @@ struct SearchView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if searchText.isEmpty && results.isEmpty {
+                if searchText.isEmpty && repoResults.isEmpty && artifactResults.isEmpty {
                     ContentUnavailableView(
-                        "Search Packages",
+                        "Search",
                         systemImage: "magnifyingglass",
-                        description: Text("Search across all repositories by name, format, or version")
+                        description: Text("Search across repositories and artifacts by name, key, or format")
                     )
                 } else if isSearching {
                     ProgressView("Searching...")
-                } else if results.isEmpty && !searchText.isEmpty {
+                } else if repoResults.isEmpty && artifactResults.isEmpty && !searchText.isEmpty {
                     ContentUnavailableView.search(text: searchText)
                 } else {
-                    List(results) { pkg in
-                        NavigationLink {
-                            PackageDetailView(package: pkg)
-                        } label: {
-                            SearchResultRow(package: pkg)
+                    List {
+                        if !repoResults.isEmpty {
+                            Section("Repositories") {
+                                ForEach(repoResults) { repo in
+                                    NavigationLink {
+                                        RepositoryDetailView(repoKey: repo.key)
+                                    } label: {
+                                        RepoSearchResultRow(repo: repo)
+                                    }
+                                }
+                            }
+                        }
+                        if !artifactResults.isEmpty {
+                            Section("Artifacts") {
+                                ForEach(artifactResults) { artifact in
+                                    ArtifactSearchResultRow(artifact: artifact)
+                                }
+                            }
                         }
                     }
                     .listStyle(.plain)
@@ -152,24 +198,21 @@ struct SearchView: View {
             }
             .navigationTitle("Search")
             .accountToolbar()
-            .searchable(text: $searchText, prompt: "Search packages...")
+            .searchable(text: $searchText, prompt: "Search repositories & artifacts...")
             .onChange(of: searchText) { _, newValue in
-                // Cancel any pending search
                 searchTask?.cancel()
 
                 guard !newValue.trimmingCharacters(in: .whitespaces).isEmpty else {
-                    results = []
+                    repoResults = []
+                    artifactResults = []
                     isSearching = false
                     errorMessage = nil
                     return
                 }
 
-                // Debounce 300ms
                 searchTask = Task { @MainActor in
                     try? await Task.sleep(for: .milliseconds(300))
-
                     guard !Task.isCancelled else { return }
-
                     await performSearch(query: newValue)
                 }
             }
@@ -191,38 +234,49 @@ struct SearchView: View {
         isSearching = true
         errorMessage = nil
 
-        do {
-            let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
-            let response: PackageListResponse = try await apiClient.request(
-                "/api/v1/packages?search=\(encoded)&per_page=50"
-            )
+        let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
 
-            guard !Task.isCancelled else { return }
+        async let repoSearch: RepositoryListResponse? = {
+            do {
+                return try await apiClient.request("/api/v1/repositories?search=\(encoded)&per_page=20")
+            } catch {
+                return nil
+            }
+        }()
 
-            results = response.items
-        } catch {
-            guard !Task.isCancelled else { return }
-            errorMessage = error.localizedDescription
-            results = []
-        }
+        async let artifactSearch: ArtifactListResponse? = {
+            do {
+                return try await apiClient.request("/api/v1/packages?search=\(encoded)&per_page=20")
+            } catch {
+                return nil
+            }
+        }()
+
+        let (repos, artifacts) = await (repoSearch, artifactSearch)
+
+        guard !Task.isCancelled else { return }
+
+        repoResults = repos?.items ?? []
+        artifactResults = artifacts?.items ?? []
+
         isSearching = false
     }
 }
 
-// MARK: - Search Result Row
+// MARK: - Repository Search Result Row
 
-struct SearchResultRow: View {
-    let package: PackageItem
+struct RepoSearchResultRow: View {
+    let repo: Repository
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
-                Text(package.name)
+                Text(repo.name)
                     .font(.body.weight(.medium))
 
                 Spacer()
 
-                Text(package.format.uppercased())
+                Text(repo.format.uppercased())
                     .font(.caption2.weight(.bold))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
@@ -231,13 +285,70 @@ struct SearchResultRow: View {
             }
 
             HStack(spacing: 12) {
-                Label(package.version, systemImage: "tag")
+                Label(repo.key, systemImage: "folder")
 
-                Label(package.repositoryKey, systemImage: "folder")
+                Label(repo.repoType, systemImage: "archivebox")
 
                 Spacer()
 
-                Text(formatBytes(package.sizeBytes))
+                Text(formatBytes(repo.storageUsedBytes))
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .lineLimit(1)
+
+            if let description = repo.description, !description.isEmpty {
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func formatBytes(_ bytes: Int64) -> String {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        return formatter.string(fromByteCount: bytes)
+    }
+}
+
+// MARK: - Artifact Search Result Row
+
+struct ArtifactSearchResultRow: View {
+    let artifact: Artifact
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(artifact.name)
+                    .font(.body.weight(.medium))
+
+                Spacer()
+
+                if let contentType = artifact.contentType, !contentType.isEmpty {
+                    Text(contentType)
+                        .font(.caption2.weight(.bold))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(.orange.opacity(0.1), in: Capsule())
+                        .foregroundStyle(.orange)
+                }
+            }
+
+            HStack(spacing: 12) {
+                if let repoKey = artifact.repositoryKey {
+                    Label(repoKey, systemImage: "folder")
+                }
+
+                if let version = artifact.version {
+                    Label(version, systemImage: "tag")
+                }
+
+                Spacer()
+
+                Text(formatBytes(artifact.sizeBytes))
             }
             .font(.caption)
             .foregroundStyle(.secondary)
