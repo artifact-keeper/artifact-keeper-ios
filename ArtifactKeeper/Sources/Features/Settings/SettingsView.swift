@@ -42,6 +42,14 @@ struct SettingsContentView: View {
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                         }
+
+                        Button(role: .destructive) {
+                            serverToDelete = server
+                        } label: {
+                            Image(systemName: "trash")
+                                .font(.body)
+                        }
+                        .buttonStyle(.borderless)
                     }
                     .padding(.vertical, 2)
                     .swipeActions(edge: .trailing) {
@@ -132,7 +140,11 @@ struct SettingsContentView: View {
             Button("Cancel", role: .cancel) { serverToDelete = nil }
             Button("Remove", role: .destructive) {
                 if let server = serverToDelete {
+                    let wasActive = server.id == serverManager.activeServerId
                     serverManager.removeServer(server)
+                    if wasActive {
+                        authManager.logout()
+                    }
                     serverToDelete = nil
                 }
             }

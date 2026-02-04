@@ -1,5 +1,21 @@
 import Foundation
 
+/// URLSession delegate that accepts self-signed certificates for self-hosted servers.
+private final class SelfSignedCertDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
+    func urlSession(
+        _ session: URLSession,
+        didReceive challenge: URLAuthenticationChallenge,
+        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+    ) {
+        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+              let serverTrust = challenge.protectionSpace.serverTrust else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        completionHandler(.useCredential, URLCredential(trust: serverTrust))
+    }
+}
+
 actor APIClient {
     static let shared = APIClient()
 
@@ -15,7 +31,9 @@ actor APIClient {
     init() {
         let stored = UserDefaults.standard.string(forKey: APIClient.serverURLKey)
         self.baseURL = stored ?? APIClient.defaultServerURL
-        self.session = URLSession.shared
+        let config = URLSessionConfiguration.default
+        config.timeoutIntervalForRequest = 30
+        self.session = URLSession(configuration: config, delegate: SelfSignedCertDelegate(), delegateQueue: nil)
         self.decoder = JSONDecoder()
     }
 

@@ -13,53 +13,54 @@ struct WelcomeView: View {
     private let apiClient = APIClient.shared
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                Spacer()
-                    .frame(height: 60)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: 0) {
+                    Spacer()
 
-                // Logo area
-                logoSection
-                    .padding(.bottom, 32)
+                    // Logo area
+                    logoSection
+                        .padding(.bottom, 24)
 
-                // Title
-                Text("Welcome to Artifact Keeper")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .multilineTextAlignment(.center)
-                    .padding(.bottom, 8)
+                    // Title
+                    Text("Welcome to Artifact Keeper")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .padding(.bottom, 6)
 
-                // Subtitle
-                Text("Connect to your Artifact Keeper server to browse repositories, packages, and builds.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 40)
+                    // Subtitle
+                    Text("Connect to your Artifact Keeper server to browse repositories, packages, and builds.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                        .padding(.bottom, 32)
 
-                // Form
-                connectionForm
-                    .padding(.horizontal, 24)
+                    // Form
+                    connectionForm
+                        .padding(.horizontal, 32)
 
-                Spacer()
-                    .frame(height: 40)
+                    Spacer()
 
-                // Learn More
-                Link(destination: URL(string: "https://artifactkeeper.com")!) {
-                    HStack(spacing: 4) {
-                        Text("Learn More")
-                            .font(.footnote)
-                        Image(systemName: "arrow.up.right")
-                            .font(.caption2)
+                    // Learn More
+                    Link(destination: URL(string: "https://artifactkeeper.com")!) {
+                        HStack(spacing: 4) {
+                            Text("Learn More")
+                                .font(.footnote)
+                            Image(systemName: "arrow.up.right")
+                                .font(.caption2)
+                        }
+                        .foregroundStyle(.secondary)
                     }
-                    .foregroundStyle(.secondary)
+                    .padding(.bottom, 20)
                 }
-                .padding(.bottom, 24)
+                .frame(maxWidth: 400)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: geo.size.height)
             }
-            .frame(maxWidth: 480)
-            .frame(maxWidth: .infinity)
         }
-        .background(AppTheme.background)
+        .background(AppTheme.background.ignoresSafeArea())
     }
 
     // MARK: - Logo
@@ -69,19 +70,19 @@ struct WelcomeView: View {
         Image("Logo")
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width: 120, height: 120)
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .shadow(color: .black.opacity(0.2), radius: 16, y: 8)
+            .frame(width: 96, height: 96)
+            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
     }
 
     // MARK: - Connection Form
 
     @ViewBuilder
     private var connectionForm: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading, spacing: 6) {
+        VStack(spacing: 12) {
+            VStack(alignment: .leading, spacing: 5) {
                 Text("Server URL")
-                    .font(.subheadline)
+                    .font(.footnote)
                     .fontWeight(.medium)
 
                 TextField("https://artifacts.example.com", text: $serverURL)
@@ -126,7 +127,7 @@ struct WelcomeView: View {
                         .fontWeight(.semibold)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                .padding(.vertical, 10)
             }
             .buttonStyle(.borderedProminent)
             .tint(AppTheme.primary)
