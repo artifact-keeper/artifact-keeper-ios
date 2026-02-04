@@ -84,6 +84,9 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Install iOS simulator runtime
+        run: xcodebuild -downloadPlatform iOS
+
       - name: Build macOS app
         run: |
           xcodebuild build \
@@ -154,6 +157,9 @@ jobs:
 
       - name: Generate Xcode project
         run: xcodegen generate
+
+      - name: Install iOS simulator runtime
+        run: xcodebuild -downloadPlatform iOS
 
       - name: Cache Swift packages
         uses: actions/cache@v4
