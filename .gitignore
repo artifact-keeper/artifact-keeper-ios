@@ -1,4 +1,15 @@
+.secrets
 .DS_Store
+
+# Signing credentials (NEVER commit these)
+*.p12
+*.p8
+*.cer
+*.pem
+*.csr
+*.key
+*.mobileprovision
+*.provisionprofile
 /.build
 /Packages
 xcuserdata/
