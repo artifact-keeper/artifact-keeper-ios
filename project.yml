@@ -36,7 +36,7 @@ targets:
           CODE_SIGN_IDENTITY: "-"
           CODE_SIGNING_REQUIRED: NO
         release:
-          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_STYLE: Automatic
     info:
       path: Info.plist
       properties:
