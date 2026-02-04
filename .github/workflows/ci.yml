@@ -234,8 +234,9 @@ jobs:
         env:
           APPSTORE_API_KEY_ID: ${{ secrets.APPSTORE_API_KEY_ID }}
           APPSTORE_API_ISSUER_ID: ${{ secrets.APPSTORE_API_ISSUER_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cat > "$RUNNER_TEMP/ExportOptions-iOS.plist" << 'PLIST'
+          cat > "$RUNNER_TEMP/ExportOptions-iOS.plist" << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
             "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -243,11 +244,18 @@ jobs:
           <dict>
             <key>method</key>
             <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>$APPLE_TEAM_ID</string>
             <key>uploadSymbols</key>
             <true/>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>com.artifactkeeper.ios</key>
+              <string>$PROVISIONING_PROFILE_SPECIFIER</string>
+            </dict>
           </dict>
           </plist>
-          PLIST
+          EOF
 
           xcodebuild -exportArchive \
             -archivePath "$RUNNER_TEMP/ArtifactKeeper-iOS.xcarchive" \
