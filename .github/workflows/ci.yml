@@ -158,9 +158,6 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: Install iOS simulator runtime
-        run: xcodebuild -downloadPlatform iOS
-
       - name: Cache Swift packages
         uses: actions/cache@v4
         with:
