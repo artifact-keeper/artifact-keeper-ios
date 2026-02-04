@@ -106,7 +106,7 @@ jobs:
             -project ArtifactKeeper.xcodeproj \
             -scheme ArtifactKeeper_iOS \
             -configuration Release \
-            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build-ios \
             CODE_SIGN_IDENTITY="-" \
             CODE_SIGNING_REQUIRED=NO \
