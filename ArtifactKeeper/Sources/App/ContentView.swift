@@ -10,6 +10,8 @@ struct ContentView: View {
                 WelcomeView {
                     // URL was saved by WelcomeView, @AppStorage triggers refresh
                 }
+            } else if authManager.mustChangePassword {
+                ChangePasswordView()
             } else {
                 MainTabView()
             }

@@ -10,12 +10,14 @@ struct LoginResponse: Codable, Sendable {
     let refreshToken: String
     let expiresIn: Int
     let tokenType: String
+    let mustChangePassword: Bool?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
         case expiresIn = "expires_in"
         case tokenType = "token_type"
+        case mustChangePassword = "must_change_password"
     }
 }
 

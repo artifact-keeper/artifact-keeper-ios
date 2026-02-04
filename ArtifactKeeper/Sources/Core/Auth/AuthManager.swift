@@ -4,6 +4,7 @@ import Foundation
 @MainActor
 class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
+    @Published var mustChangePassword = false
     @Published var currentUser: UserInfo?
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -28,6 +29,10 @@ class AuthManager: ObservableObject {
                 currentUser = user
             }
             isAuthenticated = true
+
+            if response.mustChangePassword == true {
+                mustChangePassword = true
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -41,6 +46,7 @@ class AuthManager: ObservableObject {
         }
         currentUser = nil
         isAuthenticated = false
+        mustChangePassword = false
     }
 
     /// Decode user info from JWT access token payload (base64 middle segment)
