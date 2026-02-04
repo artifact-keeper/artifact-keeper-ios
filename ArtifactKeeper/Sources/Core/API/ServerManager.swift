@@ -49,14 +49,16 @@ class ServerManager: ObservableObject {
         servers.removeAll { $0.id == server.id }
         if activeServerId == server.id {
             activeServerId = servers.first?.id
-            if let active = activeServer {
-                applyServer(active)
-            } else {
-                // No servers left — clear everything
-                UserDefaults.standard.set("", forKey: APIClient.serverURLKey)
-                Task { await APIClient.shared.updateBaseURL("") }
-            }
             UserDefaults.standard.set(activeServerId, forKey: Self.activeServerKey)
+        }
+        if servers.isEmpty {
+            // No servers left — clear everything and go back to welcome
+            activeServerId = nil
+            UserDefaults.standard.set("", forKey: APIClient.serverURLKey)
+            UserDefaults.standard.set(nil as String?, forKey: Self.activeServerKey)
+            Task { await APIClient.shared.updateBaseURL("") }
+        } else if let active = activeServer {
+            applyServer(active)
         }
         saveServers()
     }
