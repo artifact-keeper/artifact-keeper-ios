@@ -26,12 +26,11 @@ struct AccountToolbarModifier: ViewModifier {
                                         serverManager.switchTo(server)
                                         authManager.logout()  // Auto-logout when switching servers
                                     } label: {
-                                        Label {
-                                            Text(server.name)
-                                        } icon: {
-                                            Image(systemName: serverManager.serverStatuses[server.id] == true ? "circle.fill" : "circle")
-                                                .foregroundStyle(serverManager.serverStatuses[server.id] == true ? .green : .gray)
-                                                .imageScale(.small)
+                                        if serverManager.serverStatuses[server.id] == true {
+                                            Label(server.name, systemImage: "checkmark.circle.fill")
+                                                .symbolRenderingMode(.multicolor)
+                                        } else {
+                                            Label(server.name, systemImage: "xmark.circle")
                                         }
                                     }
                                 }
