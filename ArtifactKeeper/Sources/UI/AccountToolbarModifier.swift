@@ -160,6 +160,7 @@ struct AccountToolbarModifier: ViewModifier {
                             }
                         }
                 }
+                .frame(minWidth: 600, idealWidth: 700, minHeight: 500, idealHeight: 600)
             }
             .task(id: serverManager.servers.count) {
                 await serverManager.refreshStatuses()

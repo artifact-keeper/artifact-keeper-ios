@@ -104,3 +104,129 @@ struct ChangePasswordRequest: Encodable, Sendable {
         case newPassword = "new_password"
     }
 }
+
+// MARK: - Profile
+
+struct ProfileResponse: Codable, Sendable {
+    let id: String
+    let username: String
+    let email: String
+    let displayName: String?
+    let isAdmin: Bool
+    let totpEnabled: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case id, username, email
+        case displayName = "display_name"
+        case isAdmin = "is_admin"
+        case totpEnabled = "totp_enabled"
+    }
+}
+
+struct UpdateProfileRequest: Encodable, Sendable {
+    let displayName: String?
+    let email: String?
+
+    enum CodingKeys: String, CodingKey {
+        case displayName = "display_name"
+        case email
+    }
+}
+
+// MARK: - API Keys
+
+struct ApiKey: Codable, Sendable, Identifiable {
+    let id: String
+    let name: String
+    let keyPrefix: String
+    let createdAt: String
+    let expiresAt: String?
+    let lastUsedAt: String?
+    let scopes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, scopes
+        case keyPrefix = "key_prefix"
+        case createdAt = "created_at"
+        case expiresAt = "expires_at"
+        case lastUsedAt = "last_used_at"
+    }
+}
+
+struct ApiKeysListResponse: Codable, Sendable {
+    let apiKeys: [ApiKey]
+
+    enum CodingKeys: String, CodingKey {
+        case apiKeys = "api_keys"
+    }
+}
+
+struct CreateApiKeyRequest: Encodable, Sendable {
+    let name: String
+    let expiresInDays: Int?
+    let scopes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case name, scopes
+        case expiresInDays = "expires_in_days"
+    }
+}
+
+struct CreateApiKeyResponse: Codable, Sendable {
+    let apiKey: ApiKey
+    let key: String
+
+    enum CodingKeys: String, CodingKey {
+        case apiKey = "api_key"
+        case key
+    }
+}
+
+// MARK: - Access Tokens
+
+struct AccessToken: Codable, Sendable, Identifiable {
+    let id: String
+    let name: String
+    let tokenPrefix: String
+    let createdAt: String
+    let expiresAt: String?
+    let lastUsedAt: String?
+    let scopes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, scopes
+        case tokenPrefix = "token_prefix"
+        case createdAt = "created_at"
+        case expiresAt = "expires_at"
+        case lastUsedAt = "last_used_at"
+    }
+}
+
+struct AccessTokensListResponse: Codable, Sendable {
+    let accessTokens: [AccessToken]
+
+    enum CodingKeys: String, CodingKey {
+        case accessTokens = "access_tokens"
+    }
+}
+
+struct CreateAccessTokenRequest: Encodable, Sendable {
+    let name: String
+    let expiresInDays: Int?
+    let scopes: [String]?
+
+    enum CodingKeys: String, CodingKey {
+        case name, scopes
+        case expiresInDays = "expires_in_days"
+    }
+}
+
+struct CreateAccessTokenResponse: Codable, Sendable {
+    let accessToken: AccessToken
+    let token: String
+
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case token
+    }
+}

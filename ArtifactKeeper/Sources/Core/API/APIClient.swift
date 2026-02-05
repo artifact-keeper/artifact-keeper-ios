@@ -187,6 +187,58 @@ actor APIClient {
             body: ChangePasswordRequest(currentPassword: currentPassword, newPassword: newPassword)
         )
     }
+
+    // MARK: - Profile
+
+    func getProfile() async throws -> ProfileResponse {
+        try await request("/api/v1/auth/me")
+    }
+
+    func updateProfile(displayName: String?, email: String?) async throws -> ProfileResponse {
+        try await request(
+            "/api/v1/profile",
+            method: "PUT",
+            body: UpdateProfileRequest(displayName: displayName, email: email)
+        )
+    }
+
+    // MARK: - API Keys
+
+    func listApiKeys() async throws -> [ApiKey] {
+        let response: ApiKeysListResponse = try await request("/api/v1/profile/api-keys")
+        return response.apiKeys
+    }
+
+    func createApiKey(name: String, scopes: [String], expiresInDays: Int?) async throws -> CreateApiKeyResponse {
+        try await request(
+            "/api/v1/profile/api-keys",
+            method: "POST",
+            body: CreateApiKeyRequest(name: name, expiresInDays: expiresInDays, scopes: scopes)
+        )
+    }
+
+    func deleteApiKey(_ id: String) async throws {
+        try await requestVoid("/api/v1/profile/api-keys/\(id)", method: "DELETE")
+    }
+
+    // MARK: - Access Tokens
+
+    func listAccessTokens() async throws -> [AccessToken] {
+        let response: AccessTokensListResponse = try await request("/api/v1/profile/access-tokens")
+        return response.accessTokens
+    }
+
+    func createAccessToken(name: String, scopes: [String], expiresInDays: Int?) async throws -> CreateAccessTokenResponse {
+        try await request(
+            "/api/v1/profile/access-tokens",
+            method: "POST",
+            body: CreateAccessTokenRequest(name: name, expiresInDays: expiresInDays, scopes: scopes)
+        )
+    }
+
+    func deleteAccessToken(_ id: String) async throws {
+        try await requestVoid("/api/v1/profile/access-tokens/\(id)", method: "DELETE")
+    }
 }
 
 enum APIError: LocalizedError {

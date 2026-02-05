@@ -4,6 +4,537 @@ import CoreImage.CIFilterBuiltins
 struct ProfileView: View {
     @EnvironmentObject var authManager: AuthManager
 
+    @State private var selectedTab = 0
+
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            GeneralTab()
+                .tabItem { Label("General", systemImage: "person") }
+                .tag(0)
+            ApiKeysTab()
+                .tabItem { Label("API Keys", systemImage: "key") }
+                .tag(1)
+            AccessTokensTab()
+                .tabItem { Label("Access Tokens", systemImage: "shield") }
+                .tag(2)
+            SecurityTab()
+                .tabItem { Label("Security", systemImage: "lock") }
+                .tag(3)
+        }
+        .frame(minWidth: 500, minHeight: 400)
+    }
+}
+
+// MARK: - General Tab
+
+private struct GeneralTab: View {
+    @EnvironmentObject var authManager: AuthManager
+
+    @State private var profile: ProfileResponse?
+    @State private var displayName = ""
+    @State private var email = ""
+    @State private var isLoading = true
+    @State private var isSaving = false
+    @State private var error: String?
+    @State private var success = false
+
+    private let api = APIClient.shared
+
+    var body: some View {
+        Form {
+            Section("Profile Information") {
+                LabeledContent("Username") {
+                    Text(profile?.username ?? authManager.currentUser?.username ?? "—")
+                        .foregroundStyle(.secondary)
+                }
+
+                TextField("Display Name", text: $displayName)
+                    .autocorrectionDisabled()
+                TextField("Email", text: $email)
+                    .autocorrectionDisabled()
+                    #if os(iOS)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    #endif
+
+                if let error {
+                    Text(error).font(.caption).foregroundStyle(.red)
+                }
+
+                if success {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Text("Profile updated").font(.caption).foregroundStyle(.green)
+                    }
+                }
+
+                Button {
+                    Task { await saveProfile() }
+                } label: {
+                    HStack {
+                        if isSaving { ProgressView().controlSize(.small) }
+                        Text("Save Changes")
+                    }
+                }
+                .disabled(isSaving)
+            }
+        }
+        .formStyle(.grouped)
+        .task { await loadProfile() }
+    }
+
+    private func loadProfile() async {
+        isLoading = true
+        do {
+            let p = try await api.getProfile()
+            profile = p
+            displayName = p.displayName ?? ""
+            email = p.email
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isLoading = false
+    }
+
+    private func saveProfile() async {
+        isSaving = true
+        error = nil
+        success = false
+        do {
+            let updated = try await api.updateProfile(
+                displayName: displayName.isEmpty ? nil : displayName,
+                email: email.isEmpty ? nil : email
+            )
+            profile = updated
+            success = true
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isSaving = false
+    }
+}
+
+// MARK: - API Keys Tab
+
+private struct ApiKeysTab: View {
+    @State private var keys: [ApiKey] = []
+    @State private var isLoading = true
+    @State private var error: String?
+
+    // Create
+    @State private var showCreate = false
+    @State private var newKeyName = ""
+    @State private var newKeyExpiry = 90
+    @State private var newKeyScopes: Set<String> = ["read"]
+    @State private var createdKey: String?
+    @State private var isCreating = false
+
+    // Delete
+    @State private var keyToDelete: ApiKey?
+
+    private let api = APIClient.shared
+
+    private let expiryOptions: [(String, Int)] = [
+        ("30 days", 30), ("60 days", 60), ("90 days", 90),
+        ("180 days", 180), ("1 year", 365), ("Never", 0),
+    ]
+
+    var body: some View {
+        List {
+            Section {
+                if isLoading {
+                    ProgressView()
+                } else if keys.isEmpty {
+                    ContentUnavailableView(
+                        "No API Keys",
+                        systemImage: "key",
+                        description: Text("Create an API key for programmatic access.")
+                    )
+                } else {
+                    ForEach(keys) { key in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(key.name).font(.headline)
+                                Spacer()
+                                Button(role: .destructive) {
+                                    keyToDelete = key
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(.borderless)
+                            }
+                            Text(key.keyPrefix + "...").font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                            if let scopes = key.scopes, !scopes.isEmpty {
+                                HStack(spacing: 4) {
+                                    ForEach(scopes, id: \.self) { scope in
+                                        Text(scope)
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(.secondary.opacity(0.15), in: Capsule())
+                                    }
+                                }
+                            }
+                            Text("Created \(formattedDate(key.createdAt))")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("API Keys")
+                    Spacer()
+                    Button {
+                        showCreate = true
+                    } label: {
+                        Label("Create", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+
+            if let createdKey {
+                Section("New Key Created") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Copy this key now — it won't be shown again.")
+                            .font(.caption).foregroundStyle(.orange)
+                        HStack {
+                            Text(createdKey)
+                                .font(.system(.body, design: .monospaced))
+                                .textSelection(.enabled)
+                            Spacer()
+                            Button {
+                                copyToClipboard(createdKey)
+                            } label: {
+                                Image(systemName: "doc.on.doc")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                        Button("Dismiss") {
+                            self.createdKey = nil
+                        }
+                    }
+                }
+            }
+        }
+        .task { await loadKeys() }
+        .sheet(isPresented: $showCreate) {
+            createKeySheet
+        }
+        .alert("Revoke API Key?", isPresented: .init(
+            get: { keyToDelete != nil },
+            set: { if !$0 { keyToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) {}
+            Button("Revoke", role: .destructive) {
+                if let key = keyToDelete {
+                    Task { await deleteKey(key.id) }
+                }
+            }
+        } message: {
+            Text("This action cannot be undone.")
+        }
+    }
+
+    @ViewBuilder
+    private var createKeySheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Key Name", text: $newKeyName)
+                    .autocorrectionDisabled()
+
+                Picker("Expires", selection: $newKeyExpiry) {
+                    ForEach(expiryOptions, id: \.1) { option in
+                        Text(option.0).tag(option.1)
+                    }
+                }
+
+                Section("Scopes") {
+                    ForEach(["read", "write", "delete", "admin"], id: \.self) { scope in
+                        Toggle(scope.capitalized, isOn: Binding(
+                            get: { newKeyScopes.contains(scope) },
+                            set: { if $0 { newKeyScopes.insert(scope) } else { newKeyScopes.remove(scope) } }
+                        ))
+                    }
+                }
+
+                if let error {
+                    Text(error).font(.caption).foregroundStyle(.red)
+                }
+            }
+            .formStyle(.grouped)
+            .navigationTitle("Create API Key")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showCreate = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        Task { await createKey() }
+                    } label: {
+                        if isCreating { ProgressView().controlSize(.small) }
+                        else { Text("Create") }
+                    }
+                    .disabled(newKeyName.isEmpty || isCreating)
+                }
+            }
+        }
+        .frame(minWidth: 350, minHeight: 300)
+    }
+
+    private func loadKeys() async {
+        isLoading = true
+        do { keys = try await api.listApiKeys() } catch { self.error = error.localizedDescription }
+        isLoading = false
+    }
+
+    private func createKey() async {
+        isCreating = true
+        error = nil
+        do {
+            let result = try await api.createApiKey(
+                name: newKeyName,
+                scopes: Array(newKeyScopes),
+                expiresInDays: newKeyExpiry == 0 ? nil : newKeyExpiry
+            )
+            createdKey = result.key
+            newKeyName = ""
+            newKeyScopes = ["read"]
+            newKeyExpiry = 90
+            showCreate = false
+            await loadKeys()
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isCreating = false
+    }
+
+    private func deleteKey(_ id: String) async {
+        do {
+            try await api.deleteApiKey(id)
+            keyToDelete = nil
+            await loadKeys()
+        } catch {}
+    }
+}
+
+// MARK: - Access Tokens Tab
+
+private struct AccessTokensTab: View {
+    @State private var tokens: [AccessToken] = []
+    @State private var isLoading = true
+    @State private var error: String?
+
+    // Create
+    @State private var showCreate = false
+    @State private var newTokenName = ""
+    @State private var newTokenExpiry = 90
+    @State private var newTokenScopes: Set<String> = ["read"]
+    @State private var createdToken: String?
+    @State private var isCreating = false
+
+    // Delete
+    @State private var tokenToDelete: AccessToken?
+
+    private let api = APIClient.shared
+
+    private let expiryOptions: [(String, Int)] = [
+        ("30 days", 30), ("60 days", 60), ("90 days", 90),
+        ("180 days", 180), ("1 year", 365), ("Never", 0),
+    ]
+
+    var body: some View {
+        List {
+            Section {
+                if isLoading {
+                    ProgressView()
+                } else if tokens.isEmpty {
+                    ContentUnavailableView(
+                        "No Access Tokens",
+                        systemImage: "shield",
+                        description: Text("Create an access token for CLI or CI/CD use.")
+                    )
+                } else {
+                    ForEach(tokens) { token in
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack {
+                                Text(token.name).font(.headline)
+                                Spacer()
+                                Button(role: .destructive) {
+                                    tokenToDelete = token
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
+                                .buttonStyle(.borderless)
+                            }
+                            Text(token.tokenPrefix + "...").font(.system(.caption, design: .monospaced)).foregroundStyle(.secondary)
+                            if let scopes = token.scopes, !scopes.isEmpty {
+                                HStack(spacing: 4) {
+                                    ForEach(scopes, id: \.self) { scope in
+                                        Text(scope)
+                                            .font(.caption2)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(.secondary.opacity(0.15), in: Capsule())
+                                    }
+                                }
+                            }
+                            Text("Created \(formattedDate(token.createdAt))")
+                                .font(.caption).foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("Access Tokens")
+                    Spacer()
+                    Button {
+                        showCreate = true
+                    } label: {
+                        Label("Create", systemImage: "plus")
+                    }
+                    .buttonStyle(.borderless)
+                }
+            }
+
+            if let createdToken {
+                Section("New Token Created") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Copy this token now — it won't be shown again.")
+                            .font(.caption).foregroundStyle(.orange)
+                        HStack {
+                            Text(createdToken)
+                                .font(.system(.body, design: .monospaced))
+                                .textSelection(.enabled)
+                            Spacer()
+                            Button {
+                                copyToClipboard(createdToken)
+                            } label: {
+                                Image(systemName: "doc.on.doc")
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                        Button("Dismiss") {
+                            self.createdToken = nil
+                        }
+                    }
+                }
+            }
+        }
+        .task { await loadTokens() }
+        .sheet(isPresented: $showCreate) {
+            createTokenSheet
+        }
+        .alert("Revoke Access Token?", isPresented: .init(
+            get: { tokenToDelete != nil },
+            set: { if !$0 { tokenToDelete = nil } }
+        )) {
+            Button("Cancel", role: .cancel) {}
+            Button("Revoke", role: .destructive) {
+                if let token = tokenToDelete {
+                    Task { await deleteToken(token.id) }
+                }
+            }
+        } message: {
+            Text("This action cannot be undone.")
+        }
+    }
+
+    @ViewBuilder
+    private var createTokenSheet: some View {
+        NavigationStack {
+            Form {
+                TextField("Token Name", text: $newTokenName)
+                    .autocorrectionDisabled()
+
+                Picker("Expires", selection: $newTokenExpiry) {
+                    ForEach(expiryOptions, id: \.1) { option in
+                        Text(option.0).tag(option.1)
+                    }
+                }
+
+                Section("Scopes") {
+                    ForEach(["read", "write", "delete", "admin"], id: \.self) { scope in
+                        Toggle(scope.capitalized, isOn: Binding(
+                            get: { newTokenScopes.contains(scope) },
+                            set: { if $0 { newTokenScopes.insert(scope) } else { newTokenScopes.remove(scope) } }
+                        ))
+                    }
+                }
+
+                if let error {
+                    Text(error).font(.caption).foregroundStyle(.red)
+                }
+            }
+            .formStyle(.grouped)
+            .navigationTitle("Create Access Token")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showCreate = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button {
+                        Task { await createToken() }
+                    } label: {
+                        if isCreating { ProgressView().controlSize(.small) }
+                        else { Text("Create") }
+                    }
+                    .disabled(newTokenName.isEmpty || isCreating)
+                }
+            }
+        }
+        .frame(minWidth: 350, minHeight: 300)
+    }
+
+    private func loadTokens() async {
+        isLoading = true
+        do { tokens = try await api.listAccessTokens() } catch { self.error = error.localizedDescription }
+        isLoading = false
+    }
+
+    private func createToken() async {
+        isCreating = true
+        error = nil
+        do {
+            let result = try await api.createAccessToken(
+                name: newTokenName,
+                scopes: Array(newTokenScopes),
+                expiresInDays: newTokenExpiry == 0 ? nil : newTokenExpiry
+            )
+            createdToken = result.token
+            newTokenName = ""
+            newTokenScopes = ["read"]
+            newTokenExpiry = 90
+            showCreate = false
+            await loadTokens()
+        } catch {
+            self.error = error.localizedDescription
+        }
+        isCreating = false
+    }
+
+    private func deleteToken(_ id: String) async {
+        do {
+            try await api.deleteAccessToken(id)
+            tokenToDelete = nil
+            await loadTokens()
+        } catch {}
+    }
+}
+
+// MARK: - Security Tab
+
+private struct SecurityTab: View {
+    @EnvironmentObject var authManager: AuthManager
+
     // Password change
     @State private var currentPassword = ""
     @State private var newPassword = ""
@@ -25,33 +556,17 @@ struct ProfileView: View {
     @State private var disableCode = ""
     @State private var disableLoading = false
 
-    private let apiClient = APIClient.shared
+    private let api = APIClient.shared
 
     var body: some View {
-        List {
-            accountSection
+        Form {
             changePasswordSection
             twoFactorSection
         }
-        .navigationTitle("Profile")
+        .formStyle(.grouped)
     }
 
-    // MARK: - Account Section
-
-    @ViewBuilder
-    private var accountSection: some View {
-        if let user = authManager.currentUser {
-            Section("Account") {
-                LabeledContent("Username", value: user.username)
-                if let email = user.email {
-                    LabeledContent("Email", value: email)
-                }
-                LabeledContent("Role", value: user.isAdmin ? "Admin" : "User")
-            }
-        }
-    }
-
-    // MARK: - Change Password Section
+    // MARK: - Change Password
 
     @ViewBuilder
     private var changePasswordSection: some View {
@@ -73,18 +588,13 @@ struct ProfileView: View {
                 #endif
 
             if let error = passwordError {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
+                Text(error).font(.caption).foregroundStyle(.red)
             }
 
             if passwordSuccess {
                 HStack {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Password changed successfully")
-                        .font(.caption)
-                        .foregroundStyle(.green)
+                    Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                    Text("Password changed successfully").font(.caption).foregroundStyle(.green)
                 }
             }
 
@@ -92,25 +602,14 @@ struct ProfileView: View {
                 Task { await changePassword() }
             } label: {
                 HStack {
-                    if passwordLoading {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
+                    if passwordLoading { ProgressView().controlSize(.small) }
                     Text("Change Password")
                 }
             }
-            .disabled(changePasswordDisabled)
+            .disabled(currentPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty || newPassword != confirmPassword || passwordLoading)
         } header: {
             Text("Change Password")
         }
-    }
-
-    private var changePasswordDisabled: Bool {
-        currentPassword.isEmpty
-            || newPassword.isEmpty
-            || confirmPassword.isEmpty
-            || newPassword != confirmPassword
-            || passwordLoading
     }
 
     private func changePassword() async {
@@ -118,13 +617,8 @@ struct ProfileView: View {
         passwordLoading = true
         passwordError = nil
         passwordSuccess = false
-
         do {
-            try await apiClient.changeUserPassword(
-                userId: user.id,
-                currentPassword: currentPassword,
-                newPassword: newPassword
-            )
+            try await api.changeUserPassword(userId: user.id, currentPassword: currentPassword, newPassword: newPassword)
             passwordSuccess = true
             currentPassword = ""
             newPassword = ""
@@ -132,11 +626,10 @@ struct ProfileView: View {
         } catch {
             passwordError = error.localizedDescription
         }
-
         passwordLoading = false
     }
 
-    // MARK: - Two-Factor Authentication Section
+    // MARK: - Two-Factor Authentication
 
     @ViewBuilder
     private var twoFactorSection: some View {
@@ -152,9 +645,7 @@ struct ProfileView: View {
             }
 
             if let error = totpError {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
+                Text(error).font(.caption).foregroundStyle(.red)
             }
         } header: {
             Text("Two-Factor Authentication")
@@ -191,10 +682,7 @@ struct ProfileView: View {
                 Task { await disableTotp() }
             } label: {
                 HStack {
-                    if disableLoading {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
+                    if disableLoading { ProgressView().controlSize(.small) }
                     Text("Confirm Disable")
                 }
             }
@@ -231,10 +719,7 @@ struct ProfileView: View {
             Task { await setupTotp() }
         } label: {
             HStack {
-                if totpSetupLoading {
-                    ProgressView()
-                        .controlSize(.small)
-                }
+                if totpSetupLoading { ProgressView().controlSize(.small) }
                 Label("Enable 2FA", systemImage: "lock.shield")
             }
         }
@@ -260,9 +745,17 @@ struct ProfileView: View {
                 Text("Manual entry key:")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(setup.secret)
-                    .font(.system(.body, design: .monospaced))
-                    .textSelection(.enabled)
+                HStack {
+                    Text(setup.secret)
+                        .font(.system(.body, design: .monospaced))
+                        .textSelection(.enabled)
+                    Button {
+                        copyToClipboard(setup.secret)
+                    } label: {
+                        Image(systemName: "doc.on.doc")
+                    }
+                    .buttonStyle(.borderless)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -279,10 +772,7 @@ struct ProfileView: View {
             Task { await enableTotp() }
         } label: {
             HStack {
-                if totpSetupLoading {
-                    ProgressView()
-                        .controlSize(.small)
-                }
+                if totpSetupLoading { ProgressView().controlSize(.small) }
                 Text("Verify and Enable")
             }
         }
@@ -299,20 +789,15 @@ struct ProfileView: View {
     private func backupCodesContent(_ codes: [String]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                Text("Two-factor authentication enabled!")
-                    .font(.headline)
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                Text("Two-factor authentication enabled!").font(.headline)
             }
 
             Text("Save these backup codes in a secure location. Each code can only be used once.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-            ], spacing: 8) {
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 8) {
                 ForEach(codes, id: \.self) { code in
                     Text(code)
                         .font(.system(.body, design: .monospaced))
@@ -321,14 +806,22 @@ struct ProfileView: View {
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 6))
                 }
             }
+
+            HStack {
+                Button {
+                    copyToClipboard(codes.joined(separator: "\n"))
+                } label: {
+                    Label("Copy All", systemImage: "doc.on.doc")
+                }
+
+                Button("Done") {
+                    totpBackupCodes = nil
+                    totpSetupResponse = nil
+                    totpVerificationCode = ""
+                }
+            }
         }
         .padding(.vertical, 4)
-
-        Button("Done") {
-            totpBackupCodes = nil
-            totpSetupResponse = nil
-            totpVerificationCode = ""
-        }
     }
 
     // MARK: - TOTP Actions
@@ -336,43 +829,30 @@ struct ProfileView: View {
     private func setupTotp() async {
         totpSetupLoading = true
         totpError = nil
-
-        do {
-            totpSetupResponse = try await apiClient.totpSetup()
-        } catch {
-            totpError = error.localizedDescription
-        }
-
+        do { totpSetupResponse = try await api.totpSetup() }
+        catch { totpError = error.localizedDescription }
         totpSetupLoading = false
     }
 
     private func enableTotp() async {
         totpSetupLoading = true
         totpError = nil
-
         do {
-            let response = try await apiClient.totpEnable(code: totpVerificationCode)
+            let response = try await api.totpEnable(code: totpVerificationCode)
             totpBackupCodes = response.backupCodes
-        } catch {
-            totpError = error.localizedDescription
-        }
-
+        } catch { totpError = error.localizedDescription }
         totpSetupLoading = false
     }
 
     private func disableTotp() async {
         disableLoading = true
         totpError = nil
-
         do {
-            try await apiClient.totpDisable(password: disablePassword, code: disableCode)
+            try await api.totpDisable(password: disablePassword, code: disableCode)
             showingDisableTotp = false
             disablePassword = ""
             disableCode = ""
-        } catch {
-            totpError = error.localizedDescription
-        }
-
+        } catch { totpError = error.localizedDescription }
         disableLoading = false
     }
 
@@ -401,4 +881,35 @@ struct ProfileView: View {
         return Image(nsImage: NSImage(cgImage: cgImage, size: NSSize(width: cgImage.width, height: cgImage.height)))
         #endif
     }
+}
+
+// MARK: - Helpers
+
+private func formattedDate(_ isoString: String) -> String {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    if let date = formatter.date(from: isoString) {
+        let display = DateFormatter()
+        display.dateStyle = .medium
+        display.timeStyle = .short
+        return display.string(from: date)
+    }
+    // Try without fractional seconds
+    formatter.formatOptions = [.withInternetDateTime]
+    if let date = formatter.date(from: isoString) {
+        let display = DateFormatter()
+        display.dateStyle = .medium
+        display.timeStyle = .short
+        return display.string(from: date)
+    }
+    return isoString
+}
+
+private func copyToClipboard(_ text: String) {
+    #if os(iOS)
+    UIPasteboard.general.string = text
+    #else
+    NSPasteboard.general.clearContents()
+    NSPasteboard.general.setString(text, forType: .string)
+    #endif
 }
