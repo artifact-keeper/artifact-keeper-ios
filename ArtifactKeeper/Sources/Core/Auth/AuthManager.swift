@@ -9,6 +9,8 @@ class AuthManager: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var setupRequired = false
+    @Published var totpRequired = false
+    @Published var totpToken: String?
 
     private let apiClient = APIClient.shared
 
@@ -22,6 +24,14 @@ class AuthManager: ObservableObject {
                 method: "POST",
                 body: LoginRequest(username: username, password: password)
             )
+
+            // Check if TOTP verification is required
+            if response.totpRequired == true {
+                totpRequired = true
+                totpToken = response.totpToken
+                isLoading = false
+                return
+            }
 
             await apiClient.setToken(response.accessToken)
 
@@ -41,6 +51,33 @@ class AuthManager: ObservableObject {
         isLoading = false
     }
 
+    func verifyTotp(code: String) async {
+        guard let token = totpToken else { return }
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            let response: LoginResponse = try await apiClient.totpVerify(totpToken: token, code: code)
+
+            await apiClient.setToken(response.accessToken)
+
+            if let user = Self.decodeJWT(response.accessToken) {
+                currentUser = user
+            }
+            isAuthenticated = true
+            totpRequired = false
+            totpToken = nil
+
+            if response.mustChangePassword == true {
+                mustChangePassword = true
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
+        isLoading = false
+    }
+
     func logout() {
         Task {
             await apiClient.setToken(nil)
@@ -48,6 +85,8 @@ class AuthManager: ObservableObject {
         currentUser = nil
         isAuthenticated = false
         mustChangePassword = false
+        totpRequired = false
+        totpToken = nil
     }
 
     func checkSetupStatus() async {

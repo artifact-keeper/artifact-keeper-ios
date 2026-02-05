@@ -6,6 +6,7 @@ struct AccountToolbarModifier: ViewModifier {
     @State private var showingLoginSheet = false
     @State private var showingDashboard = false
     @State private var showingAddServer = false
+    @State private var showingProfile = false
 
     func body(content: Content) -> some View {
         content
@@ -68,6 +69,12 @@ struct AccountToolbarModifier: ViewModifier {
                                 Label(email, systemImage: "envelope")
                             }
                             Label(user.isAdmin ? "Admin" : "User", systemImage: "shield")
+                            Divider()
+                            Button {
+                                showingProfile = true
+                            } label: {
+                                Label("Profile", systemImage: "person.text.rectangle")
+                            }
                             Divider()
                             Button(role: .destructive) {
                                 authManager.logout()
@@ -133,6 +140,22 @@ struct AccountToolbarModifier: ViewModifier {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
                                     showingAddServer = false
+                                }
+                            }
+                        }
+                }
+            }
+            .sheet(isPresented: $showingProfile) {
+                NavigationStack {
+                    ProfileView()
+                        .navigationTitle("Profile")
+                        #if os(iOS)
+                        .navigationBarTitleDisplayMode(.inline)
+                        #endif
+                        .toolbar {
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Done") {
+                                    showingProfile = false
                                 }
                             }
                         }

@@ -151,6 +151,42 @@ actor APIClient {
         let encoded = artifactPath.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? artifactPath
         return URL(string: "\(baseURL)/api/v1/repositories/\(repoKey)/artifacts/\(encoded)/download")
     }
+
+    // MARK: - TOTP
+
+    func totpSetup() async throws -> TotpSetupResponse {
+        try await request("/api/v1/auth/totp/setup", method: "POST")
+    }
+
+    func totpEnable(code: String) async throws -> TotpEnableResponse {
+        try await request("/api/v1/auth/totp/enable", method: "POST", body: TotpCodeRequest(code: code))
+    }
+
+    func totpVerify(totpToken: String, code: String) async throws -> LoginResponse {
+        try await request(
+            "/api/v1/auth/totp/verify",
+            method: "POST",
+            body: TotpVerifyRequest(totpToken: totpToken, code: code)
+        )
+    }
+
+    func totpDisable(password: String, code: String) async throws {
+        try await requestVoid(
+            "/api/v1/auth/totp/disable",
+            method: "POST",
+            body: TotpDisableRequest(password: password, code: code)
+        )
+    }
+
+    // MARK: - Password
+
+    func changeUserPassword(userId: String, currentPassword: String, newPassword: String) async throws {
+        try await requestVoid(
+            "/api/v1/users/\(userId)/password",
+            method: "POST",
+            body: ChangePasswordRequest(currentPassword: currentPassword, newPassword: newPassword)
+        )
+    }
 }
 
 enum APIError: LocalizedError {

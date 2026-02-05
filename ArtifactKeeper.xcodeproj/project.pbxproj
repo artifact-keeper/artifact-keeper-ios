@@ -16,6 +16,8 @@
 		0FAD280684B34F3ABB6306F5 /* Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8118DAD8066C9D0EED317C /* Security.swift */; };
 		152D6AC4ACB54B60335AAA44 /* TelemetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4252913A5015A9448F73683 /* TelemetryView.swift */; };
 		2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
+		4BFBAC9B527289CC3F826D88 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5819C3F90D5FA72941CD660 /* ProfileView.swift */; };
+		0F23E3282ACEE5A27D0506BC /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5819C3F90D5FA72941CD660 /* ProfileView.swift */; };
 		22E710F949296F2C4F470275 /* AdminSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A1E349FB6E5B428703A548 /* AdminSectionView.swift */; };
 		28EDDF86319305C5ABC398D0 /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CFB90021A1428D8962F1BF /* Operations.swift */; };
 		2D8B1BCF039F334B0A7FD76A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9415E01C2D644848CDBB4D0 /* Theme.swift */; };
@@ -120,6 +122,7 @@
 		79512BEEB0DBDA10DFDCFAAC /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		8063DEF3B0228C26496797B7 /* WebhooksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhooksView.swift; sourceTree = "<group>"; };
 		8067728F7917AD61F0DB4037 /* ReplicationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReplicationView.swift; sourceTree = "<group>"; };
+				D5819C3F90D5FA72941CD660 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		8267620B852D7914EAD83DAE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		85C67E4A61ED479E094891F7 /* PackagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagesView.swift; sourceTree = "<group>"; };
 		90190CE35DA804C357A5FFDB /* Build.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Build.swift; sourceTree = "<group>"; };
@@ -353,6 +356,7 @@
 				042E0D67EEA95AAB12420E1A /* Repositories */,
 				A69D702B0E189B628246D145 /* Search */,
 				514C97A50E229F57F7461C12 /* Security */,
+				0B7CB962D56A158358D7A7F3 /* Profile */,
 				E7C87B92709E5F81DD7E421E /* Settings */,
 				04CA57A38B1937E40CE111B1 /* Welcome */,
 			);
@@ -367,6 +371,14 @@
 				AD6324D1245757CE4DC9A4F0 /* Theme */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+				0B7CB962D56A158358D7A7F3 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				D5819C3F90D5FA72941CD660 /* ProfileView.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		E7C87B92709E5F81DD7E421E /* Settings */ = {
@@ -551,6 +563,7 @@
 				03D59745AFA47FE8D1811B9A /* SecurityView.swift in Sources */,
 				9DE03A85868EB62612D588DC /* ServerManager.swift in Sources */,
 				4BB5107B04DD21BF5EC76FB0 /* SettingsView.swift in Sources */,
+				4BFBAC9B527289CC3F826D88 /* ProfileView.swift in Sources */,
 				42DD12D515613DB543BCD922 /* TelemetryView.swift in Sources */,
 				5E51BAB787218813CAC5477D /* Theme.swift in Sources */,
 				859514D003E6E75A90E88192 /* UsersView.swift in Sources */,
@@ -600,6 +613,7 @@
 				C485A2CE45918DADE34AAA1B /* SecurityView.swift in Sources */,
 				D11B924C3B8CFCE3F0E46905 /* ServerManager.swift in Sources */,
 				2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */,
+				0F23E3282ACEE5A27D0506BC /* ProfileView.swift in Sources */,
 				152D6AC4ACB54B60335AAA44 /* TelemetryView.swift in Sources */,
 				2D8B1BCF039F334B0A7FD76A /* Theme.swift in Sources */,
 				5C6497F001D512DDC978EA47 /* UsersView.swift in Sources */,
