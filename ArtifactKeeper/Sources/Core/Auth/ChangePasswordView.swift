@@ -29,7 +29,7 @@ struct ChangePasswordView: View {
             VStack(spacing: 16) {
                 Image(systemName: authManager.setupRequired ? "shield.checkered" : "lock.rotation")
                     .font(.system(size: 72, weight: .thin))
-                    .foregroundStyle(authManager.setupRequired ? .orange.gradient : .blue.gradient)
+                    .foregroundStyle(authManager.setupRequired ? Color.orange.gradient : Color.blue.gradient)
 
                 Text(authManager.setupRequired ? "Complete Setup" : "Change Password")
                     .font(.largeTitle.bold())
