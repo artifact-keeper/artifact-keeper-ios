@@ -24,6 +24,7 @@ class ServerManager: ObservableObject {
 
     @Published var servers: [SavedServer] = []
     @Published var activeServerId: String?
+    @Published var serverStatuses: [String: Bool] = [:]
 
     var activeServer: SavedServer? {
         servers.first { $0.id == activeServerId }
@@ -67,6 +68,31 @@ class ServerManager: ObservableObject {
         activeServerId = server.id
         UserDefaults.standard.set(server.id, forKey: Self.activeServerKey)
         applyServer(server)
+    }
+
+    func refreshStatuses() async {
+        var results: [String: Bool] = [:]
+        for server in servers {
+            let urlString = server.url.hasSuffix("/") ? "\(server.url)health" : "\(server.url)/health"
+            guard let url = URL(string: urlString) else {
+                results[server.id] = false
+                continue
+            }
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            request.timeoutInterval = 5
+            do {
+                let (_, response) = try await URLSession.shared.data(for: request)
+                if let http = response as? HTTPURLResponse {
+                    results[server.id] = (200...299).contains(http.statusCode)
+                } else {
+                    results[server.id] = false
+                }
+            } catch {
+                results[server.id] = false
+            }
+        }
+        serverStatuses = results
     }
 
     private func applyServer(_ server: SavedServer) {

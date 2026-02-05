@@ -26,7 +26,10 @@ struct AccountToolbarModifier: ViewModifier {
                                         serverManager.switchTo(server)
                                         authManager.logout()  // Auto-logout when switching servers
                                     } label: {
-                                        HStack {
+                                        HStack(spacing: 6) {
+                                            Circle()
+                                                .fill(serverManager.serverStatuses[server.id] == true ? Color.green : Color.gray)
+                                                .frame(width: 8, height: 8)
                                             Text(server.name)
                                             if server.id == serverManager.activeServerId {
                                                 Image(systemName: "checkmark")
@@ -137,6 +140,9 @@ struct AccountToolbarModifier: ViewModifier {
                             }
                         }
                 }
+            }
+            .task(id: serverManager.servers.count) {
+                await serverManager.refreshStatuses()
             }
             .onChange(of: authManager.isAuthenticated) { _, isAuth in
                 if isAuth {
