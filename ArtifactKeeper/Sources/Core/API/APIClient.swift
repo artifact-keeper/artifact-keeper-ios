@@ -56,7 +56,7 @@ actor APIClient {
     }
 
     func testConnection(to urlString: String) async throws {
-        guard let url = URL(string: "\(urlString)/api/v1/repositories?per_page=1") else {
+        guard let url = URL(string: "\(urlString)/health") else {
             throw APIError.invalidURL
         }
 
