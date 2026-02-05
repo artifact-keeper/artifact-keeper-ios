@@ -114,7 +114,7 @@ struct ChangePasswordView: View {
                 newPassword: newPassword
             )
             try await APIClient.shared.requestVoid(
-                "/api/v1/admin/users/\(userId)/password",
+                "/api/v1/users/\(userId)/password",
                 method: "POST",
                 body: body
             )
