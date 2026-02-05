@@ -34,3 +34,11 @@ struct UserInfo: Codable, Sendable, Identifiable {
         case isAdmin = "is_admin"
     }
 }
+
+struct SetupStatusResponse: Codable, Sendable {
+    let setupRequired: Bool
+
+    enum CodingKeys: String, CodingKey {
+        case setupRequired = "setup_required"
+    }
+}

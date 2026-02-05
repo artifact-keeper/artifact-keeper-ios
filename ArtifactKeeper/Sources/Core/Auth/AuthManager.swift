@@ -8,6 +8,7 @@ class AuthManager: ObservableObject {
     @Published var currentUser: UserInfo?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var setupRequired = false
 
     private let apiClient = APIClient.shared
 
@@ -47,6 +48,19 @@ class AuthManager: ObservableObject {
         currentUser = nil
         isAuthenticated = false
         mustChangePassword = false
+    }
+
+    func checkSetupStatus() async {
+        do {
+            let status: SetupStatusResponse = try await apiClient.request("/api/v1/setup/status")
+            setupRequired = status.setupRequired
+        } catch {
+            setupRequired = false
+        }
+    }
+
+    func handleServerSwitch() {
+        logout()
     }
 
     /// Decode user info from JWT access token payload (base64 middle segment)

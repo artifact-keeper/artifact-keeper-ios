@@ -24,6 +24,7 @@ struct AccountToolbarModifier: ViewModifier {
                                 ForEach(serverManager.servers) { server in
                                     Button {
                                         serverManager.switchTo(server)
+                                        authManager.logout()  // Auto-logout when switching servers
                                     } label: {
                                         HStack {
                                             Text(server.name)

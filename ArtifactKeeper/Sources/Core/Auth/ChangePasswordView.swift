@@ -27,17 +27,29 @@ struct ChangePasswordView: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Image(systemName: "lock.rotation")
+                Image(systemName: authManager.setupRequired ? "shield.checkered" : "lock.rotation")
                     .font(.system(size: 72, weight: .thin))
-                    .foregroundStyle(.blue.gradient)
+                    .foregroundStyle(authManager.setupRequired ? .orange.gradient : .blue.gradient)
 
-                Text("Change Password")
+                Text(authManager.setupRequired ? "Complete Setup" : "Change Password")
                     .font(.largeTitle.bold())
 
-                Text("You must change your password before continuing")
+                Text(authManager.setupRequired
+                    ? "Set a secure admin password to unlock the API and complete first-time setup."
+                    : "You must change your password before continuing")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+
+                if authManager.setupRequired {
+                    Label("All API endpoints are locked until this step is completed.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.blue)
+                        .padding(8)
+                        .frame(maxWidth: .infinity)
+                        .background(.blue.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
             }
 
             VStack(spacing: 16) {
@@ -107,6 +119,7 @@ struct ChangePasswordView: View {
                 body: body
             )
             authManager.mustChangePassword = false
+            authManager.setupRequired = false
         } catch {
             errorMessage = error.localizedDescription
         }
