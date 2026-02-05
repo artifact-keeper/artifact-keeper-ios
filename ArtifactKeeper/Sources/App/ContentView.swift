@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var authManager: AuthManager
+    @EnvironmentObject var serverManager: ServerManager
     @AppStorage(APIClient.serverURLKey) private var serverURL: String = ""
 
     var body: some View {
@@ -14,6 +15,7 @@ struct ContentView: View {
                 ChangePasswordView()
             } else {
                 MainTabView()
+                    .id(serverManager.activeServerId)
             }
         }
         .background(AppTheme.background.ignoresSafeArea())
