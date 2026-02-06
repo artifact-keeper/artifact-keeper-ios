@@ -6,13 +6,25 @@ struct SecuritySectionView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Picker("", selection: $selectedTab) {
-                    Text("Dashboard").tag("dashboard")
-                    Text("Scans").tag("scans")
-                    Text("Policies").tag("policies")
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        ForEach(["dashboard", "scans", "policies", "licenses"], id: \.self) { tab in
+                            Button {
+                                selectedTab = tab
+                            } label: {
+                                Text(tabTitle(for: tab))
+                                    .font(.subheadline.weight(selectedTab == tab ? .semibold : .regular))
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(selectedTab == tab ? Color.accentColor.opacity(0.1) : Color.clear)
+                                    .foregroundStyle(selectedTab == tab ? .primary : .secondary)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal)
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
                 .padding(.vertical, 8)
 
                 Divider()
@@ -25,6 +37,8 @@ struct SecuritySectionView: View {
                         SecurityScansContentView()
                     case "policies":
                         PoliciesView()
+                    case "licenses":
+                        LicensePoliciesView()
                     default:
                         EmptyView()
                     }
@@ -33,6 +47,16 @@ struct SecuritySectionView: View {
             }
             .navigationTitle("Security")
             .accountToolbar()
+        }
+    }
+
+    private func tabTitle(for tab: String) -> String {
+        switch tab {
+        case "dashboard": return "Dashboard"
+        case "scans": return "Scans"
+        case "policies": return "Policies"
+        case "licenses": return "Licenses"
+        default: return tab.capitalized
         }
     }
 }
