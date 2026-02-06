@@ -14,6 +14,11 @@ struct MainTabView: View {
                 }
 
             if isLoggedIn {
+                StagingSectionView()
+                    .tabItem {
+                        Label("Staging", systemImage: "tray.and.arrow.up")
+                    }
+
                 IntegrationSectionView()
                     .tabItem {
                         Label("Integration", systemImage: "link")

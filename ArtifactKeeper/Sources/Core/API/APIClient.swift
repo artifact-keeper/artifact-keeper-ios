@@ -239,6 +239,43 @@ actor APIClient {
     func deleteAccessToken(_ id: String) async throws {
         try await requestVoid("/api/v1/profile/access-tokens/\(id)", method: "DELETE")
     }
+
+    // MARK: - Staging Repositories
+
+    func listStagingRepos() async throws -> [StagingRepository] {
+        let response: StagingRepositoryListResponse = try await request("/api/v1/staging/repositories")
+        return response.items
+    }
+
+    func listStagingArtifacts(repoKey: String) async throws -> [StagingArtifact] {
+        let response: StagingArtifactListResponse = try await request(
+            "/api/v1/staging/repositories/\(repoKey)/artifacts?per_page=100"
+        )
+        return response.items
+    }
+
+    func promoteArtifact(repoKey: String, artifactId: String, request: PromotionRequest) async throws -> PromotionResponse {
+        try await self.request(
+            "/api/v1/staging/repositories/\(repoKey)/artifacts/\(artifactId)/promote",
+            method: "POST",
+            body: request
+        )
+    }
+
+    func promoteBulk(repoKey: String, request: BulkPromotionRequest) async throws -> BulkPromotionResponse {
+        try await self.request(
+            "/api/v1/staging/repositories/\(repoKey)/promote-bulk",
+            method: "POST",
+            body: request
+        )
+    }
+
+    func getPromotionHistory(repoKey: String) async throws -> [PromotionHistoryEntry] {
+        let response: PromotionHistoryResponse = try await request(
+            "/api/v1/staging/repositories/\(repoKey)/history?per_page=100"
+        )
+        return response.items
+    }
 }
 
 enum APIError: LocalizedError {
