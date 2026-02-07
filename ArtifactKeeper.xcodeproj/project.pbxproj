@@ -121,6 +121,10 @@
 		2B7879808182838485868788 /* StagingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C9D0E1F2A3B4C5D6E7F8A9 /* StagingDetailView.swift */; };
 		2B8990919293949596979899 /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D0E1F2A3B4C5D6E7F8A9B0 /* StagingListView.swift */; };
 		2B9001020304050607080910 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E1F2A3B4C5D6E7F8A9B0C1 /* StagingSectionView.swift */; };
+		3C0102030405060708091011 /* VirtualMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1A2B3C4D5E6F7A8B9C0D1E2 /* VirtualMember.swift */; };
+		3C1213141516171819202122 /* VirtualMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G2B3C4D5E6F7A8B9C0D1E2F3 /* VirtualMembersView.swift */; };
+		4D0102030405060708091011 /* VirtualMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1A2B3C4D5E6F7A8B9C0D1E2 /* VirtualMember.swift */; };
+		4D1213141516171819202122 /* VirtualMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G2B3C4D5E6F7A8B9C0D1E2F3 /* VirtualMembersView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -180,6 +184,8 @@
 		D4E5F6A7B8C9D0E1F2A3B4C5 /* PromotionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionHistoryView.swift; sourceTree = "<group>"; };
 		E5F6A7B8C9D0E1F2A3B4C5D6 /* PromotionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionSheet.swift; sourceTree = "<group>"; };
 		F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sbom.swift; sourceTree = "<group>"; };
+		G1A2B3C4D5E6F7A8B9C0D1E2 /* VirtualMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMember.swift; sourceTree = "<group>"; };
+		G2B3C4D5E6F7A8B9C0D1E2F3 /* VirtualMembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMembersView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */,
+				G2B3C4D5E6F7A8B9C0D1E2F3 /* VirtualMembersView.swift */,
 			);
 			path = Repositories;
 			sourceTree = "<group>";
@@ -275,6 +282,7 @@
 				75FB2391848A9D7A02E4F7DC /* Repository.swift */,
 				F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */,
 				3D8118DAD8066C9D0EED317C /* Security.swift */,
+				G1A2B3C4D5E6F7A8B9C0D1E2 /* VirtualMember.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -627,6 +635,8 @@
 				859514D003E6E75A90E88192 /* UsersView.swift in Sources */,
 				FF47AA66613AA085B81F3A93 /* WebhooksView.swift in Sources */,
 				F37EAD999EEE9694758BBE8D /* WelcomeView.swift in Sources */,
+				3C0102030405060708091011 /* VirtualMember.swift in Sources */,
+				3C1213141516171819202122 /* VirtualMembersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -687,6 +697,8 @@
 				5C6497F001D512DDC978EA47 /* UsersView.swift in Sources */,
 				F790A545605AFA178BEEA506 /* WebhooksView.swift in Sources */,
 				C42665F0C144A44BC7AAA95D /* WelcomeView.swift in Sources */,
+				4D0102030405060708091011 /* VirtualMember.swift in Sources */,
+				4D1213141516171819202122 /* VirtualMembersView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
