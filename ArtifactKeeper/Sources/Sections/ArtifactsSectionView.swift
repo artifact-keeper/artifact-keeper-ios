@@ -24,8 +24,10 @@ struct ArtifactsSectionView: View {
                 Group {
                     switch selectedTab {
                     case "repositories":
-                        RepositoriesContentView()
-                            .id(refreshTrigger)
+                        RepositoriesContentView(onCreateTapped: {
+                            showingCreateRepoSheet = true
+                        })
+                        .id(refreshTrigger)
                     case "packages":
                         PackagesContentView()
                     case "builds":
@@ -40,17 +42,6 @@ struct ArtifactsSectionView: View {
             }
             .navigationTitle("Artifacts")
             .accountToolbar()
-            .toolbar {
-                if selectedTab == "repositories" {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button {
-                            showingCreateRepoSheet = true
-                        } label: {
-                            Image(systemName: "plus")
-                        }
-                    }
-                }
-            }
             .sheet(isPresented: $showingCreateRepoSheet) {
                 CreateRepositorySheet(
                     onCreated: { repoKey, repoType in

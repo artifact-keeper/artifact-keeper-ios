@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct RepositoriesContentView: View {
+    var onCreateTapped: (() -> Void)?
+
     @State private var repos: [Repository] = []
     @State private var isLoading = true
     @State private var searchText = ""
@@ -19,18 +21,37 @@ struct RepositoriesContentView: View {
     }
 
     var body: some View {
-        Group {
-            if isLoading {
-                ProgressView("Loading repositories...")
-            } else if filteredRepos.isEmpty {
-                ContentUnavailableView.search(text: searchText)
-            } else {
-                List(filteredRepos) { repo in
-                    NavigationLink(value: repo.key) {
-                        RepoListItem(repo: repo)
+        VStack(spacing: 0) {
+            Group {
+                if isLoading {
+                    ProgressView("Loading repositories...")
+                        .frame(maxHeight: .infinity)
+                } else if filteredRepos.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                        .frame(maxHeight: .infinity)
+                } else {
+                    List(filteredRepos) { repo in
+                        NavigationLink(value: repo.key) {
+                            RepoListItem(repo: repo)
+                        }
                     }
+                    .listStyle(.plain)
                 }
-                .listStyle(.plain)
+            }
+
+            if let onCreateTapped {
+                Divider()
+                VStack(spacing: 8) {
+                    Button {
+                        onCreateTapped()
+                    } label: {
+                        Label("Create Repository", systemImage: "plus.circle.fill")
+                            .font(.body.weight(.medium))
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.accentColor)
+                }
+                .padding(.vertical, 16)
             }
         }
         .searchable(text: $searchText, prompt: "Search repositories")
@@ -43,6 +64,10 @@ struct RepositoriesContentView: View {
         .navigationDestination(for: String.self) { key in
             RepositoryDetailView(repoKey: key)
         }
+    }
+
+    func refresh() async {
+        await loadRepos()
     }
 
     private func loadRepos() async {
