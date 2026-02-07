@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct ArtifactsSectionView: View {
+    @EnvironmentObject var authManager: AuthManager
+
     @State private var selectedTab = "repositories"
     @State private var showingCreateRepoSheet = false
     @State private var createdVirtualRepoKey: String?
@@ -24,9 +26,9 @@ struct ArtifactsSectionView: View {
                 Group {
                     switch selectedTab {
                     case "repositories":
-                        RepositoriesContentView(onCreateTapped: {
+                        RepositoriesContentView(onCreateTapped: authManager.isAuthenticated ? {
                             showingCreateRepoSheet = true
-                        })
+                        } : nil)
                         .id(refreshTrigger)
                     case "packages":
                         PackagesContentView()

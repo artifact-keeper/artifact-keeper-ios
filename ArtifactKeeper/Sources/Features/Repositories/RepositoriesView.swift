@@ -83,6 +83,7 @@ struct RepositoriesContentView: View {
 }
 
 struct RepositoriesView: View {
+    @EnvironmentObject var authManager: AuthManager
     @State private var repos: [Repository] = []
     @State private var isLoading = true
     @State private var searchText = ""
@@ -121,11 +122,13 @@ struct RepositoriesView: View {
             .navigationTitle("Repositories")
             .accountToolbar()
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingCreateSheet = true
-                    } label: {
-                        Image(systemName: "plus")
+                if authManager.isAuthenticated {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button {
+                            showingCreateSheet = true
+                        } label: {
+                            Image(systemName: "plus")
+                        }
                     }
                 }
             }
