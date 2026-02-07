@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct ArtifactsSectionView: View {
+    @EnvironmentObject var authManager: AuthManager
+
     @State private var selectedTab = "repositories"
+    @State private var showingCreateRepoSheet = false
+    @State private var createdVirtualRepoKey: String?
+    @State private var refreshTrigger = UUID()
 
     var body: some View {
         NavigationStack {
@@ -21,7 +26,10 @@ struct ArtifactsSectionView: View {
                 Group {
                     switch selectedTab {
                     case "repositories":
-                        RepositoriesContentView()
+                        RepositoriesContentView(onCreateTapped: authManager.isAuthenticated ? {
+                            showingCreateRepoSheet = true
+                        } : nil)
+                        .id(refreshTrigger)
                     case "packages":
                         PackagesContentView()
                     case "builds":
@@ -36,6 +44,21 @@ struct ArtifactsSectionView: View {
             }
             .navigationTitle("Artifacts")
             .accountToolbar()
+            .sheet(isPresented: $showingCreateRepoSheet) {
+                CreateRepositorySheet(
+                    onCreated: { repoKey, repoType in
+                        refreshTrigger = UUID()
+                        if repoType == "virtual" {
+                            createdVirtualRepoKey = repoKey
+                        }
+                    }
+                )
+            }
+            .sheet(item: $createdVirtualRepoKey) { repoKey in
+                AddMembersAfterCreateSheet(repoKey: repoKey) {
+                    createdVirtualRepoKey = nil
+                }
+            }
         }
     }
 }
