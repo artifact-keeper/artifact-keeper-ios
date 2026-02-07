@@ -4,6 +4,8 @@ struct SecurityDashboardContentView: View {
     @State private var scores: [RepoSecurityScore] = []
     @State private var repoNames: [String: String] = [:]
     @State private var isLoading = true
+    @State private var dtStatus: DtStatus?
+    @State private var dtPortfolioMetrics: DtPortfolioMetrics?
 
     private let apiClient = APIClient.shared
 
@@ -11,19 +13,34 @@ struct SecurityDashboardContentView: View {
         Group {
             if isLoading {
                 ProgressView("Loading security data...")
-            } else if scores.isEmpty {
+            } else if scores.isEmpty && dtStatus?.enabled != true {
                 ContentUnavailableView(
                     "No Security Data",
                     systemImage: "shield.slash",
                     description: Text("Enable scanning on repositories to see security scores")
                 )
             } else {
-                List(scores) { score in
-                    NavigationLink(value: score) {
-                        SecurityScoreRow(
-                            score: score,
-                            repoName: repoNames[score.repositoryId]
-                        )
+                List {
+                    if let status = dtStatus, status.enabled {
+                        Section {
+                            DtPortfolioSummaryView(
+                                status: status,
+                                metrics: dtPortfolioMetrics
+                            )
+                        }
+                    }
+
+                    if !scores.isEmpty {
+                        Section("Repository Scores") {
+                            ForEach(scores) { score in
+                                NavigationLink(value: score) {
+                                    SecurityScoreRow(
+                                        score: score,
+                                        repoName: repoNames[score.repositoryId]
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -44,7 +61,7 @@ struct SecurityDashboardContentView: View {
     }
 
     private func loadData() async {
-        isLoading = scores.isEmpty
+        isLoading = scores.isEmpty && dtStatus == nil
         do {
             async let scoresResult: [RepoSecurityScore] = apiClient.request("/api/v1/security/scores")
             async let reposResult: RepositoryListResponse = apiClient.request("/api/v1/repositories?per_page=200")
@@ -55,7 +72,117 @@ struct SecurityDashboardContentView: View {
         } catch {
             // silent
         }
+
+        // Load DT status independently — failures should not affect the rest
+        do {
+            let status: DtStatus = try await apiClient.request("/api/v1/dependency-track/status")
+            dtStatus = status
+            if status.enabled && status.healthy {
+                let metrics: DtPortfolioMetrics = try await apiClient.request(
+                    "/api/v1/dependency-track/metrics/portfolio"
+                )
+                dtPortfolioMetrics = metrics
+            }
+        } catch {
+            // DT not available — that is fine, hide the section
+        }
+
         isLoading = false
+    }
+}
+
+// MARK: - Dependency-Track Portfolio Summary
+
+struct DtPortfolioSummaryView: View {
+    let status: DtStatus
+    let metrics: DtPortfolioMetrics?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with status badge
+            HStack(spacing: 8) {
+                Image(systemName: "shield.checkered")
+                    .font(.title3)
+                    .foregroundStyle(.indigo)
+
+                Text("Dependency-Track")
+                    .font(.headline)
+
+                Spacer()
+
+                Text(status.healthy ? "Connected" : "Disconnected")
+                    .font(.caption2.weight(.bold))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(
+                        (status.healthy ? Color.green : Color.red).opacity(0.15),
+                        in: Capsule()
+                    )
+                    .foregroundStyle(status.healthy ? .green : .red)
+            }
+
+            if let m = metrics {
+                // Severity metrics grid
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible()),
+                    GridItem(.flexible()),
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: 8) {
+                    DtMetricBox(label: "Critical", value: m.critical, color: .red)
+                    DtMetricBox(label: "High", value: m.high, color: .orange)
+                    DtMetricBox(label: "Findings", value: m.findingsTotal, color: .secondary)
+                    DtMetricBox(label: "Violations", value: m.policyViolationsTotal, color: .purple)
+                    DtMetricBox(label: "Projects", value: m.projects, color: .blue)
+                }
+
+                // Audit progress
+                let total = m.findingsTotal
+                let audited = m.findingsAudited
+                if total > 0 {
+                    let percent = Int(Double(audited) / Double(total) * 100)
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.seal")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text("\(audited) of \(total) findings audited (\(percent)%)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } else if !status.healthy {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                    Text("Unable to reach Dependency-Track server")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+private struct DtMetricBox: View {
+    let label: String
+    let value: Int64
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 2) {
+            Text("\(value)")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(value > 0 ? color : .secondary)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(color.opacity(value > 0 ? 0.05 : 0.02), in: RoundedRectangle(cornerRadius: 6))
     }
 }
 
