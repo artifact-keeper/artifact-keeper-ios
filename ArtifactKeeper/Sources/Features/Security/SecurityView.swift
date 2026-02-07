@@ -22,7 +22,7 @@ struct SecurityDashboardContentView: View {
                 )
             } else {
                 List {
-                    if let trends = cveTrends, trends.totalCves > 0 {
+                    if let trends = cveTrends {
                         Section {
                             CveTrendsSummaryCard(trends: trends)
                         }
@@ -121,30 +121,20 @@ private struct CveTrendsSummaryCard: View {
                     .font(.headline)
             }
 
-            // Severity pills
+            // Severity pills — always show all four
             HStack(spacing: 8) {
-                if trends.criticalCount > 0 {
-                    SeverityPill(count: trends.criticalCount, label: "Critical", color: .red)
-                }
-                if trends.highCount > 0 {
-                    SeverityPill(count: trends.highCount, label: "High", color: .orange)
-                }
-                if trends.mediumCount > 0 {
-                    SeverityPill(count: trends.mediumCount, label: "Medium", color: .yellow)
-                }
-                if trends.lowCount > 0 {
-                    SeverityPill(count: trends.lowCount, label: "Low", color: .blue)
-                }
+                SeverityPill(count: trends.criticalCount, label: "Critical", color: .red)
+                SeverityPill(count: trends.highCount, label: "High", color: .orange)
+                SeverityPill(count: trends.mediumCount, label: "Medium", color: .yellow)
+                SeverityPill(count: trends.lowCount, label: "Low", color: .blue)
             }
 
             // Status counts
             HStack(spacing: 16) {
-                Label("\(trends.openCves) open", systemImage: "exclamationmark.shield")
+                Text("\(trends.totalCves - trends.fixedCves) detected")
                     .foregroundStyle(.red)
-                Label("\(trends.fixedCves) fixed", systemImage: "checkmark.shield")
+                Text("\(trends.fixedCves) resolved")
                     .foregroundStyle(.green)
-                Label("\(trends.acknowledgedCves) ack'd", systemImage: "hand.thumbsup")
-                    .foregroundStyle(.orange)
             }
             .font(.caption)
 
@@ -178,8 +168,15 @@ struct DtPortfolioSummaryView: View {
                     .font(.title3)
                     .foregroundStyle(.indigo)
 
-                Text("Dependency-Track")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dependency-Track")
+                        .font(.headline)
+                    if let url = status.url {
+                        Text(url)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
 
                 Spacer()
 
