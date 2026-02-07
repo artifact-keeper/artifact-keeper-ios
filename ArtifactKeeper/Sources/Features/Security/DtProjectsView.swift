@@ -718,9 +718,8 @@ private struct DtTriageSheet: View {
         .presentationDetents([.medium, .large])
     }
 
-    @ViewBuilder
     private var triageFormContent: some View {
-        Form {
+        let form = Form {
             findingHeaderSection
             analysisStateSection
             detailsSection
@@ -728,11 +727,14 @@ private struct DtTriageSheet: View {
             errorSection
         }
         .navigationTitle("Triage Finding")
-        #if os(iOS)
-        .navigationBarTitleDisplayMode(.inline)
-        #endif
         .toolbar { triageToolbarContent }
         .overlay { updatingOverlay }
+
+        #if os(iOS)
+        return form.navigationBarTitleDisplayMode(.inline)
+        #else
+        return form
+        #endif
     }
 
     @ToolbarContentBuilder

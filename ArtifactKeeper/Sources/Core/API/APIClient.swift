@@ -323,6 +323,29 @@ actor APIClient {
             body: request
         )
     }
+
+    // MARK: - Repository Security Config
+
+    func getRepoSecurityConfig(repoKey: String) async throws -> RepoSecurityConfig {
+        let response: RepoSecurityInfoResponse = try await request(
+            "/api/v1/repositories/\(repoKey)/security"
+        )
+        return response.config ?? RepoSecurityConfig(
+            scanEnabled: false,
+            scanOnUpload: false,
+            scanOnProxy: false,
+            blockOnPolicyViolation: false,
+            severityThreshold: "high"
+        )
+    }
+
+    func updateRepoSecurityConfig(repoKey: String, config: RepoSecurityConfig) async throws -> RepoSecurityConfig {
+        try await request(
+            "/api/v1/repositories/\(repoKey)/security",
+            method: "PUT",
+            body: config
+        )
+    }
 }
 
 enum APIError: LocalizedError {

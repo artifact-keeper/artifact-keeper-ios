@@ -418,7 +418,7 @@ struct ArtifactRow: View {
                     } label: {
                         Image(systemName: "shield.fill")
                             .font(.caption)
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("SBOM & Security")
