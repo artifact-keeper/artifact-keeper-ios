@@ -713,37 +713,48 @@ private struct DtTriageSheet: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                findingHeaderSection
-                analysisStateSection
-                detailsSection
-                suppressSection
-                errorSection
-            }
-            .navigationTitle("Triage Finding")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Update") {
-                        Task { await updateAnalysis() }
-                    }
-                    .disabled(isUpdating)
-                }
-            }
-            .overlay {
-                if isUpdating {
-                    ProgressView("Updating...")
-                        .padding()
-                        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
-                }
-            }
+            triageFormContent
         }
         .presentationDetents([.medium, .large])
+    }
+
+    @ViewBuilder
+    private var triageFormContent: some View {
+        Form {
+            findingHeaderSection
+            analysisStateSection
+            detailsSection
+            suppressSection
+            errorSection
+        }
+        .navigationTitle("Triage Finding")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .toolbar { triageToolbarContent }
+        .overlay { updatingOverlay }
+    }
+
+    @ToolbarContentBuilder
+    private var triageToolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel") { dismiss() }
+        }
+        ToolbarItem(placement: .confirmationAction) {
+            Button("Update") {
+                Task { await updateAnalysis() }
+            }
+            .disabled(isUpdating)
+        }
+    }
+
+    @ViewBuilder
+    private var updatingOverlay: some View {
+        if isUpdating {
+            ProgressView("Updating...")
+                .padding()
+                .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 10))
+        }
     }
 
     @ViewBuilder

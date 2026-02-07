@@ -10,7 +10,7 @@ struct DtStatus: Codable, Sendable {
 
 // MARK: - Projects
 
-struct DtProject: Codable, Identifiable, Sendable {
+struct DtProject: Codable, Identifiable, Hashable, Sendable {
     let uuid: String
     let name: String
     let version: String?
