@@ -323,6 +323,74 @@ actor APIClient {
             body: request
         )
     }
+
+    // MARK: - Artifact Upload
+
+    func uploadArtifact(repoKey: String, fileURL: URL, customPath: String?) async throws -> Artifact {
+        let boundary = UUID().uuidString
+        guard let url = URL(string: "\(baseURL)/api/v1/repositories/\(repoKey)/artifacts") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        if let token = accessToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        let fileData = try Data(contentsOf: fileURL)
+        let fileName = fileURL.lastPathComponent
+
+        var body = Data()
+        // File part
+        body.append("--\(boundary)\r\n".data(using: .utf8)!)
+        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(fileName)\"\r\n".data(using: .utf8)!)
+        body.append("Content-Type: application/octet-stream\r\n\r\n".data(using: .utf8)!)
+        body.append(fileData)
+        body.append("\r\n".data(using: .utf8)!)
+
+        // Custom path part
+        if let path = customPath, !path.isEmpty {
+            body.append("--\(boundary)\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"path\"\r\n\r\n".data(using: .utf8)!)
+            body.append(path.data(using: .utf8)!)
+            body.append("\r\n".data(using: .utf8)!)
+        }
+
+        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        request.httpBody = body
+
+        let (data, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
+        }
+        return try decoder.decode(Artifact.self, from: data)
+    }
+
+    // MARK: - Repository Security Config
+
+    func getRepoSecurityConfig(repoKey: String) async throws -> RepoSecurityConfig {
+        let response: RepoSecurityInfoResponse = try await request(
+            "/api/v1/repositories/\(repoKey)/security"
+        )
+        return response.config ?? RepoSecurityConfig(
+            scanEnabled: false,
+            scanOnUpload: false,
+            scanOnProxy: false,
+            blockOnPolicyViolation: false,
+            severityThreshold: "high"
+        )
+    }
+
+    func updateRepoSecurityConfig(repoKey: String, config: RepoSecurityConfig) async throws -> RepoSecurityConfig {
+        try await request(
+            "/api/v1/repositories/\(repoKey)/security",
+            method: "PUT",
+            body: config
+        )
+    }
 }
 
 enum APIError: LocalizedError {

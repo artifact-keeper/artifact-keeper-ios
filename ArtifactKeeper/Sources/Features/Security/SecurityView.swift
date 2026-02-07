@@ -6,6 +6,7 @@ struct SecurityDashboardContentView: View {
     @State private var isLoading = true
     @State private var dtStatus: DtStatus?
     @State private var dtPortfolioMetrics: DtPortfolioMetrics?
+    @State private var cveTrends: CveTrends?
 
     private let apiClient = APIClient.shared
 
@@ -13,7 +14,7 @@ struct SecurityDashboardContentView: View {
         Group {
             if isLoading {
                 ProgressView("Loading security data...")
-            } else if scores.isEmpty && dtStatus?.enabled != true {
+            } else if scores.isEmpty && dtStatus?.enabled != true && cveTrends == nil {
                 ContentUnavailableView(
                     "No Security Data",
                     systemImage: "shield.slash",
@@ -21,6 +22,12 @@ struct SecurityDashboardContentView: View {
                 )
             } else {
                 List {
+                    if let trends = cveTrends {
+                        Section {
+                            CveTrendsSummaryCard(trends: trends)
+                        }
+                    }
+
                     if let status = dtStatus, status.enabled {
                         Section {
                             DtPortfolioSummaryView(
@@ -73,6 +80,14 @@ struct SecurityDashboardContentView: View {
             // silent
         }
 
+        // Load CVE trends independently
+        do {
+            let trends: CveTrends = try await apiClient.request("/api/v1/sbom/cve/trends")
+            cveTrends = trends
+        } catch {
+            // CVE trends not available — hide the section
+        }
+
         // Load DT status independently — failures should not affect the rest
         do {
             let status: DtStatus = try await apiClient.request("/api/v1/dependency-track/status")
@@ -91,6 +106,54 @@ struct SecurityDashboardContentView: View {
     }
 }
 
+// MARK: - CVE Trends Summary Card
+
+private struct CveTrendsSummaryCard: View {
+    let trends: CveTrends
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "chart.line.uptrend.xyaxis")
+                    .font(.title3)
+                    .foregroundStyle(.indigo)
+                Text("CVE Trends")
+                    .font(.headline)
+            }
+
+            // Severity pills — always show all four
+            HStack(spacing: 8) {
+                SeverityPill(count: trends.criticalCount, label: "Critical", color: .red)
+                SeverityPill(count: trends.highCount, label: "High", color: .orange)
+                SeverityPill(count: trends.mediumCount, label: "Medium", color: .yellow)
+                SeverityPill(count: trends.lowCount, label: "Low", color: .blue)
+            }
+
+            // Status counts
+            HStack(spacing: 16) {
+                Text("\(trends.totalCves - trends.fixedCves) detected")
+                    .foregroundStyle(.red)
+                Text("\(trends.fixedCves) resolved")
+                    .foregroundStyle(.green)
+            }
+            .font(.caption)
+
+            // Avg fix time
+            if let avgDays = trends.avgDaysToFix {
+                HStack(spacing: 4) {
+                    Image(systemName: "clock")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text("Avg fix time: \(String(format: "%.1f", avgDays)) days")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
 // MARK: - Dependency-Track Portfolio Summary
 
 struct DtPortfolioSummaryView: View {
@@ -105,8 +168,15 @@ struct DtPortfolioSummaryView: View {
                     .font(.title3)
                     .foregroundStyle(.indigo)
 
-                Text("Dependency-Track")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dependency-Track")
+                        .font(.headline)
+                    if let url = status.url {
+                        Text(url)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
 
                 Spacer()
 

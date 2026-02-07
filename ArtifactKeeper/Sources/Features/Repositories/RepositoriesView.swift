@@ -233,6 +233,7 @@ struct RepositoryDetailView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var selectedArtifact: Artifact?
+    @State private var securityArtifact: Artifact?
 
     private let apiClient = APIClient.shared
 
@@ -285,7 +286,11 @@ struct RepositoryDetailView: View {
 
                     Section("Artifacts (\(artifacts.count))") {
                         ForEach(artifacts) { artifact in
-                            ArtifactRow(artifact: artifact, repoKey: repoKey)
+                            ArtifactRow(
+                                artifact: artifact,
+                                repoKey: repoKey,
+                                onSecurityTap: { securityArtifact = artifact }
+                            )
                                 .contentShape(Rectangle())
                                 .onTapGesture {
                                     selectedArtifact = artifact
@@ -295,6 +300,12 @@ struct RepositoryDetailView: View {
                                         openDownloadURL(artifact: artifact)
                                     } label: {
                                         Label("Download in Browser", systemImage: "safari")
+                                    }
+
+                                    Button {
+                                        securityArtifact = artifact
+                                    } label: {
+                                        Label("SBOM & Security", systemImage: "shield.fill")
                                     }
 
                                     Button {
@@ -317,6 +328,20 @@ struct RepositoryDetailView: View {
         }
         .sheet(item: $selectedArtifact) { artifact in
             ArtifactDetailSheet(artifact: artifact, repoKey: repoKey)
+        }
+        .sheet(item: $securityArtifact) { artifact in
+            NavigationStack {
+                SbomView(artifactId: artifact.id, artifactName: artifact.name)
+                    .navigationTitle(artifact.name)
+                    #if os(iOS)
+                    .navigationBarTitleDisplayMode(.inline)
+                    #endif
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") { securityArtifact = nil }
+                        }
+                    }
+            }
         }
     }
 
@@ -363,6 +388,7 @@ struct RepositoryDetailView: View {
 struct ArtifactRow: View {
     let artifact: Artifact
     let repoKey: String
+    var onSecurityTap: (() -> Void)?
 
     private func formatBytes(_ bytes: Int64) -> String {
         let formatter = ByteCountFormatter()
@@ -386,6 +412,17 @@ struct ArtifactRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
+                if let onSecurityTap {
+                    Button {
+                        onSecurityTap()
+                    } label: {
+                        Image(systemName: "shield.fill")
+                            .font(.caption)
+                            .foregroundStyle(Color.accentColor)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("SBOM & Security")
+                }
                 Label("\(artifact.downloadCount)", systemImage: "arrow.down.circle")
                     .font(.caption)
                     .foregroundStyle(.secondary)
