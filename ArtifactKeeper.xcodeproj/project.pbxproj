@@ -101,6 +101,26 @@
 		FCA0BB626B22F06543044B90 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */; };
 		FDD83FAF91847C130D24C7ED /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79512BEEB0DBDA10DFDCFAAC /* MainTabView.swift */; };
 		FF47AA66613AA085B81F3A93 /* WebhooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8063DEF3B0228C26496797B7 /* WebhooksView.swift */; };
+		1A0102030405060708091011 /* DependencyTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* DependencyTrack.swift */; };
+		1A1213141516171819202122 /* LicensePoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* LicensePoliciesView.swift */; };
+		1A2324252627282930313233 /* Promotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8C9D0E1F2A3B4 /* Promotion.swift */; };
+		1A3435363738394041424344 /* PromotionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9D0E1F2A3B4C5 /* PromotionHistoryView.swift */; };
+		1A4546474849505152535455 /* PromotionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F2A3B4C5D6 /* PromotionSheet.swift */; };
+		1A5657585960616263646566 /* Sbom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */; };
+		1A6768697071727374757677 /* SbomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D0E1F2A3B4C5D6E7F8 /* SbomView.swift */; };
+		1A7879808182838485868788 /* StagingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C9D0E1F2A3B4C5D6E7F8A9 /* StagingDetailView.swift */; };
+		1A8990919293949596979899 /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D0E1F2A3B4C5D6E7F8A9B0 /* StagingListView.swift */; };
+		1A9001020304050607080910 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E1F2A3B4C5D6E7F8A9B0C1 /* StagingSectionView.swift */; };
+		2B0102030405060708091011 /* DependencyTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* DependencyTrack.swift */; };
+		2B1213141516171819202122 /* LicensePoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C3D4E5F6A7B8C9D0E1F2A3 /* LicensePoliciesView.swift */; };
+		2B2324252627282930313233 /* Promotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3D4E5F6A7B8C9D0E1F2A3B4 /* Promotion.swift */; };
+		2B3435363738394041424344 /* PromotionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E5F6A7B8C9D0E1F2A3B4C5 /* PromotionHistoryView.swift */; };
+		2B4546474849505152535455 /* PromotionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F6A7B8C9D0E1F2A3B4C5D6 /* PromotionSheet.swift */; };
+		2B5657585960616263646566 /* Sbom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */; };
+		2B6768697071727374757677 /* SbomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7B8C9D0E1F2A3B4C5D6E7F8 /* SbomView.swift */; };
+		2B7879808182838485868788 /* StagingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8C9D0E1F2A3B4C5D6E7F8A9 /* StagingDetailView.swift */; };
+		2B8990919293949596979899 /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9D0E1F2A3B4C5D6E7F8A9B0 /* StagingListView.swift */; };
+		2B9001020304050607080910 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0E1F2A3B4C5D6E7F8A9B0C1 /* StagingSectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -150,6 +170,16 @@
 		F9415E01C2D644848CDBB4D0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		FCA65CF7CCFDB01286A0C408 /* Integration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integration.swift; sourceTree = "<group>"; };
 		FD29BEA4F2708262CE34F2E3 /* SecuritySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuritySectionView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* DependencyTrack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyTrack.swift; sourceTree = "<group>"; };
+		A7B8C9D0E1F2A3B4C5D6E7F8 /* SbomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SbomView.swift; sourceTree = "<group>"; };
+		B2C3D4E5F6A7B8C9D0E1F2A3 /* LicensePoliciesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicensePoliciesView.swift; sourceTree = "<group>"; };
+		B8C9D0E1F2A3B4C5D6E7F8A9 /* StagingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingDetailView.swift; sourceTree = "<group>"; };
+		C3D4E5F6A7B8C9D0E1F2A3B4 /* Promotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Promotion.swift; sourceTree = "<group>"; };
+		C9D0E1F2A3B4C5D6E7F8A9B0 /* StagingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingListView.swift; sourceTree = "<group>"; };
+		D0E1F2A3B4C5D6E7F8A9B0C1 /* StagingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSectionView.swift; sourceTree = "<group>"; };
+		D4E5F6A7B8C9D0E1F2A3B4C5 /* PromotionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionHistoryView.swift; sourceTree = "<group>"; };
+		E5F6A7B8C9D0E1F2A3B4C5D6 /* PromotionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionSheet.swift; sourceTree = "<group>"; };
+		F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sbom.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -212,7 +242,9 @@
 		514C97A50E229F57F7461C12 /* Security */ = {
 			isa = PBXGroup;
 			children = (
+				B2C3D4E5F6A7B8C9D0E1F2A3 /* LicensePoliciesView.swift */,
 				387B1308AF0F0D5F5C768F13 /* PoliciesView.swift */,
+				A7B8C9D0E1F2A3B4C5D6E7F8 /* SbomView.swift */,
 				7351368D8EDB157E264ECBBC /* SecurityView.swift */,
 			);
 			path = Security;
@@ -235,10 +267,13 @@
 				59F86EB93D00E4631A8F8F9C /* Artifact.swift */,
 				E59705D3B5F2000ACABB8A48 /* Auth.swift */,
 				90190CE35DA804C357A5FFDB /* Build.swift */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* DependencyTrack.swift */,
 				FCA65CF7CCFDB01286A0C408 /* Integration.swift */,
 				C5CFB90021A1428D8962F1BF /* Operations.swift */,
 				B6F9DDB4F8B15C1FB99A2843 /* Package.swift */,
+				C3D4E5F6A7B8C9D0E1F2A3B4 /* Promotion.swift */,
 				75FB2391848A9D7A02E4F7DC /* Repository.swift */,
+				F6A7B8C9D0E1F2A3B4C5D6E7 /* Sbom.swift */,
 				3D8118DAD8066C9D0EED317C /* Security.swift */,
 			);
 			path = Models;
@@ -356,6 +391,7 @@
 				042E0D67EEA95AAB12420E1A /* Repositories */,
 				A69D702B0E189B628246D145 /* Search */,
 				514C97A50E229F57F7461C12 /* Security */,
+				E1F2A3B4C5D6E7F8A9B0C1D2 /* Staging */,
 				0B7CB962D56A158358D7A7F3 /* Profile */,
 				E7C87B92709E5F81DD7E421E /* Settings */,
 				04CA57A38B1937E40CE111B1 /* Welcome */,
@@ -381,6 +417,17 @@
 			path = Profile;
 			sourceTree = "<group>";
 		};
+		E1F2A3B4C5D6E7F8A9B0C1D2 /* Staging */ = {
+			isa = PBXGroup;
+			children = (
+				D4E5F6A7B8C9D0E1F2A3B4C5 /* PromotionHistoryView.swift */,
+				E5F6A7B8C9D0E1F2A3B4C5D6 /* PromotionSheet.swift */,
+				B8C9D0E1F2A3B4C5D6E7F8A9 /* StagingDetailView.swift */,
+				C9D0E1F2A3B4C5D6E7F8A9B0 /* StagingListView.swift */,
+			);
+			path = Staging;
+			sourceTree = "<group>";
+		};
 		E7C87B92709E5F81DD7E421E /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -397,6 +444,7 @@
 				3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */,
 				5B6A94422BAD7B966077C0D9 /* OperationsSectionView.swift */,
 				FD29BEA4F2708262CE34F2E3 /* SecuritySectionView.swift */,
+				D0E1F2A3B4C5D6E7F8A9B0C1 /* StagingSectionView.swift */,
 			);
 			path = Sections;
 			sourceTree = "<group>";
@@ -541,9 +589,11 @@
 				797AE3D1C3726C2AAA195E4D /* ContentView.swift in Sources */,
 				1FD90BDVIH298NXYXQ1YBX61 /* ChangePasswordView.swift in Sources */,
 				7926AACBA3FC6E057D5340FE /* DashboardView.swift in Sources */,
+				1A0102030405060708091011 /* DependencyTrack.swift in Sources */,
 				B711A4EF6DF167F16406CBD3 /* GroupsView.swift in Sources */,
 				2EE7333E8775B1BB8124E0B7 /* Integration.swift in Sources */,
 				634179231AD90932820E8519 /* IntegrationSectionView.swift in Sources */,
+				1A1213141516171819202122 /* LicensePoliciesView.swift in Sources */,
 				431F59BD5A02CA08C396903A /* LoginView.swift in Sources */,
 				8227BD7FC4FA90F1EDDE2662 /* MainTabView.swift in Sources */,
 				04D04D992D40CBE4A2A9A8D5 /* MonitoringView.swift in Sources */,
@@ -553,16 +603,24 @@
 				363B3E9588A4895C999757BC /* PackagesView.swift in Sources */,
 				95AFE5BD66F78CB88FB2ABA1 /* PeersView.swift in Sources */,
 				706149420AF74CC3C2F55FDB /* PoliciesView.swift in Sources */,
+				1A2324252627282930313233 /* Promotion.swift in Sources */,
+				1A3435363738394041424344 /* PromotionHistoryView.swift in Sources */,
+				1A4546474849505152535455 /* PromotionSheet.swift in Sources */,
 				D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */,
 				CBA92159E5A5DFC00F6CBC28 /* RepositoriesView.swift in Sources */,
 				CB9F64C28FEBB032DD2210F6 /* Repository.swift in Sources */,
 				D3653822D6C8332BC92D8642 /* SSOView.swift in Sources */,
+				1A5657585960616263646566 /* Sbom.swift in Sources */,
+				1A6768697071727374757677 /* SbomView.swift in Sources */,
 				3D57CDAFE896BFB0BB441D87 /* SearchView.swift in Sources */,
 				0FAD280684B34F3ABB6306F5 /* Security.swift in Sources */,
 				850750014FDAA447F7FEAA6A /* SecuritySectionView.swift in Sources */,
 				03D59745AFA47FE8D1811B9A /* SecurityView.swift in Sources */,
 				9DE03A85868EB62612D588DC /* ServerManager.swift in Sources */,
 				4BB5107B04DD21BF5EC76FB0 /* SettingsView.swift in Sources */,
+				1A7879808182838485868788 /* StagingDetailView.swift in Sources */,
+				1A8990919293949596979899 /* StagingListView.swift in Sources */,
+				1A9001020304050607080910 /* StagingSectionView.swift in Sources */,
 				4BFBAC9B527289CC3F826D88 /* ProfileView.swift in Sources */,
 				42DD12D515613DB543BCD922 /* TelemetryView.swift in Sources */,
 				5E51BAB787218813CAC5477D /* Theme.swift in Sources */,
@@ -590,10 +648,12 @@
 				0AB4F8101A72D6C81B34D496 /* BuildsView.swift in Sources */,
 				EA935E6E499F8A518FCBA8C3 /* ContentView.swift in Sources */,
 				04E9EC2157EA947C8B9FE159 /* DashboardView.swift in Sources */,
+				2B0102030405060708091011 /* DependencyTrack.swift in Sources */,
 				0D2124206E78085A90971F0A /* GroupsView.swift in Sources */,
 				5E0D22452C4DCD3E0ECCEED2 /* Integration.swift in Sources */,
 				C0067BC56E14F7597CD91596 /* IntegrationSectionView.swift in Sources */,
 				6297979D8EEDAB703E565D70 /* ChangePasswordView.swift in Sources */,
+				2B1213141516171819202122 /* LicensePoliciesView.swift in Sources */,
 				389A90FAD7E4FDA7B8464B92 /* LoginView.swift in Sources */,
 				FDD83FAF91847C130D24C7ED /* MainTabView.swift in Sources */,
 				AFDDA47CBD83C0460C150C5D /* MonitoringView.swift in Sources */,
@@ -603,16 +663,24 @@
 				B88EC39592199C1C4E1FB621 /* PackagesView.swift in Sources */,
 				C0426BF8DC4EE20233E24AC4 /* PeersView.swift in Sources */,
 				50E508B7E51DFFC65B9BCBCE /* PoliciesView.swift in Sources */,
+				2B2324252627282930313233 /* Promotion.swift in Sources */,
+				2B3435363738394041424344 /* PromotionHistoryView.swift in Sources */,
+				2B4546474849505152535455 /* PromotionSheet.swift in Sources */,
 				475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */,
 				3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */,
 				DD14915474376F9ECAB7D78B /* Repository.swift in Sources */,
 				99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */,
+				2B5657585960616263646566 /* Sbom.swift in Sources */,
+				2B6768697071727374757677 /* SbomView.swift in Sources */,
 				098B007AFDBBB928C7FC45AB /* SearchView.swift in Sources */,
 				8F03693614D04D4C4BE9C332 /* Security.swift in Sources */,
 				85BE9083FC33581A5290D269 /* SecuritySectionView.swift in Sources */,
 				C485A2CE45918DADE34AAA1B /* SecurityView.swift in Sources */,
 				D11B924C3B8CFCE3F0E46905 /* ServerManager.swift in Sources */,
 				2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */,
+				2B7879808182838485868788 /* StagingDetailView.swift in Sources */,
+				2B8990919293949596979899 /* StagingListView.swift in Sources */,
+				2B9001020304050607080910 /* StagingSectionView.swift in Sources */,
 				0F23E3282ACEE5A27D0506BC /* ProfileView.swift in Sources */,
 				152D6AC4ACB54B60335AAA44 /* TelemetryView.swift in Sources */,
 				2D8B1BCF039F334B0A7FD76A /* Theme.swift in Sources */,
