@@ -42,3 +42,38 @@ struct Pagination: Codable, Sendable {
         case totalPages = "total_pages"
     }
 }
+
+struct CreateRepositoryRequest: Codable, Sendable {
+    let key: String
+    let name: String
+    let format: String
+    let repoType: String
+    let isPublic: Bool
+    let description: String?
+    let upstreamUrl: String?
+
+    enum CodingKeys: String, CodingKey {
+        case key, name, format, description
+        case repoType = "repo_type"
+        case isPublic = "is_public"
+        case upstreamUrl = "upstream_url"
+    }
+
+    init(
+        key: String,
+        name: String,
+        format: String,
+        repoType: String,
+        isPublic: Bool = false,
+        description: String? = nil,
+        upstreamUrl: String? = nil
+    ) {
+        self.key = key
+        self.name = name
+        self.format = format
+        self.repoType = repoType
+        self.isPublic = isPublic
+        self.description = description
+        self.upstreamUrl = upstreamUrl
+    }
+}

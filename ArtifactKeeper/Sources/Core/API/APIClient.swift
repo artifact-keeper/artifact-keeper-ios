@@ -276,6 +276,53 @@ actor APIClient {
         )
         return response.items
     }
+
+    // MARK: - Virtual Repository Members
+
+    func listVirtualMembers(repoKey: String) async throws -> [VirtualMember] {
+        let response: VirtualMembersResponse = try await request(
+            "/api/v1/repositories/\(repoKey)/members"
+        )
+        return response.items
+    }
+
+    func addVirtualMember(repoKey: String, memberKey: String, priority: Int?) async throws -> VirtualMember {
+        try await request(
+            "/api/v1/repositories/\(repoKey)/members",
+            method: "POST",
+            body: AddMemberRequest(memberKey: memberKey, priority: priority)
+        )
+    }
+
+    func removeVirtualMember(repoKey: String, memberKey: String) async throws {
+        try await requestVoid(
+            "/api/v1/repositories/\(repoKey)/members/\(memberKey)",
+            method: "DELETE"
+        )
+    }
+
+    func reorderVirtualMembers(repoKey: String, members: [MemberPriority]) async throws {
+        try await requestVoid(
+            "/api/v1/repositories/\(repoKey)/members",
+            method: "PUT",
+            body: ReorderMembersRequest(members: members)
+        )
+    }
+
+    // MARK: - Repositories
+
+    func listRepositories() async throws -> [Repository] {
+        let response: RepositoryListResponse = try await request("/api/v1/repositories?per_page=100")
+        return response.items
+    }
+
+    func createRepository(request: CreateRepositoryRequest) async throws -> Repository {
+        try await self.request(
+            "/api/v1/repositories",
+            method: "POST",
+            body: request
+        )
+    }
 }
 
 enum APIError: LocalizedError {
