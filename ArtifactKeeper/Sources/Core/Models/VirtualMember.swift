@@ -18,6 +18,24 @@ struct VirtualMember: Codable, Identifiable, Sendable {
         case priority
         case createdAt = "created_at"
     }
+
+    init(
+        id: String,
+        memberRepoId: String,
+        memberRepoKey: String,
+        memberRepoName: String,
+        memberRepoType: String,
+        priority: Int,
+        createdAt: String
+    ) {
+        self.id = id
+        self.memberRepoId = memberRepoId
+        self.memberRepoKey = memberRepoKey
+        self.memberRepoName = memberRepoName
+        self.memberRepoType = memberRepoType
+        self.priority = priority
+        self.createdAt = createdAt
+    }
 }
 
 struct VirtualMembersResponse: Codable, Sendable {

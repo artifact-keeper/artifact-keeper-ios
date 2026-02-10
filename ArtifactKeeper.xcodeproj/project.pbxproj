@@ -27,6 +27,7 @@
 		2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
 		22E710F949296F2C4F470275 /* AdminSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A1E349FB6E5B428703A548 /* AdminSectionView.swift */; };
 		238DBF144A2302C11DE50388 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7812397531D2CD01F4488BC6 /* ChangePasswordView.swift */; };
+		2765A46120FE03FEBFC1E7A5 /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = AAB8C31E7368B19A07AE1A3E /* OpenAPIURLSession */; };
 		28EDDF86319305C5ABC398D0 /* Operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5CFB90021A1428D8962F1BF /* Operations.swift */; };
 		2D8B1BCF039F334B0A7FD76A /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9415E01C2D644848CDBB4D0 /* Theme.swift */; };
 		2DDFD6ABC4E15C7FFF7C72C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1164C99171DC47A99F71C0D /* Assets.xcassets */; };
@@ -41,18 +42,21 @@
 		397E6C46FAA21775D022DEA1 /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970FC2E2E5418295A48A9B0E /* StagingListView.swift */; };
 		3D57CDAFE896BFB0BB441D87 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72273F4294E6BC2DA2D09609 /* SearchView.swift */; };
 		3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */; };
+		3E86A76D6A7C20EB5128C9B9 /* SDKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */; };
 		42DD12D515613DB543BCD922 /* TelemetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4252913A5015A9448F73683 /* TelemetryView.swift */; };
 		431F59BD5A02CA08C396903A /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73AE1952EFB3C338C7D0771 /* LoginView.swift */; };
 		475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
 		47DFA7F8B01E5A21906642A2 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9DDB4F8B15C1FB99A2843 /* Package.swift */; };
 		4BB5107B04DD21BF5EC76FB0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
 		4BE83BE4509F6A9FBAC7EA93 /* RepoSecurityConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746DB83A1B571F5CDFDD791E /* RepoSecurityConfigView.swift */; };
+		4F9A68618BD7C56914CA8D65 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 068276BAE547E09F546FF9A8 /* OpenAPIRuntime */; };
 		50E508B7E51DFFC65B9BCBCE /* PoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387B1308AF0F0D5F5C768F13 /* PoliciesView.swift */; };
 		540BD81E8B758B26D1D5A040 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341E812182C7DEF2DE15BDE6 /* AuthManager.swift */; };
 		55D6428BD2147FDF7F9BA85A /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970FC2E2E5418295A48A9B0E /* StagingListView.swift */; };
 		55E48C58A4F43DC5DC868FE0 /* Promotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CA7F1FBDE367A6D4052F47 /* Promotion.swift */; };
 		576ECFCB3DD22323E6DF2217 /* RepositoryDetailTabbedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEF3A0FA55ECC63DDC8899F /* RepositoryDetailTabbedView.swift */; };
 		596F4AA252F5DB25B76106B8 /* Sbom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF4F010E1DD1DC5415E7F11 /* Sbom.swift */; };
+		5A6DAF18D877C3CD3491EE83 /* OpenAPIRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = 97058A57D74CF527E5233E83 /* OpenAPIRuntime */; };
 		5B084A3BAB0EDDAFF19B81EF /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = 1918E595B83245CF64AE0DB5 /* Dependencies */; };
 		5C6497F001D512DDC978EA47 /* UsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8761FACD0287EF99C0A1E50 /* UsersView.swift */; };
 		5E0D22452C4DCD3E0ECCEED2 /* Integration.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA65CF7CCFDB01286A0C408 /* Integration.swift */; };
@@ -90,6 +94,7 @@
 		99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783C66794630C443427F1527 /* SSOView.swift */; };
 		9DE03A85868EB62612D588DC /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */; };
 		9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
+		9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */; };
 		ABC754B5DC49717B25A912DB /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59705D3B5F2000ACABB8A48 /* Auth.swift */; };
 		AF076028A446FB1E28446D96 /* DtDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59106973EB99FD9424D44224 /* DtDashboardView.swift */; };
 		AFDDA47CBD83C0460C150C5D /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F6787AE2A18008C8EA282F /* MonitoringView.swift */; };
@@ -110,15 +115,18 @@
 		C0067BC56E14F7597CD91596 /* IntegrationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */; };
 		C02053BA07DD2669117F0E0C /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
 		C0426BF8DC4EE20233E24AC4 /* PeersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F130C4E4EC403EC23594AE44 /* PeersView.swift */; };
+		C0DB34D8D07AFB6A08BE9C1F /* ArtifactKeeperClient in Frameworks */ = {isa = PBXBuildFile; productRef = BF71DF2B7D3220D7E6D30597 /* ArtifactKeeperClient */; };
 		C271C3B782A35CE71284249F /* Promotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7CA7F1FBDE367A6D4052F47 /* Promotion.swift */; };
 		C42665F0C144A44BC7AAA95D /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A15E45652EBB4DD2505127F /* WelcomeView.swift */; };
 		C485A2CE45918DADE34AAA1B /* SecurityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7351368D8EDB157E264ECBBC /* SecurityView.swift */; };
+		CB1B30416205DE75103AE1EC /* ArtifactKeeperClient in Frameworks */ = {isa = PBXBuildFile; productRef = 55A6201C43E26F452A85B4AC /* ArtifactKeeperClient */; };
 		CB9F64C28FEBB032DD2210F6 /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FB2391848A9D7A02E4F7DC /* Repository.swift */; };
 		CBA92159E5A5DFC00F6CBC28 /* RepositoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */; };
 		CE29910E19439190B021FD6B /* Artifact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F86EB93D00E4631A8F8F9C /* Artifact.swift */; };
 		D11B924C3B8CFCE3F0E46905 /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */; };
 		D3653822D6C8332BC92D8642 /* SSOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783C66794630C443427F1527 /* SSOView.swift */; };
 		D36FF1BE98A8940CC8E38C27 /* DependencyTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3514BB30D4591F702FE3C8B /* DependencyTrack.swift */; };
+		D40943078196189E5E593C67 /* SDKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */; };
 		D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
 		D6794B241227A7A33DE011F3 /* ArtifactKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D217BC8D6B2994A881C4E04E /* ArtifactKeeperApp.swift */; };
 		D7ED286EF2FA5A473F566856 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
@@ -178,6 +186,7 @@
 		9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoriesView.swift; sourceTree = "<group>"; };
 		970FC2E2E5418295A48A9B0E /* StagingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingListView.swift; sourceTree = "<group>"; };
+		974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKClient.swift; sourceTree = "<group>"; };
 		97C25FDC3175541D37A0EF96 /* ArtifactKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ArtifactKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A15E45652EBB4DD2505127F /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		9CBE59905B179E64919791A7 /* Admin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Admin.swift; sourceTree = "<group>"; };
@@ -214,6 +223,9 @@
 				B535272FD68109CDCE673AFC /* Alamofire in Frameworks */,
 				2E444BC52EC3271C8EC44E4D /* Kingfisher in Frameworks */,
 				B516A827540A1DDE26F2B9BA /* Dependencies in Frameworks */,
+				C0DB34D8D07AFB6A08BE9C1F /* ArtifactKeeperClient in Frameworks */,
+				4F9A68618BD7C56914CA8D65 /* OpenAPIRuntime in Frameworks */,
+				2765A46120FE03FEBFC1E7A5 /* OpenAPIURLSession in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -224,6 +236,9 @@
 				32C0A53DAE5CEA63670B57F2 /* Alamofire in Frameworks */,
 				94FC8121D7F395B27138FF6C /* Kingfisher in Frameworks */,
 				5B084A3BAB0EDDAFF19B81EF /* Dependencies in Frameworks */,
+				CB1B30416205DE75103AE1EC /* ArtifactKeeperClient in Frameworks */,
+				5A6DAF18D877C3CD3491EE83 /* OpenAPIRuntime in Frameworks */,
+				9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,13 +399,6 @@
 			path = Operations;
 			sourceTree = "<group>";
 		};
-		B569171887FEA5C430B3C5DE /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
 		B996E356DE5DDBFB3D2557A2 /* Staging */ = {
 			isa = PBXGroup;
 			children = (
@@ -425,6 +433,7 @@
 			isa = PBXGroup;
 			children = (
 				3412EF9765589F0F5C9613ED /* APIClient.swift */,
+				974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */,
 				E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */,
 			);
 			path = API;
@@ -454,7 +463,6 @@
 			isa = PBXGroup;
 			children = (
 				E6A527DEEF9DECA3F2E8EC26 /* AccountToolbarModifier.swift */,
-				B569171887FEA5C430B3C5DE /* Components */,
 				AD6324D1245757CE4DC9A4F0 /* Theme */,
 			);
 			path = UI;
@@ -521,6 +529,9 @@
 				36656CBAF76FAB0F5ECC7855 /* Alamofire */,
 				3706EE4D071525F8E60A5A3B /* Kingfisher */,
 				1918E595B83245CF64AE0DB5 /* Dependencies */,
+				55A6201C43E26F452A85B4AC /* ArtifactKeeperClient */,
+				97058A57D74CF527E5233E83 /* OpenAPIRuntime */,
+				F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */,
 			);
 			productName = ArtifactKeeper_iOS;
 			productReference = DC2FE890E60756D1FFA94CD1 /* ArtifactKeeper.app */;
@@ -543,6 +554,9 @@
 				A0A50A1985B1B97F68A946DA /* Alamofire */,
 				9CEE3D545B740FE08259C18F /* Kingfisher */,
 				F1F1A51E9222F8A1C1F5C1EB /* Dependencies */,
+				BF71DF2B7D3220D7E6D30597 /* ArtifactKeeperClient */,
+				068276BAE547E09F546FF9A8 /* OpenAPIRuntime */,
+				AAB8C31E7368B19A07AE1A3E /* OpenAPIURLSession */,
 			);
 			productName = ArtifactKeeper_macOS;
 			productReference = 97C25FDC3175541D37A0EF96 /* ArtifactKeeper.app */;
@@ -570,7 +584,10 @@
 			packageReferences = (
 				35E6D2AC4A1155938881AA4F /* XCRemoteSwiftPackageReference "Alamofire" */,
 				38DE02D2EDBC7397FB53C39A /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				55BD8E155775DB2FFC028CE1 /* XCRemoteSwiftPackageReference "artifact-keeper-swift-sdk" */,
 				D467491AC25938924605717B /* XCRemoteSwiftPackageReference "swift-dependencies" */,
+				076178158F5A63B454FAF5D4 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */,
+				734E1A5E4269B26A38FFE68C /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */,
 			);
 			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
@@ -648,6 +665,7 @@
 				CBA92159E5A5DFC00F6CBC28 /* RepositoriesView.swift in Sources */,
 				CB9F64C28FEBB032DD2210F6 /* Repository.swift in Sources */,
 				576ECFCB3DD22323E6DF2217 /* RepositoryDetailTabbedView.swift in Sources */,
+				D40943078196189E5E593C67 /* SDKClient.swift in Sources */,
 				D3653822D6C8332BC92D8642 /* SSOView.swift in Sources */,
 				B6A7958608DE308DD63F5435 /* Sbom.swift in Sources */,
 				7795B1C86E7E5530C0ECA6BE /* SbomView.swift in Sources */,
@@ -716,6 +734,7 @@
 				3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */,
 				DD14915474376F9ECAB7D78B /* Repository.swift in Sources */,
 				1EB081D63A5092425E75A0B0 /* RepositoryDetailTabbedView.swift in Sources */,
+				3E86A76D6A7C20EB5128C9B9 /* SDKClient.swift in Sources */,
 				99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */,
 				596F4AA252F5DB25B76106B8 /* Sbom.swift in Sources */,
 				B85DD5AD52ECDF8AF03AD72F /* SbomView.swift in Sources */,
@@ -987,6 +1006,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		076178158F5A63B454FAF5D4 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-runtime";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.7.0;
+			};
+		};
 		35E6D2AC4A1155938881AA4F /* XCRemoteSwiftPackageReference "Alamofire" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
@@ -1003,6 +1030,22 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		55BD8E155775DB2FFC028CE1 /* XCRemoteSwiftPackageReference "artifact-keeper-swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/artifact-keeper/artifact-keeper-swift-sdk.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "1.1.0-dev.1";
+			};
+		};
+		734E1A5E4269B26A38FFE68C /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-openapi-urlsession";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		D467491AC25938924605717B /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-dependencies.git";
@@ -1014,6 +1057,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		068276BAE547E09F546FF9A8 /* OpenAPIRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 076178158F5A63B454FAF5D4 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */;
+			productName = OpenAPIRuntime;
+		};
 		1918E595B83245CF64AE0DB5 /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D467491AC25938924605717B /* XCRemoteSwiftPackageReference "swift-dependencies" */;
@@ -1029,6 +1077,16 @@
 			package = 38DE02D2EDBC7397FB53C39A /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
 		};
+		55A6201C43E26F452A85B4AC /* ArtifactKeeperClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55BD8E155775DB2FFC028CE1 /* XCRemoteSwiftPackageReference "artifact-keeper-swift-sdk" */;
+			productName = ArtifactKeeperClient;
+		};
+		97058A57D74CF527E5233E83 /* OpenAPIRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 076178158F5A63B454FAF5D4 /* XCRemoteSwiftPackageReference "swift-openapi-runtime" */;
+			productName = OpenAPIRuntime;
+		};
 		9CEE3D545B740FE08259C18F /* Kingfisher */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 38DE02D2EDBC7397FB53C39A /* XCRemoteSwiftPackageReference "Kingfisher" */;
@@ -1039,10 +1097,25 @@
 			package = 35E6D2AC4A1155938881AA4F /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
 		};
+		AAB8C31E7368B19A07AE1A3E /* OpenAPIURLSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 734E1A5E4269B26A38FFE68C /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
+			productName = OpenAPIURLSession;
+		};
+		BF71DF2B7D3220D7E6D30597 /* ArtifactKeeperClient */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55BD8E155775DB2FFC028CE1 /* XCRemoteSwiftPackageReference "artifact-keeper-swift-sdk" */;
+			productName = ArtifactKeeperClient;
+		};
 		F1F1A51E9222F8A1C1F5C1EB /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D467491AC25938924605717B /* XCRemoteSwiftPackageReference "swift-dependencies" */;
 			productName = Dependencies;
+		};
+		F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 734E1A5E4269B26A38FFE68C /* XCRemoteSwiftPackageReference "swift-openapi-urlsession" */;
+			productName = OpenAPIURLSession;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

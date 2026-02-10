@@ -23,6 +23,24 @@ struct LoginResponse: Codable, Sendable {
         case totpRequired = "totp_required"
         case totpToken = "totp_token"
     }
+
+    init(
+        accessToken: String,
+        refreshToken: String,
+        expiresIn: Int,
+        tokenType: String,
+        mustChangePassword: Bool?,
+        totpRequired: Bool?,
+        totpToken: String?
+    ) {
+        self.accessToken = accessToken
+        self.refreshToken = refreshToken
+        self.expiresIn = expiresIn
+        self.tokenType = tokenType
+        self.mustChangePassword = mustChangePassword
+        self.totpRequired = totpRequired
+        self.totpToken = totpToken
+    }
 }
 
 struct UserInfo: Codable, Sendable, Identifiable {
@@ -66,6 +84,11 @@ struct TotpSetupResponse: Codable, Sendable {
         case secret
         case qrCodeUrl = "qr_code_url"
     }
+
+    init(secret: String, qrCodeUrl: String) {
+        self.secret = secret
+        self.qrCodeUrl = qrCodeUrl
+    }
 }
 
 struct TotpEnableResponse: Codable, Sendable {
@@ -73,6 +96,10 @@ struct TotpEnableResponse: Codable, Sendable {
 
     enum CodingKeys: String, CodingKey {
         case backupCodes = "backup_codes"
+    }
+
+    init(backupCodes: [String]) {
+        self.backupCodes = backupCodes
     }
 }
 
@@ -120,6 +147,22 @@ struct ProfileResponse: Codable, Sendable {
         case displayName = "display_name"
         case isAdmin = "is_admin"
         case totpEnabled = "totp_enabled"
+    }
+
+    init(
+        id: String,
+        username: String,
+        email: String,
+        displayName: String?,
+        isAdmin: Bool,
+        totpEnabled: Bool
+    ) {
+        self.id = id
+        self.username = username
+        self.email = email
+        self.displayName = displayName
+        self.isAdmin = isAdmin
+        self.totpEnabled = totpEnabled
     }
 }
 

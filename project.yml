@@ -17,6 +17,15 @@ packages:
   swift-dependencies:
     url: https://github.com/pointfreeco/swift-dependencies.git
     from: "1.0.0"
+  artifact-keeper-swift-sdk:
+    url: https://github.com/artifact-keeper/artifact-keeper-swift-sdk.git
+    from: "1.1.0-dev.1"
+  swift-openapi-runtime:
+    url: https://github.com/apple/swift-openapi-runtime
+    from: "1.7.0"
+  swift-openapi-urlsession:
+    url: https://github.com/apple/swift-openapi-urlsession
+    from: "1.0.0"
 
 targets:
   ArtifactKeeper:
@@ -44,10 +53,19 @@ targets:
       properties:
         CFBundleDisplayName: "Artifact Keeper"
         LSApplicationCategoryType: "public.app-category.developer-tools"
+        UILaunchScreen: {}
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
     dependencies:
       - package: Alamofire
       - package: Kingfisher
       - package: swift-dependencies
         product: Dependencies
+      - package: artifact-keeper-swift-sdk
+        product: ArtifactKeeperClient
+      - package: swift-openapi-runtime
+        product: OpenAPIRuntime
+      - package: swift-openapi-urlsession
+        product: OpenAPIURLSession
     entitlements:
       path: ArtifactKeeper.entitlements
