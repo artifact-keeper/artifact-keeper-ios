@@ -22,6 +22,32 @@ struct Repository: Codable, Identifiable, Sendable {
         case createdAt = "created_at"
         case updatedAt = "updated_at"
     }
+
+    init(
+        id: String,
+        key: String,
+        name: String,
+        format: String,
+        repoType: String,
+        isPublic: Bool,
+        description: String?,
+        storageUsedBytes: Int64,
+        quotaBytes: Int64?,
+        createdAt: String,
+        updatedAt: String
+    ) {
+        self.id = id
+        self.key = key
+        self.name = name
+        self.format = format
+        self.repoType = repoType
+        self.isPublic = isPublic
+        self.description = description
+        self.storageUsedBytes = storageUsedBytes
+        self.quotaBytes = quotaBytes
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+    }
 }
 
 struct RepositoryListResponse: Codable, Sendable {

@@ -1,5 +1,7 @@
 import SwiftUI
 import Foundation
+import ArtifactKeeperClient
+import OpenAPIRuntime
 
 @MainActor
 class AuthManager: ObservableObject {
@@ -13,35 +15,36 @@ class AuthManager: ObservableObject {
     @Published var totpToken: String?
 
     private let apiClient = APIClient.shared
+    private let sdkClient = SDKClient.shared
 
     func login(username: String, password: String) async {
         isLoading = true
         errorMessage = nil
 
         do {
-            let response: LoginResponse = try await apiClient.request(
-                "/api/v1/auth/login",
-                method: "POST",
-                body: LoginRequest(username: username, password: password)
+            let client = await sdkClient.client
+            let response = try await client.login(
+                body: .json(.init(password: password, username: username))
             )
+            let data = try response.ok.body.json
 
             // Check if TOTP verification is required
-            if response.totpRequired == true {
+            if data.totp_required == true {
                 totpRequired = true
-                totpToken = response.totpToken
+                totpToken = data.totp_token
                 isLoading = false
                 return
             }
 
-            await apiClient.setToken(response.accessToken)
+            await apiClient.setToken(data.access_token)
 
             // Decode user info from JWT payload
-            if let user = Self.decodeJWT(response.accessToken) {
+            if let user = Self.decodeJWT(data.access_token) {
                 currentUser = user
             }
             isAuthenticated = true
 
-            if response.mustChangePassword == true {
+            if data.must_change_password {
                 mustChangePassword = true
             }
         } catch {
@@ -66,7 +69,7 @@ class AuthManager: ObservableObject {
             }
             isAuthenticated = true
             totpRequired = false
-            totpToken = nil
+            self.totpToken = nil
 
             if response.mustChangePassword == true {
                 mustChangePassword = true
@@ -91,8 +94,10 @@ class AuthManager: ObservableObject {
 
     func checkSetupStatus() async {
         do {
-            let status: SetupStatusResponse = try await apiClient.request("/api/v1/setup/status")
-            setupRequired = status.setupRequired
+            let client = await sdkClient.client
+            let response = try await client.setup_status()
+            let data = try response.ok.body.json
+            setupRequired = data.setup_required
         } catch {
             setupRequired = false
         }

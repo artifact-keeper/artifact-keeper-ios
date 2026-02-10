@@ -97,7 +97,10 @@ class ServerManager: ObservableObject {
 
     private func applyServer(_ server: SavedServer) {
         UserDefaults.standard.set(server.url, forKey: APIClient.serverURLKey)
-        Task { await APIClient.shared.updateBaseURL(server.url) }
+        Task {
+            await APIClient.shared.updateBaseURL(server.url)
+            // SDKClient is also updated via APIClient.updateBaseURL
+        }
     }
 
     // Migrate from old single-server storage

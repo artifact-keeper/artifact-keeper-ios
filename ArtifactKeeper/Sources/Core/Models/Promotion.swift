@@ -185,6 +185,22 @@ struct PromotionResponse: Codable, Sendable {
         case promotedPath = "promoted_path"
         case message, warnings
     }
+
+    init(
+        success: Bool,
+        artifactId: String,
+        targetRepoKey: String,
+        promotedPath: String?,
+        message: String?,
+        warnings: [String]?
+    ) {
+        self.success = success
+        self.artifactId = artifactId
+        self.targetRepoKey = targetRepoKey
+        self.promotedPath = promotedPath
+        self.message = message
+        self.warnings = warnings
+    }
 }
 
 struct BulkPromotionRequest: Encodable, Sendable {
@@ -211,6 +227,13 @@ struct BulkPromotionResult: Codable, Sendable {
         case success, message
         case promotedPath = "promoted_path"
     }
+
+    init(artifactId: String, success: Bool, message: String?, promotedPath: String?) {
+        self.artifactId = artifactId
+        self.success = success
+        self.message = message
+        self.promotedPath = promotedPath
+    }
 }
 
 struct BulkPromotionResponse: Codable, Sendable {
@@ -224,6 +247,13 @@ struct BulkPromotionResponse: Codable, Sendable {
         case totalSucceeded = "total_succeeded"
         case totalFailed = "total_failed"
         case results
+    }
+
+    init(totalRequested: Int, totalSucceeded: Int, totalFailed: Int, results: [BulkPromotionResult]) {
+        self.totalRequested = totalRequested
+        self.totalSucceeded = totalSucceeded
+        self.totalFailed = totalFailed
+        self.results = results
     }
 }
 
@@ -254,6 +284,32 @@ struct PromotionHistoryEntry: Codable, Identifiable, Sendable {
         case comment
         case wasForced = "was_forced"
         case promotedAt = "promoted_at"
+    }
+
+    init(
+        id: String,
+        artifactId: String,
+        artifactName: String,
+        artifactVersion: String?,
+        sourceRepoKey: String,
+        targetRepoKey: String,
+        promotedBy: String,
+        promotedByUsername: String?,
+        comment: String?,
+        wasForced: Bool,
+        promotedAt: String
+    ) {
+        self.id = id
+        self.artifactId = artifactId
+        self.artifactName = artifactName
+        self.artifactVersion = artifactVersion
+        self.sourceRepoKey = sourceRepoKey
+        self.targetRepoKey = targetRepoKey
+        self.promotedBy = promotedBy
+        self.promotedByUsername = promotedByUsername
+        self.comment = comment
+        self.wasForced = wasForced
+        self.promotedAt = promotedAt
     }
 }
 

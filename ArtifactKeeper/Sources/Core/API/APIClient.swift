@@ -1,20 +1,7 @@
 import Foundation
-
-/// URLSession delegate that accepts self-signed certificates for self-hosted servers.
-private final class SelfSignedCertDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
-    func urlSession(
-        _ session: URLSession,
-        didReceive challenge: URLAuthenticationChallenge,
-        completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
-    ) {
-        guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-              let serverTrust = challenge.protectionSpace.serverTrust else {
-            completionHandler(.performDefaultHandling, nil)
-            return
-        }
-        completionHandler(.useCredential, URLCredential(trust: serverTrust))
-    }
-}
+import ArtifactKeeperClient
+import OpenAPIRuntime
+import OpenAPIURLSession
 
 actor APIClient {
     static let shared = APIClient()
@@ -25,6 +12,7 @@ actor APIClient {
     private var baseURL: String
     private let session: URLSession
     private let decoder: JSONDecoder
+    private let sdkClient = SDKClient.shared
 
     var accessToken: String?
 
@@ -39,11 +27,13 @@ actor APIClient {
 
     func setToken(_ token: String?) {
         self.accessToken = token
+        Task { await sdkClient.setToken(token) }
     }
 
     func updateBaseURL(_ url: String) {
         self.baseURL = url
         UserDefaults.standard.set(url, forKey: APIClient.serverURLKey)
+        Task { await sdkClient.updateBaseURL(url) }
     }
 
     func getBaseURL() -> String {
@@ -75,6 +65,7 @@ actor APIClient {
         }
     }
 
+    /// Generic request method kept for backward compatibility with views that call it directly.
     func request<T: Decodable & Sendable>(
         _ endpoint: String,
         method: String = "GET",
@@ -152,49 +143,89 @@ actor APIClient {
         return URL(string: "\(baseURL)/api/v1/repositories/\(repoKey)/artifacts/\(encoded)/download")
     }
 
-    // MARK: - TOTP
+    // MARK: - SDK-backed Methods
+
+    // MARK: TOTP
 
     func totpSetup() async throws -> TotpSetupResponse {
-        try await request("/api/v1/auth/totp/setup", method: "POST")
+        let client = await sdkClient.client
+        let response = try await client.setup_totp()
+        let data = try response.ok.body.json
+        return TotpSetupResponse(secret: data.secret, qrCodeUrl: data.qr_code_url)
     }
 
     func totpEnable(code: String) async throws -> TotpEnableResponse {
-        try await request("/api/v1/auth/totp/enable", method: "POST", body: TotpCodeRequest(code: code))
+        let client = await sdkClient.client
+        let response = try await client.enable_totp(
+            body: .json(.init(code: code))
+        )
+        let data = try response.ok.body.json
+        return TotpEnableResponse(backupCodes: data.backup_codes)
     }
 
     func totpVerify(totpToken: String, code: String) async throws -> LoginResponse {
-        try await request(
-            "/api/v1/auth/totp/verify",
-            method: "POST",
-            body: TotpVerifyRequest(totpToken: totpToken, code: code)
+        let client = await sdkClient.client
+        let response = try await client.verify_totp(
+            body: .json(.init(code: code, totp_token: totpToken))
+        )
+        let data = try response.ok.body.json
+        return LoginResponse(
+            accessToken: data.access_token,
+            refreshToken: data.refresh_token,
+            expiresIn: Int(data.expires_in),
+            tokenType: data.token_type,
+            mustChangePassword: data.must_change_password,
+            totpRequired: data.totp_required,
+            totpToken: data.totp_token
         )
     }
 
     func totpDisable(password: String, code: String) async throws {
-        try await requestVoid(
-            "/api/v1/auth/totp/disable",
-            method: "POST",
-            body: TotpDisableRequest(password: password, code: code)
+        let client = await sdkClient.client
+        let response = try await client.disable_totp(
+            body: .json(.init(code: code, password: password))
         )
+        switch response {
+        case .ok:
+            return
+        case .unauthorized(let err):
+            let msg = (try? err.body.json.message) ?? "Unauthorized"
+            throw APIError.httpError(statusCode: 401, data: msg.data(using: .utf8) ?? Data())
+        case .undocumented(let statusCode, _):
+            throw APIError.httpError(statusCode: statusCode, data: Data())
+        }
     }
 
-    // MARK: - Password
+    // MARK: Password
 
     func changeUserPassword(userId: String, currentPassword: String, newPassword: String) async throws {
-        try await requestVoid(
-            "/api/v1/users/\(userId)/password",
-            method: "POST",
-            body: ChangePasswordRequest(currentPassword: currentPassword, newPassword: newPassword)
+        let client = await sdkClient.client
+        let response = try await client.change_password(
+            path: .init(id: userId),
+            body: .json(.init(current_password: currentPassword, new_password: newPassword))
         )
+        // Use the .ok computed property -- it throws if the response is not .ok
+        _ = try response.ok
     }
 
-    // MARK: - Profile
+    // MARK: Profile
 
     func getProfile() async throws -> ProfileResponse {
-        try await request("/api/v1/auth/me")
+        let client = await sdkClient.client
+        let response = try await client.get_current_user()
+        let data = try response.ok.body.json
+        return ProfileResponse(
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            displayName: data.display_name,
+            isAdmin: data.is_admin,
+            totpEnabled: data.totp_enabled
+        )
     }
 
     func updateProfile(displayName: String?, email: String?) async throws -> ProfileResponse {
+        // The SDK does not have a /profile endpoint, use raw request
         try await request(
             "/api/v1/profile",
             method: "PUT",
@@ -202,7 +233,7 @@ actor APIClient {
         )
     }
 
-    // MARK: - API Keys
+    // MARK: API Keys (profile endpoints not in SDK, kept as raw requests)
 
     func listApiKeys() async throws -> [ApiKey] {
         let response: ApiKeysListResponse = try await request("/api/v1/profile/api-keys")
@@ -221,7 +252,7 @@ actor APIClient {
         try await requestVoid("/api/v1/profile/api-keys/\(id)", method: "DELETE")
     }
 
-    // MARK: - Access Tokens
+    // MARK: Access Tokens (profile endpoints not in SDK, kept as raw requests)
 
     func listAccessTokens() async throws -> [AccessToken] {
         let response: AccessTokensListResponse = try await request("/api/v1/profile/access-tokens")
@@ -240,7 +271,7 @@ actor APIClient {
         try await requestVoid("/api/v1/profile/access-tokens/\(id)", method: "DELETE")
     }
 
-    // MARK: - Staging Repositories
+    // MARK: Staging Repositories (staging endpoints not in SDK, kept as raw requests)
 
     func listStagingRepos() async throws -> [StagingRepository] {
         let response: StagingRepositoryListResponse = try await request("/api/v1/staging/repositories")
@@ -277,54 +308,101 @@ actor APIClient {
         return response.items
     }
 
-    // MARK: - Virtual Repository Members
+    // MARK: Virtual Repository Members
 
     func listVirtualMembers(repoKey: String) async throws -> [VirtualMember] {
-        let response: VirtualMembersResponse = try await request(
-            "/api/v1/repositories/\(repoKey)/members"
+        let client = await sdkClient.client
+        let response = try await client.list_virtual_members(
+            path: .init(key: repoKey)
         )
-        return response.items
+        let data = try response.ok.body.json
+        return data.items.map { m in
+            VirtualMember(
+                id: m.id,
+                memberRepoId: m.member_repo_id,
+                memberRepoKey: m.member_repo_key,
+                memberRepoName: m.member_repo_name,
+                memberRepoType: m.member_repo_type,
+                priority: Int(m.priority),
+                createdAt: Self.formatDate(m.created_at)
+            )
+        }
     }
 
     func addVirtualMember(repoKey: String, memberKey: String, priority: Int?) async throws -> VirtualMember {
-        try await request(
-            "/api/v1/repositories/\(repoKey)/members",
-            method: "POST",
-            body: AddMemberRequest(memberKey: memberKey, priority: priority)
+        let client = await sdkClient.client
+        let response = try await client.add_virtual_member(
+            path: .init(key: repoKey),
+            body: .json(.init(
+                member_key: memberKey,
+                priority: priority.map { Int32($0) }
+            ))
+        )
+        let m = try response.ok.body.json
+        return VirtualMember(
+            id: m.id,
+            memberRepoId: m.member_repo_id,
+            memberRepoKey: m.member_repo_key,
+            memberRepoName: m.member_repo_name,
+            memberRepoType: m.member_repo_type,
+            priority: Int(m.priority),
+            createdAt: Self.formatDate(m.created_at)
         )
     }
 
     func removeVirtualMember(repoKey: String, memberKey: String) async throws {
-        try await requestVoid(
-            "/api/v1/repositories/\(repoKey)/members/\(memberKey)",
-            method: "DELETE"
+        let client = await sdkClient.client
+        let response = try await client.remove_virtual_member(
+            path: .init(key: repoKey, member_key: memberKey)
         )
+        _ = try response.ok
     }
 
     func reorderVirtualMembers(repoKey: String, members: [MemberPriority]) async throws {
-        try await requestVoid(
-            "/api/v1/repositories/\(repoKey)/members",
-            method: "PUT",
-            body: ReorderMembersRequest(members: members)
+        let client = await sdkClient.client
+        let response = try await client.update_virtual_members(
+            path: .init(key: repoKey),
+            body: .json(.init(
+                members: members.map { m in
+                    Components.Schemas.VirtualMemberPriority(
+                        member_key: m.memberKey,
+                        priority: Int32(m.priority)
+                    )
+                }
+            ))
         )
+        _ = try response.ok
     }
 
-    // MARK: - Repositories
+    // MARK: Repositories
 
     func listRepositories() async throws -> [Repository] {
-        let response: RepositoryListResponse = try await request("/api/v1/repositories?per_page=100")
-        return response.items
+        let client = await sdkClient.client
+        let response = try await client.list_repositories(
+            query: .init(per_page: 100)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { Repository(from: $0) }
     }
 
     func createRepository(request: CreateRepositoryRequest) async throws -> Repository {
-        try await self.request(
-            "/api/v1/repositories",
-            method: "POST",
-            body: request
+        let client = await sdkClient.client
+        let response = try await client.create_repository(
+            body: .json(.init(
+                description: request.description,
+                format: request.format,
+                is_public: request.isPublic,
+                key: request.key,
+                name: request.name,
+                repo_type: request.repoType,
+                upstream_url: request.upstreamUrl
+            ))
         )
+        let data = try response.ok.body.json
+        return Repository(from: data)
     }
 
-    // MARK: - Artifact Upload
+    // MARK: Artifact Upload (multipart -- kept as raw URLSession)
 
     func uploadArtifact(repoKey: String, fileURL: URL, customPath: String?) async throws -> Artifact {
         let boundary = UUID().uuidString
@@ -369,7 +447,7 @@ actor APIClient {
         return try decoder.decode(Artifact.self, from: data)
     }
 
-    // MARK: - Repository Security Config
+    // MARK: Repository Security Config
 
     func getRepoSecurityConfig(repoKey: String) async throws -> RepoSecurityConfig {
         let response: RepoSecurityInfoResponse = try await request(
@@ -389,6 +467,34 @@ actor APIClient {
             "/api/v1/repositories/\(repoKey)/security",
             method: "PUT",
             body: config
+        )
+    }
+
+    // MARK: - Date Formatting Helper
+
+    nonisolated static func formatDate(_ date: Foundation.Date) -> String {
+        let f = ISO8601DateFormatter()
+        f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return f.string(from: date)
+    }
+}
+
+// MARK: - Repository Conversion Extension
+
+extension Repository {
+    init(from sdk: Components.Schemas.RepositoryResponse) {
+        self.init(
+            id: sdk.id,
+            key: sdk.key,
+            name: sdk.name,
+            format: sdk.format,
+            repoType: sdk.repo_type,
+            isPublic: sdk.is_public,
+            description: sdk.description,
+            storageUsedBytes: sdk.storage_used_bytes,
+            quotaBytes: sdk.quota_bytes,
+            createdAt: APIClient.formatDate(sdk.created_at),
+            updatedAt: APIClient.formatDate(sdk.updated_at)
         )
     }
 }
