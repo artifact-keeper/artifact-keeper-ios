@@ -402,6 +402,10 @@ actor APIClient {
         return Repository(from: data)
     }
 
+    func updateRepository(key: String, request: UpdateRepositoryRequest) async throws -> Repository {
+        try await self.request("/api/v1/repositories/\(key)", method: "PATCH", body: request)
+    }
+
     // MARK: Artifact Upload (multipart -- kept as raw URLSession)
 
     func uploadArtifact(repoKey: String, fileURL: URL, customPath: String?) async throws -> Artifact {
