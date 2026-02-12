@@ -3,6 +3,7 @@ import SwiftUI
 struct RepositoryDetailTabbedView: View {
     let repoKey: String
 
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthManager
     @State private var repo: Repository?
     @State private var artifacts: [Artifact] = []
@@ -12,6 +13,7 @@ struct RepositoryDetailTabbedView: View {
     @State private var selectedArtifact: Artifact?
     @State private var securityArtifact: Artifact?
     @State private var searchText = ""
+    @State private var showingEditSheet = false
 
     private let apiClient = APIClient.shared
 
@@ -74,6 +76,28 @@ struct RepositoryDetailTabbedView: View {
                             Button("Done") { securityArtifact = nil }
                         }
                     }
+            }
+        }
+        .toolbar {
+            if authManager.isAuthenticated, repo != nil {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showingEditSheet = true
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
+                }
+            }
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            if let repo {
+                EditRepositorySheet(repository: repo) { newKey in
+                    if newKey != repoKey {
+                        dismiss()
+                    } else {
+                        Task { await loadData() }
+                    }
+                }
             }
         }
     }

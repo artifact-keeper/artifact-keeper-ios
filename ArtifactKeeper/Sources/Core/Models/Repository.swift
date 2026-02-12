@@ -103,3 +103,22 @@ struct CreateRepositoryRequest: Codable, Sendable {
         self.upstreamUrl = upstreamUrl
     }
 }
+
+struct UpdateRepositoryRequest: Codable, Sendable {
+    let key: String?
+    let name: String?
+    let description: String?
+    let isPublic: Bool?
+
+    enum CodingKeys: String, CodingKey {
+        case key, name, description
+        case isPublic = "is_public"
+    }
+
+    init(key: String? = nil, name: String? = nil, description: String? = nil, isPublic: Bool? = nil) {
+        self.key = key
+        self.name = name
+        self.description = description
+        self.isPublic = isPublic
+    }
+}
