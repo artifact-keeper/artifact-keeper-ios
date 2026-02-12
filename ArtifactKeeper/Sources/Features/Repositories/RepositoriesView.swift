@@ -532,7 +532,7 @@ struct CreateRepositorySheet: View {
     private let apiClient = APIClient.shared
 
     private let repoTypes = ["local", "remote", "virtual"]
-    private let formats = ["generic", "docker", "maven", "npm", "pypi", "cargo", "nuget", "go", "helm", "rpm", "debian"]
+    private let formats = ["generic", "docker", "maven", "npm", "pypi", "cargo", "nuget", "go", "helm", "rpm", "debian", "protobuf"]
 
     private var isValid: Bool {
         !key.isEmpty && !name.isEmpty &&
