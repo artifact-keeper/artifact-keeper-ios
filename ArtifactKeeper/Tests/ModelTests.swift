@@ -8,11 +8,11 @@ import Foundation
 struct AuthModelTests {
 
     @Test func loginRequestEncodesCorrectly() throws {
-        let request = LoginRequest(username: "admin", password: "secret123")
+        let request = LoginRequest(username: "testuser", password: "test-value-not-real") // NOSONAR: test fixture
         let data = try JSONEncoder().encode(request)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        #expect(json?["username"] as? String == "admin")
-        #expect(json?["password"] as? String == "secret123")
+        #expect(json?["username"] as? String == "testuser")
+        #expect(json?["password"] as? String == "test-value-not-real")
     }
 
     @Test func loginResponseDecodesFromSnakeCase() throws {
@@ -125,7 +125,7 @@ struct AuthModelTests {
     }
 
     @Test func totpSetupResponseRoundTrip() throws {
-        let original = TotpSetupResponse(secret: "JBSWY3DPEHPK3PXP", qrCodeUrl: "otpauth://totp/test")
+        let original = TotpSetupResponse(secret: "AAAAAABBBBBBCCCCCC", qrCodeUrl: "otpauth://totp/test") // NOSONAR: test fixture
         let data = try JSONEncoder().encode(original)
         let decoded = try JSONDecoder().decode(TotpSetupResponse.self, from: data)
         #expect(decoded.secret == original.secret)
@@ -162,19 +162,19 @@ struct AuthModelTests {
     }
 
     @Test func totpDisableRequestEncodes() throws {
-        let req = TotpDisableRequest(password: "mypass", code: "111111")
+        let req = TotpDisableRequest(password: "test-value-not-real", code: "111111") // NOSONAR: test fixture
         let data = try JSONEncoder().encode(req)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        #expect(json?["password"] as? String == "mypass")
+        #expect(json?["password"] as? String == "test-value-not-real")
         #expect(json?["code"] as? String == "111111")
     }
 
     @Test func changePasswordRequestEncodesSnakeCase() throws {
-        let req = ChangePasswordRequest(currentPassword: "old", newPassword: "new")
+        let req = ChangePasswordRequest(currentPassword: "test-old-value", newPassword: "test-new-value") // NOSONAR: test fixture
         let data = try JSONEncoder().encode(req)
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        #expect(json?["current_password"] as? String == "old")
-        #expect(json?["new_password"] as? String == "new")
+        #expect(json?["current_password"] as? String == "test-old-value")
+        #expect(json?["new_password"] as? String == "test-new-value")
     }
 
     @Test func profileResponseRoundTrip() throws {
