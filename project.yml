@@ -69,3 +69,14 @@ targets:
         product: OpenAPIURLSession
     entitlements:
       path: ArtifactKeeper.entitlements
+
+  ArtifactKeeperTests:
+    type: bundle.unit-test
+    platform: [iOS, macOS]
+    sources:
+      - ArtifactKeeper/Tests
+    settings:
+      base:
+        SWIFT_VERSION: "6.0"
+    dependencies:
+      - target: ArtifactKeeper

@@ -26,7 +26,13 @@ let package = Package(
                 .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
                 .product(name: "OpenAPIURLSession", package: "swift-openapi-urlsession"),
             ],
-            path: "ArtifactKeeper/Sources"
+            path: "ArtifactKeeper/Sources",
+            exclude: ["App/ArtifactKeeperApp.swift"]
+        ),
+        .testTarget(
+            name: "ArtifactKeeperTests",
+            dependencies: ["ArtifactKeeper"],
+            path: "ArtifactKeeper/Tests"
         ),
     ]
 )
