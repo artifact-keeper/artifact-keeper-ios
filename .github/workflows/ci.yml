@@ -73,6 +73,8 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Select Xcode
         run: sudo xcode-select -s "$XCODE_PATH"
@@ -86,6 +88,11 @@ jobs:
 
       - name: Run tests
         run: swift test
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   nightly:
     name: Nightly Release
