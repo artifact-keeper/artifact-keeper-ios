@@ -1,0 +1,93 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the Artifact Keeper iOS/macOS app
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement.
+
+        If this feature relates to the **backend or API**, please file it in [artifact-keeper](https://github.com/artifact-keeper/artifact-keeper/issues/new).
+
+        If you're not sure which repo the feature belongs in, go ahead and file it here. We'll move it if needed.
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: Describe the problem or limitation you are experiencing. What is frustrating or missing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe what you would like to happen. How should the feature work from a user's perspective?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe the specific scenario or workflow where this feature would be useful.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which platform(s) does this feature apply to?
+      options:
+        - iOS
+        - iPadOS
+        - macOS
+        - All platforms
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which part of the app does this feature relate to?
+      options:
+        - Artifacts Browser
+        - Integration
+        - Security / Scanning
+        - Operations
+        - Administration
+        - Notifications
+        - Widgets
+        - Shortcuts / Automation
+        - Other
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or references that help explain the feature request.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues to verify this has not already been requested.
+          required: true
+        - label: I have reviewed the documentation to confirm this feature does not already exist.
+          required: true
