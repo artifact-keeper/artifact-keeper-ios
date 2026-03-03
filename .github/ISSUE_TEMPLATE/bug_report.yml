@@ -1,0 +1,127 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in the Artifact Keeper iOS/macOS app
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        If this is a **backend or API** issue, please file it in [artifact-keeper](https://github.com/artifact-keeper/artifact-keeper/issues/new).
+        If this is a **web UI** issue, please file it in [artifact-keeper-web](https://github.com/artifact-keeper/artifact-keeper-web/issues/new).
+
+        If you're not sure where the bug lives, go ahead and file it here. We'll move it to the right repo if needed.
+
+        For security vulnerabilities, please use [private security reporting](https://github.com/artifact-keeper/artifact-keeper-ios/security/advisories/new) instead of a public issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Information
+      description: Fill in the relevant details about your environment.
+      value: |
+        - Device: (e.g., iPhone 16, iPad Pro 13-inch, MacBook Pro M4)
+        - OS Version: (e.g., iOS 18.3, iPadOS 18.3, macOS 15.3)
+        - App Version: (e.g., 1.0.0)
+        - Xcode Version (if building from source): (e.g., 16.2)
+        - Network conditions: (e.g., Wi-Fi, cellular, VPN)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which platform are you running the app on?
+      options:
+        - iOS
+        - iPadOS
+        - macOS (Designed for iPad)
+        - macOS (Mac Catalyst)
+    validations:
+      required: true
+
+  - type: input
+    id: backend-version
+    attributes:
+      label: Backend Version
+      description: The version of the Artifact Keeper backend you are connecting to, if known.
+      placeholder: e.g., 1.1.0
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed-behavior
+    attributes:
+      label: Observed Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Provide a step-by-step list to reproduce the issue.
+      placeholder: |
+        1. Open the app
+        2. Navigate to ...
+        3. Tap on ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: crash-log
+    attributes:
+      label: Crash Log / Console Output
+      description: |
+        If the app crashed, include the crash log or relevant console output.
+        Tip: You can find crash logs in Settings > Privacy & Security > Analytics & Improvements > Analytics Data, or via the Crashes section in Xcode Organizer.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Screen Recording
+      description: If applicable, attach screenshots or a screen recording to help illustrate the issue.
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem (e.g., happens only on first launch, only with certain server configurations, etc.).
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched existing issues to verify this has not already been reported.
+          required: true
+        - label: I have redacted any sensitive information (tokens, passwords, server URLs) from logs and screenshots.
+          required: true
+        - label: I am using a supported version of the app and OS.
+          required: true
