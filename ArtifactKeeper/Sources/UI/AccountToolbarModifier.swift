@@ -4,22 +4,15 @@ struct AccountToolbarModifier: ViewModifier {
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var serverManager: ServerManager
     @State private var showingLoginSheet = false
-    @State private var showingDashboard = false
     @State private var showingAddServer = false
     @State private var showingProfile = false
 
     func body(content: Content) -> some View {
         content
             .toolbar {
-                // Leading: Dashboard + Server switcher
+                // Leading: Server switcher
                 ToolbarItem(placement: .navigation) {
                     HStack(spacing: 8) {
-                        Button {
-                            showingDashboard = true
-                        } label: {
-                            Image(systemName: "square.grid.2x2")
-                        }
-
                         if serverManager.servers.count > 1 {
                             Menu {
                                 ForEach(serverManager.servers) { server in
@@ -113,22 +106,6 @@ struct AccountToolbarModifier: ViewModifier {
                         }
                 }
             }
-            .sheet(isPresented: $showingDashboard) {
-                NavigationStack {
-                    DashboardSheetView()
-                        .navigationTitle("Dashboard")
-                        #if os(iOS)
-                        .navigationBarTitleDisplayMode(.inline)
-                        #endif
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Done") {
-                                    showingDashboard = false
-                                }
-                            }
-                        }
-                }
-            }
             .sheet(isPresented: $showingAddServer) {
                 NavigationStack {
                     AddServerView()
@@ -173,7 +150,7 @@ struct AccountToolbarModifier: ViewModifier {
     }
 }
 
-// MARK: - Dashboard Sheet
+// MARK: - Dashboard Sheet (kept for backward compatibility)
 
 struct DashboardSheetView: View {
     @State private var stats: AdminStats?
