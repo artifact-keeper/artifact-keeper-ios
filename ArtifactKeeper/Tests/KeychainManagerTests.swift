@@ -173,7 +173,7 @@ struct KeychainManagerTests {
         let server = uniqueServerURL()
         defer { cleanup(serverURL: server) }
 
-        let specialToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyLTEyMyJ9.signature+/=="
+        let specialToken = "test-header.test-payload.signature+/special-chars=="
         try KeychainManager.saveAccessToken(specialToken, serverURL: server)
         let retrieved = KeychainManager.getAccessToken(serverURL: server)
         #expect(retrieved == specialToken)

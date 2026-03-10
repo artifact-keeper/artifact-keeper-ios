@@ -18,7 +18,7 @@ struct AuthModelTests {
     @Test func loginResponseDecodesFromSnakeCase() throws {
         let json = """
         {
-            "access_token": "eyJhbGciOiJIUzI1NiJ9.test.sig",
+            "access_token": "test-header.test-payload.test-sig",
             "refresh_token": "refresh_abc",
             "expires_in": 3600,
             "token_type": "Bearer",
@@ -29,7 +29,7 @@ struct AuthModelTests {
         """.data(using: .utf8)!
 
         let response = try JSONDecoder().decode(LoginResponse.self, from: json)
-        #expect(response.accessToken == "eyJhbGciOiJIUzI1NiJ9.test.sig")
+        #expect(response.accessToken == "test-header.test-payload.test-sig")
         #expect(response.refreshToken == "refresh_abc")
         #expect(response.expiresIn == 3600)
         #expect(response.tokenType == "Bearer")
