@@ -36,6 +36,13 @@ actor APIClient {
         self.decoder = JSONDecoder()
     }
 
+    /// Testing initializer that accepts a custom URLSession (e.g. with a stubbed URLProtocol).
+    init(baseURL: String, session: URLSession) {
+        self.baseURL = baseURL
+        self.session = session
+        self.decoder = JSONDecoder()
+    }
+
     func setToken(_ token: String?) {
         self.accessToken = token
         Task { await sdkClient.setToken(token) }

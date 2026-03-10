@@ -201,7 +201,7 @@ class AuthManager: ObservableObject {
     // MARK: - Private Helpers
 
     /// Common success path after login or TOTP verification.
-    private func handleLoginSuccess(accessToken: String, refreshToken: String?, mustChange: Bool) async {
+    func handleLoginSuccess(accessToken: String, refreshToken: String?, mustChange: Bool) async {
         // Ensure we have the current server URL.
         let serverURL = currentServerURL.isEmpty
             ? (UserDefaults.standard.string(forKey: APIClient.serverURLKey) ?? "")
@@ -241,7 +241,7 @@ class AuthManager: ObservableObject {
     }
 
     /// Decode user info from JWT access token payload (base64 middle segment).
-    private static func decodeJWT(_ token: String) -> UserInfo? {
+    nonisolated static func decodeJWT(_ token: String) -> UserInfo? {
         let segments = token.split(separator: ".")
         guard segments.count == 3 else { return nil }
 
@@ -256,7 +256,7 @@ class AuthManager: ObservableObject {
     }
 
     /// Check whether the `exp` claim in a JWT is in the past.
-    private static func isTokenExpired(_ token: String) -> Bool {
+    nonisolated static func isTokenExpired(_ token: String) -> Bool {
         let segments = token.split(separator: ".")
         guard segments.count == 3 else { return true }
 
