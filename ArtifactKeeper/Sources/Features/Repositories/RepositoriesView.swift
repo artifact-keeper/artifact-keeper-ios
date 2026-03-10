@@ -284,6 +284,22 @@ struct RepositoryDetailView: View {
                         }
                     }
 
+                    Section {
+                        NavigationLink {
+                            SetupInstructionsView(repo: repo)
+                                .navigationTitle("Setup: \(repo.key)")
+                                #if os(iOS)
+                                .navigationBarTitleDisplayMode(.inline)
+                                #endif
+                        } label: {
+                            Label("Setup Instructions", systemImage: "terminal")
+                        }
+                    } header: {
+                        Text("Getting Started")
+                    } footer: {
+                        Text("Format-specific commands to configure your tools for this repository")
+                    }
+
                     Section("Artifacts (\(artifacts.count))") {
                         ForEach(artifacts) { artifact in
                             ArtifactRow(

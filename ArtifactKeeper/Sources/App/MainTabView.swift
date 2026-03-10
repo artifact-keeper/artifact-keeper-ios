@@ -8,6 +8,11 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
+            DashboardView()
+                .tabItem {
+                    Label("Dashboard", systemImage: "square.grid.2x2")
+                }
+
             ArtifactsSectionView()
                 .tabItem {
                     Label("Artifacts", systemImage: "shippingbox")

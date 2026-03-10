@@ -79,4 +79,4 @@ targets:
       base:
         SWIFT_VERSION: "6.0"
     dependencies:
-      - target: ArtifactKeeper
+      - target: ArtifactKeeper_${platform}
