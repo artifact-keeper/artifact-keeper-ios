@@ -86,21 +86,74 @@ jobs:
           key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
           restore-keys: spm-${{ runner.os }}-
 
-      - name: Run tests
-        run: swift test
+      - name: Run tests with coverage
+        run: swift test --enable-code-coverage
+
+      - name: Convert coverage to SonarCloud format
+        run: |
+          PROFDATA=$(find .build -name "default.profdata" -path "*/codecov/*" | head -1)
+          TEST_BIN=$(find .build -name "ArtifactKeeperPackageTests.xctest" | head -1)
+          BIN_PATH="$TEST_BIN/Contents/MacOS/ArtifactKeeperPackageTests"
+
+          # Export LCOV, filter to project sources only
+          xcrun llvm-cov export \
+            -instr-profile="$PROFDATA" "$BIN_PATH" \
+            --format=lcov \
+            --ignore-filename-regex='\.build/|Tests/' \
+            > coverage-raw.lcov
+
+          # Convert LCOV to SonarQube generic coverage XML
+          python3 -c "
+          import sys, xml.etree.ElementTree as ET
+          root = ET.Element('coverage', version='1')
+          current_file = None
+          file_elem = None
+          for line in open('coverage-raw.lcov'):
+              line = line.strip()
+              if line.startswith('SF:'):
+                  path = line[3:]
+                  if 'ArtifactKeeper/Sources/' not in path:
+                      current_file = None
+                      continue
+                  idx = path.find('ArtifactKeeper/Sources/')
+                  rel_path = path[idx:] if idx >= 0 else path
+                  file_elem = ET.SubElement(root, 'file', path=rel_path)
+                  current_file = rel_path
+              elif line.startswith('DA:') and current_file:
+                  parts = line[3:].split(',')
+                  if len(parts) >= 2:
+                      line_num = parts[0]
+                      hits = int(parts[1])
+                      ET.SubElement(file_elem, 'lineToCover',
+                          lineNumber=line_num,
+                          covered='true' if hits > 0 else 'false')
+              elif line == 'end_of_record':
+                  current_file = None
+          tree = ET.ElementTree(root)
+          ET.indent(tree)
+          tree.write('sonar-coverage.xml', xml_declaration=True, encoding='utf-8')
+          "
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: sonar-coverage.xml
 
   sonarcloud:
     name: SonarCloud Scan
     runs-on: ubuntu-latest
-    # SonarCloud Automatic Analysis may be enabled at the org level.
-    # Until it is disabled in the SonarCloud UI (Administration > Analysis Method),
-    # CI-based analysis will conflict and fail. Allow this job to fail gracefully
-    # so it does not block the rest of the pipeline.
     continue-on-error: true
+    needs: test
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@a31c9398be7ace6bbfaf30c0bd5d415f843d45e9 # v7.0.0
