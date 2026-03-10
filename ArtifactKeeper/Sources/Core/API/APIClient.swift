@@ -16,6 +16,17 @@ actor APIClient {
 
     var accessToken: String?
 
+    /// Callback invoked on the main actor when a 401 could not be recovered
+    /// via token refresh. The UI layer sets this to trigger re-authentication.
+    var onAuthFailure: (@MainActor @Sendable () -> Void)?
+
+    /// Callback that attempts a token refresh. Returns `true` if new tokens
+    /// were obtained and the failed request should be retried.
+    var onTokenRefresh: (@Sendable () async -> Bool)?
+
+    /// Guards against multiple concurrent refresh attempts.
+    private var isRefreshing = false
+
     init() {
         let stored = UserDefaults.standard.string(forKey: APIClient.serverURLKey)
         self.baseURL = stored ?? APIClient.defaultServerURL
@@ -28,6 +39,14 @@ actor APIClient {
     func setToken(_ token: String?) {
         self.accessToken = token
         Task { await sdkClient.setToken(token) }
+    }
+
+    func setTokenRefreshHandler(_ handler: @escaping @Sendable () async -> Bool) {
+        self.onTokenRefresh = handler
+    }
+
+    func setAuthFailureHandler(_ handler: @escaping @MainActor @Sendable () -> Void) {
+        self.onAuthFailure = handler
     }
 
     func updateBaseURL(_ url: String) {
@@ -65,7 +84,10 @@ actor APIClient {
         }
     }
 
+    // MARK: - Request Methods with 401 Retry
+
     /// Generic request method kept for backward compatibility with views that call it directly.
+    /// Automatically retries once on a 401 after attempting a token refresh.
     func request<T: Decodable & Sendable>(
         _ endpoint: String,
         method: String = "GET",
@@ -75,22 +97,28 @@ actor APIClient {
             throw APIError.invalidURL
         }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = method
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        if let token = accessToken {
-            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        let encodedBody: Data?
+        if let body {
+            encodedBody = try JSONEncoder().encode(body)
+        } else {
+            encodedBody = nil
         }
 
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(body)
-        }
+        let (data, httpResponse) = try await executeRequest(url: url, method: method, body: encodedBody)
 
-        let (data, response) = try await session.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw APIError.invalidResponse
+        if httpResponse.statusCode == 401 {
+            if let (retryData, retryResponse) = try? await attemptRefreshAndRetry(
+                url: url, method: method, body: encodedBody
+            ) {
+                guard (200...299).contains(retryResponse.statusCode) else {
+                    throw APIError.httpError(statusCode: retryResponse.statusCode, data: retryData)
+                }
+                return try decoder.decode(T.self, from: retryData)
+            }
+            if let onAuthFailure {
+                await onAuthFailure()
+            }
+            throw APIError.httpError(statusCode: 401, data: data)
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {
@@ -101,6 +129,7 @@ actor APIClient {
     }
 
     /// Fire a request where the response body is empty or can be ignored.
+    /// Automatically retries once on a 401 after attempting a token refresh.
     func requestVoid(
         _ endpoint: String,
         method: String = "POST",
@@ -110,6 +139,43 @@ actor APIClient {
             throw APIError.invalidURL
         }
 
+        let encodedBody: Data?
+        if let body {
+            encodedBody = try JSONEncoder().encode(body)
+        } else {
+            encodedBody = nil
+        }
+
+        let (data, httpResponse) = try await executeRequest(url: url, method: method, body: encodedBody)
+
+        if httpResponse.statusCode == 401 {
+            if let (retryData, retryResponse) = try? await attemptRefreshAndRetry(
+                url: url, method: method, body: encodedBody
+            ) {
+                guard (200...299).contains(retryResponse.statusCode) else {
+                    throw APIError.httpError(statusCode: retryResponse.statusCode, data: retryData)
+                }
+                return
+            }
+            if let onAuthFailure {
+                await onAuthFailure()
+            }
+            throw APIError.httpError(statusCode: 401, data: data)
+        }
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
+        }
+    }
+
+    // MARK: - Internal Request Helpers
+
+    /// Execute a single HTTP request and return the raw data and response.
+    private func executeRequest(
+        url: URL,
+        method: String,
+        body: Data?
+    ) async throws -> (Data, HTTPURLResponse) {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -118,9 +184,7 @@ actor APIClient {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
 
-        if let body = body {
-            request.httpBody = try JSONEncoder().encode(body)
-        }
+        request.httpBody = body
 
         let (data, response) = try await session.data(for: request)
 
@@ -128,9 +192,25 @@ actor APIClient {
             throw APIError.invalidResponse
         }
 
-        guard (200...299).contains(httpResponse.statusCode) else {
-            throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
-        }
+        return (data, httpResponse)
+    }
+
+    /// Attempt a token refresh, then retry the original request.
+    /// Returns `nil` if no refresh callback is configured or refresh failed.
+    private func attemptRefreshAndRetry(
+        url: URL,
+        method: String,
+        body: Data?
+    ) async throws -> (Data, HTTPURLResponse)? {
+        guard let onTokenRefresh, !isRefreshing else { return nil }
+
+        isRefreshing = true
+        let refreshed = await onTokenRefresh()
+        isRefreshing = false
+
+        guard refreshed else { return nil }
+
+        return try await executeRequest(url: url, method: method, body: body)
     }
 
     func buildURL(_ path: String) -> URL? {

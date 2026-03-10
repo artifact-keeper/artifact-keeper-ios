@@ -19,5 +19,8 @@ struct ContentView: View {
             }
         }
         .background(AppTheme.background.ignoresSafeArea())
+        .onChange(of: serverURL) { _, newURL in
+            authManager.updateServerURL(newURL)
+        }
     }
 }
