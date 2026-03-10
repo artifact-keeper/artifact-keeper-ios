@@ -55,7 +55,7 @@ jobs:
         run: sudo xcode-select -s "$XCODE_PATH"
 
       - name: Cache Swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .build
           key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
@@ -80,7 +80,7 @@ jobs:
         run: sudo xcode-select -s "$XCODE_PATH"
 
       - name: Cache Swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .build
           key: spm-${{ runner.os }}-${{ hashFiles('Package.resolved') }}
@@ -303,7 +303,7 @@ jobs:
           xcodegen generate
 
       - name: Cache Swift packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             .build
