@@ -59,6 +59,27 @@ struct SetupInstructionsView: View {
     // MARK: - Format-Specific Steps
 
     private func setupSteps(for repo: Repository) -> [SetupStep] {
+        SetupInstructionsHelper.steps(for: repo, serverURL: serverURL, serverHost: serverHost)
+    }
+}
+
+// MARK: - Extracted Helper (testable)
+
+enum SetupInstructionsHelper {
+
+    /// Derive the host string (with optional port) from a URL.
+    static func deriveHost(from url: String) -> String {
+        if let parsed = URL(string: url) {
+            var host = parsed.host ?? "artifacts.example.com"
+            if let port = parsed.port, port != 443, port != 80 {
+                host += ":\(port)"
+            }
+            return host
+        }
+        return "artifacts.example.com"
+    }
+
+    static func steps(for repo: Repository, serverURL: String, serverHost: String) -> [SetupStep] {
         let key = repo.key
         let url = serverURL.isEmpty ? "https://artifacts.example.com" : serverURL
         let host = serverHost.isEmpty ? "artifacts.example.com" : serverHost

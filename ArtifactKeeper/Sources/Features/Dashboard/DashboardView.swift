@@ -286,18 +286,39 @@ struct DashboardView: View {
     // MARK: - Helpers
 
     private func formatBytes(_ bytes: Int64) -> String {
+        DashboardHelpers.formatBytes(bytes)
+    }
+
+    private func iconForService(_ name: String) -> String {
+        DashboardHelpers.iconForService(name)
+    }
+}
+
+// MARK: - Extracted Helpers (testable)
+
+enum DashboardHelpers {
+    static func formatBytes(_ bytes: Int64) -> String {
         let formatter = ByteCountFormatter()
         formatter.countStyle = .file
         return formatter.string(fromByteCount: bytes)
     }
 
-    private func iconForService(_ name: String) -> String {
+    static func iconForService(_ name: String) -> String {
         switch name.lowercased() {
         case "database", "postgres", "postgresql": return "cylinder.fill"
         case "storage", "s3", "filesystem": return "externaldrive.fill"
         case "scanner", "trivy": return "shield.fill"
         case "search", "meilisearch": return "magnifyingglass"
         default: return "circle.fill"
+        }
+    }
+
+    /// Map a health status string to a semantic category: "healthy", "degraded", or "unhealthy".
+    static func healthCategory(for status: String) -> String {
+        switch status.lowercased() {
+        case "healthy", "ok", "up": return "healthy"
+        case "degraded", "warning": return "degraded"
+        default: return "unhealthy"
         }
     }
 }

@@ -96,3 +96,26 @@ struct TOTPVerificationView: View {
         }
     }
 }
+
+// MARK: - TOTP Validation Helpers (testable)
+
+enum TOTPValidation {
+    /// Filter a string to contain only digits, capped at `maxLength` characters.
+    static func filterCode(_ input: String, maxLength: Int = 6) -> String {
+        let filtered = input.filter(\.isNumber)
+        if filtered.count > maxLength {
+            return String(filtered.prefix(maxLength))
+        }
+        return filtered
+    }
+
+    /// Whether the given code string is valid for submission (exactly 6 digits).
+    static func isValidCode(_ code: String) -> Bool {
+        code.count == 6 && code.allSatisfy(\.isNumber)
+    }
+
+    /// Whether the verify button should be enabled.
+    static func isSubmitEnabled(code: String, isLoading: Bool) -> Bool {
+        isValidCode(code) && !isLoading
+    }
+}
