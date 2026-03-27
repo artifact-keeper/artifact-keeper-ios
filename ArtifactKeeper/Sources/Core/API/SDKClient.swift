@@ -95,7 +95,9 @@ actor SDKClient {
 
 // MARK: - Self-Signed Cert Delegate (shared)
 
-/// URLSession delegate that accepts self-signed certificates for self-hosted servers.
+/// URLSession delegate that supports self-signed certificates for self-hosted servers.
+/// By default uses standard TLS verification. Set the `trustSelfSignedCertificates`
+/// UserDefaults key to true to opt in to accepting self-signed certificates.
 final class SelfSignedCertDelegate: NSObject, URLSessionDelegate, @unchecked Sendable {
     func urlSession(
         _ session: URLSession,
@@ -107,7 +109,18 @@ final class SelfSignedCertDelegate: NSObject, URLSessionDelegate, @unchecked Sen
             completionHandler(.performDefaultHandling, nil)
             return
         }
-        completionHandler(.useCredential, URLCredential(trust: serverTrust))
+        let trustSelfSigned = UserDefaults.standard.bool(forKey: "trustSelfSignedCertificates")
+        guard trustSelfSigned else {
+            completionHandler(.performDefaultHandling, nil)
+            return
+        }
+        var error: CFError?
+        let trusted = SecTrustEvaluateWithError(serverTrust, &error)
+        if trusted || error != nil {
+            completionHandler(.useCredential, URLCredential(trust: serverTrust))
+        } else {
+            completionHandler(.performDefaultHandling, nil)
+        }
     }
 }
 
