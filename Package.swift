@@ -11,7 +11,7 @@ let package = Package(
         .package(url: "https://github.com/Alamofire/Alamofire.git", from: "5.9.0"),
         .package(url: "https://github.com/onevcat/Kingfisher.git", from: "7.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-dependencies.git", from: "1.0.0"),
-        .package(url: "https://github.com/artifact-keeper/artifact-keeper-swift-sdk.git", from: "1.1.0-dev.1"),
+        .package(url: "https://github.com/artifact-keeper/artifact-keeper-swift-sdk.git", from: "1.1.0"),
         .package(url: "https://github.com/apple/swift-openapi-runtime", from: "1.7.0"),
         .package(url: "https://github.com/apple/swift-openapi-urlsession", from: "1.0.0"),
     ],

@@ -403,7 +403,7 @@ actor APIClient {
             path: .init(key: repoKey)
         )
         let data = try response.ok.body.json
-        return data.items.map { m in
+        return data.members.map { m in
             VirtualMember(
                 id: m.id,
                 memberRepoId: m.member_repo_id,
