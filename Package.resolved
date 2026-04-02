@@ -1,5 +1,5 @@
 {
-  "originHash" : "b5006fe5fa104ef338c977b99b8d880902024afbf6b19fbb9057f3f7dcf6554c",
+  "originHash" : "f42a4447d35470758cb65abbe2b4a832bc27aa064281212d34b789c6d03854e4",
   "pins" : [
     {
       "identity" : "alamofire",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/artifact-keeper/artifact-keeper-swift-sdk.git",
       "state" : {
-        "revision" : "4b5ac6f33bba81744dc25659b4679aa3aea455a6",
-        "version" : "1.1.0-dev.1"
+        "revision" : "3906e41db860c3c25d673fbf47619e2cb3058442",
+        "version" : "1.1.0"
       }
     },
     {
