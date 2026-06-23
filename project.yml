@@ -78,5 +78,22 @@ targets:
     settings:
       base:
         SWIFT_VERSION: "6.0"
+        GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: ArtifactKeeper_${platform}
+
+schemes:
+  ArtifactKeeper_macOS:
+    build:
+      targets:
+        ArtifactKeeper_macOS: all
+    test:
+      targets:
+        - ArtifactKeeperTests_macOS
+  ArtifactKeeper_iOS:
+    build:
+      targets:
+        ArtifactKeeper_iOS: all
+    test:
+      targets:
+        - ArtifactKeeperTests_iOS
