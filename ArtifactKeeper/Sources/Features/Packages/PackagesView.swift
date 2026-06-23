@@ -234,10 +234,7 @@ struct PackageDetailView: View {
 
     private func loadVersions() async {
         do {
-            let response: PackageVersionsResponse = try await apiClient.request(
-                "/api/v1/packages/\(package.id)/versions"
-            )
-            versions = response.versions
+            versions = try await apiClient.getPackageVersions(packageId: package.id)
         } catch {
             // silent for now
         }
