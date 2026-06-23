@@ -56,7 +56,9 @@ struct PluginPathTests {
             return pluginOk(request.url!, pluginJSON)
         }
 
-        let _: Plugin = try await mock.client.request("/api/v1/plugins/plg-1")
+        // Exercise the real APIClient.getPlugin(id:) so this pins the method's
+        // path derivation, not a hand-built URL.
+        let _: Plugin = try await mock.client.getPlugin(id: "plg-1")
 
         #expect(log.contains(method: "GET", path: "/api/v1/plugins/plg-1"))
     }

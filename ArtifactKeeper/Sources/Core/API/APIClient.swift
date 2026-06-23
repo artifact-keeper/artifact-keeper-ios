@@ -523,6 +523,13 @@ actor APIClient {
         try await requestVoid("/api/v1/artifacts/\(id)/labels/\(key)", method: "DELETE")
     }
 
+    // MARK: Plugins (Integration: GET /api/v1/plugins/{id})
+
+    /// Fetch a single plugin's current state by id.
+    func getPlugin(id: String) async throws -> Plugin {
+        try await request("/api/v1/plugins/\(id)")
+    }
+
     // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
 
     /// Fetch the repository tree at a given path. Pass an empty path for the root.

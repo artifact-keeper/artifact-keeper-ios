@@ -45,7 +45,7 @@ struct PluginsView: View {
                     ForEach(plugins) { plugin in
                         NavigationLink {
                             PluginDetailView(
-                                plugin: plugin,
+                                listPlugin: plugin,
                                 isMutating: mutatingPluginId == plugin.id,
                                 onToggle: { await toggle(plugin) },
                                 onReload: { await reload(plugin) }
@@ -151,13 +151,32 @@ struct PluginRow: View {
 // MARK: - Plugin Detail
 
 struct PluginDetailView: View {
-    let plugin: Plugin
+    /// The plugin as known from the list, shown immediately while the detail
+    /// fetch is in flight.
+    let listPlugin: Plugin
     let isMutating: Bool
     let onToggle: () async -> Void
     let onReload: () async -> Void
 
+    @State private var fetched: Plugin?
+    @State private var loadError: String?
+
+    private let apiClient = APIClient.shared
+
+    /// The freshest plugin we have: the by-id detail fetch if it succeeded,
+    /// else the list value.
+    private var plugin: Plugin { fetched ?? listPlugin }
+
     var body: some View {
         List {
+            if let loadError {
+                Section {
+                    Label(loadError, systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section("Plugin") {
                 detailRow("Name", plugin.displayName)
                 detailRow("Identifier", plugin.name)
@@ -207,6 +226,18 @@ struct PluginDetailView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .task { await loadDetail() }
+        .refreshable { await loadDetail() }
+    }
+
+    private func loadDetail() async {
+        do {
+            fetched = try await apiClient.getPlugin(id: listPlugin.id)
+            loadError = nil
+        } catch {
+            // Keep showing the list value; surface that the refresh failed.
+            loadError = "Showing cached details; could not refresh: \(error.localizedDescription)"
+        }
     }
 
     private func detailRow(_ label: String, _ value: String) -> some View {
