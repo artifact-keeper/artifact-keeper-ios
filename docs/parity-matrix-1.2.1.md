@@ -212,7 +212,7 @@ Status values:
 | quality | POST /api/v1/quality/issues/{id}/suppress | suppress_issue | missing | Security | - |  |
 | sbom | GET /api/v1/sbom | list_sboms | exists | Security | Sources/Features/Security/SbomView.swift | raw /api/v1/sbom |
 | sbom | POST /api/v1/sbom | generate_sbom | missing | Security | - |  |
-| sbom | GET /api/v1/sbom/by-artifact/{artifact_id} | get_sbom_by_artifact | missing | Security | - |  |
+| sbom | GET /api/v1/sbom/by-artifact/{artifact_id} | get_sbom_by_artifact | exists | Security | Sources/Features/Security/ArtifactSecurityView.swift | SDK get_sbom_by_artifact |
 | sbom | POST /api/v1/sbom/check-compliance | check_license_compliance | missing | Security | - |  |
 | sbom | GET /api/v1/sbom/cve/history/by-artifact/{artifact_id} | get_cve_history_by_artifact | missing | Security | - |  |
 | sbom | GET /api/v1/sbom/cve/history/by-cve/{cve_id} | get_cve_history_by_cve | missing | Security | - |  |
@@ -225,8 +225,8 @@ Status values:
 | sbom | DELETE /api/v1/sbom/license-policies/{id} | delete_license_policy | missing | Security | - |  |
 | sbom | GET /api/v1/sbom/license-policies/{id} | get_license_policy | missing | Security | - |  |
 | sbom | DELETE /api/v1/sbom/{id} | delete_sbom | missing | Security | - |  |
-| sbom | GET /api/v1/sbom/{id} | get_sbom | exists | Security | Sources/Features/Security/SbomView.swift | raw /api/v1/sbom/{id} |
-| sbom | GET /api/v1/sbom/{id}/components | get_sbom_components | missing | Security | - |  |
+| sbom | GET /api/v1/sbom/{id} | get_sbom | exists | Security | Sources/Features/Security/ArtifactSecurityView.swift | SDK get_sbom (APIClient.getSbom) |
+| sbom | GET /api/v1/sbom/{id}/components | get_sbom_components | exists | Security | Sources/Features/Security/ArtifactSecurityView.swift | SDK get_sbom_components |
 | sbom | POST /api/v1/sbom/{id}/convert | convert_sbom | missing | Security | - |  |
 | security | PUT /api/v1/dependency-track/analysis | update_analysis | exists | Security | Sources/Features/Security/DtProjectsView.swift | raw PUT /api/v1/dependency-track/analysis |
 | security | GET /api/v1/dependency-track/metrics/portfolio | get_portfolio_metrics | exists | Security | Sources/Features/Security/SecurityView.swift | raw /api/v1/dependency-track/metrics/portfolio |
@@ -242,7 +242,7 @@ Status values:
 | security | GET /api/v1/repositories/{key}/security | get_repo_security | missing | Security | - |  |
 | security | PUT /api/v1/repositories/{key}/security | update_repo_security | missing | Security | - |  |
 | security | GET /api/v1/repositories/{key}/security/scans | list_repo_scans | missing | Security | - |  |
-| security | GET /api/v1/security/artifacts/{artifact_id}/scans | list_artifact_scans | missing | Security | - |  |
+| security | GET /api/v1/security/artifacts/{artifact_id}/scans | list_artifact_scans | exists | Security | Sources/Features/Security/ArtifactSecurityView.swift | SDK list_artifact_scans |
 | security | GET /api/v1/security/configs | list_scan_configs | missing | Security | - |  |
 | security | GET /api/v1/security/dashboard | get_dashboard | missing | Security | - |  |
 | security | DELETE /api/v1/security/findings/{id}/acknowledge | revoke_acknowledgment | missing | Security | - |  |
@@ -253,9 +253,9 @@ Status values:
 | security | GET /api/v1/security/policies/{id} | get_policy | missing | Security | - |  |
 | security | PUT /api/v1/security/policies/{id} | update_policy | missing | Security | - |  |
 | security | POST /api/v1/security/scan | trigger_scan | missing | Security | - |  |
-| security | GET /api/v1/security/scans | list_scans | missing | Security | - |  |
-| security | GET /api/v1/security/scans/{id} | get_scan | missing | Security | - |  |
-| security | GET /api/v1/security/scans/{id}/findings | list_findings | missing | Security | - |  |
+| security | GET /api/v1/security/scans | list_scans | exists | Security | Sources/Core/API/APIClient.swift | SDK list_scans (APIClient.listScans) |
+| security | GET /api/v1/security/scans/{id} | get_scan | exists | Security | Sources/Core/API/APIClient.swift | SDK get_scan (APIClient.getScan) |
+| security | GET /api/v1/security/scans/{id}/findings | list_findings | exists | Security | Sources/Features/Security/ArtifactSecurityView.swift | SDK list_findings |
 | security | GET /api/v1/security/scores | get_all_scores | missing | Security | - |  |
 | analytics | GET /api/v1/admin/analytics/artifacts/stale | get_stale_artifacts | missing | Operations | - |  |
 | analytics | GET /api/v1/admin/analytics/downloads/trend | get_download_trends | exists | Operations | Sources/Features/Operations/AnalyticsView.swift | raw /api/v1/admin/analytics/downloads/trend |
@@ -410,7 +410,7 @@ Status values:
 | Artifacts | 12 | 0 | 50 | 0 | 62 |
 | Staging | 0 | 3 | 18 | 0 | 21 |
 | Integration | 6 | 0 | 94 | 0 | 100 |
-| Security | 9 | 0 | 53 | 0 | 62 |
+| Security | 16 | 0 | 46 | 0 | 62 |
 | Operations | 6 | 0 | 25 | 6 | 37 |
 | Administration | 12 | 0 | 61 | 13 | 86 |
 | Cross-cutting | 9 | 5 | 8 | 0 | 22 |

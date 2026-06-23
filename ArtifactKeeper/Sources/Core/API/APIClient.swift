@@ -649,6 +649,76 @@ actor APIClient {
         return try decoder.decode(Artifact.self, from: data)
     }
 
+    // MARK: Security Scans & Findings (SDK-backed)
+
+    /// List scans for a single artifact (GET /api/v1/security/artifacts/{artifact_id}/scans).
+    func listArtifactScans(artifactId: String) async throws -> [ScanResult] {
+        let client = await sdkClient.client
+        let response = try await client.list_artifact_scans(
+            path: .init(artifact_id: artifactId),
+            query: .init(per_page: 200)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanResult(from: $0) }
+    }
+
+    /// List scans, optionally filtered to a repository (GET /api/v1/security/scans).
+    func listScans(repositoryId: String? = nil) async throws -> [ScanResult] {
+        let client = await sdkClient.client
+        let response = try await client.list_scans(
+            query: .init(repository_id: repositoryId, per_page: 200)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanResult(from: $0) }
+    }
+
+    /// Fetch a single scan by id (GET /api/v1/security/scans/{id}).
+    func getScan(id: String) async throws -> ScanResult {
+        let client = await sdkClient.client
+        let response = try await client.get_scan(path: .init(id: id))
+        let data = try response.ok.body.json
+        return ScanResult(from: data)
+    }
+
+    /// List findings for a scan (GET /api/v1/security/scans/{id}/findings).
+    func listFindings(scanId: String) async throws -> [ScanFinding] {
+        let client = await sdkClient.client
+        let response = try await client.list_findings(
+            path: .init(id: scanId),
+            query: .init(per_page: 200)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanFinding(from: $0) }
+    }
+
+    // MARK: SBOM (SDK-backed)
+
+    /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).
+    func getSbomByArtifact(artifactId: String) async throws -> SbomSummary {
+        let client = await sdkClient.client
+        let response = try await client.get_sbom_by_artifact(
+            path: .init(artifact_id: artifactId)
+        )
+        let data = try response.ok.body.json
+        return SbomSummary(from: data)
+    }
+
+    /// Fetch a SBOM summary by id (GET /api/v1/sbom/{id}).
+    func getSbom(id: String) async throws -> SbomSummary {
+        let client = await sdkClient.client
+        let response = try await client.get_sbom(path: .init(id: id))
+        let data = try response.ok.body.json
+        return SbomSummary(from: data)
+    }
+
+    /// List the components in a SBOM (GET /api/v1/sbom/{id}/components).
+    func getSbomComponents(sbomId: String) async throws -> [SbomComponent] {
+        let client = await sdkClient.client
+        let response = try await client.get_sbom_components(path: .init(id: sbomId))
+        let data = try response.ok.body.json
+        return data.map { SbomComponent(from: $0) }
+    }
+
     // MARK: Repository Security Config
 
     func getRepoSecurityConfig(repoKey: String) async throws -> RepoSecurityConfig {
