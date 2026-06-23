@@ -134,6 +134,13 @@ struct ArtifactScanDetailView: View {
     @State private var isLoading = true
     @State private var errorMessage: String?
 
+    // Finding awaiting an acknowledge reason, and the reason being typed.
+    @State private var acknowledgingFinding: ScanFinding?
+    @State private var acknowledgeReason: String = ""
+    // Id of a finding with an acknowledge/revoke request in flight.
+    @State private var mutatingFindingId: String?
+    @State private var actionError: String?
+
     private let apiClient = APIClient.shared
 
     var body: some View {
@@ -165,6 +172,12 @@ struct ArtifactScanDetailView: View {
                         Section("Findings (\(findings.count))") {
                             ForEach(findings) { finding in
                                 FindingRow(finding: finding)
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                        findingActionButton(for: finding)
+                                    }
+                                    .contextMenu {
+                                        findingActionButton(for: finding)
+                                    }
                             }
                         }
                     }
@@ -178,6 +191,112 @@ struct ArtifactScanDetailView: View {
         #endif
         .refreshable { await loadFindings() }
         .task { await loadFindings() }
+        .sheet(item: $acknowledgingFinding) { finding in
+            acknowledgeSheet(for: finding)
+        }
+        .alert("Action Failed", isPresented: Binding(
+            get: { actionError != nil },
+            set: { if !$0 { actionError = nil } }
+        )) {
+            Button("OK", role: .cancel) { actionError = nil }
+        } message: {
+            Text(actionError ?? "")
+        }
+    }
+
+    /// Acknowledge or revoke control for a single finding, shared by the swipe
+    /// action and the context menu.
+    @ViewBuilder
+    private func findingActionButton(for finding: ScanFinding) -> some View {
+        if finding.isAcknowledged {
+            Button {
+                Task { await revoke(finding) }
+            } label: {
+                Label("Revoke", systemImage: "xmark.circle")
+            }
+            .tint(.orange)
+            .disabled(mutatingFindingId == finding.id)
+        } else {
+            Button {
+                acknowledgeReason = ""
+                acknowledgingFinding = finding
+            } label: {
+                Label("Acknowledge", systemImage: "checkmark.circle")
+            }
+            .tint(.green)
+            .disabled(mutatingFindingId == finding.id)
+        }
+    }
+
+    /// Sheet prompting for the required acknowledge reason.
+    private func acknowledgeSheet(for finding: ScanFinding) -> some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text(finding.title)
+                        .font(.subheadline.weight(.semibold))
+                } header: {
+                    Text("Finding")
+                }
+
+                Section {
+                    TextField("Reason", text: $acknowledgeReason, axis: .vertical)
+                        .lineLimit(2...5)
+                } header: {
+                    Text("Acknowledge Reason")
+                } footer: {
+                    Text("A reason is required and is recorded with the acknowledgement.")
+                }
+            }
+            .navigationTitle("Acknowledge Finding")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { acknowledgingFinding = nil }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Acknowledge") {
+                        let reason = acknowledgeReason
+                        acknowledgingFinding = nil
+                        Task { await acknowledge(finding, reason: reason) }
+                    }
+                    .disabled(acknowledgeReason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+    }
+
+    private func acknowledge(_ finding: ScanFinding, reason: String) async {
+        let trimmed = reason.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        mutatingFindingId = finding.id
+        defer { mutatingFindingId = nil }
+        do {
+            let updated = try await apiClient.acknowledgeFinding(id: finding.id, reason: trimmed)
+            replaceFinding(updated)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    private func revoke(_ finding: ScanFinding) async {
+        mutatingFindingId = finding.id
+        defer { mutatingFindingId = nil }
+        do {
+            let updated = try await apiClient.revokeFindingAcknowledgment(id: finding.id)
+            replaceFinding(updated)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    private func replaceFinding(_ updated: ScanFinding) {
+        if let idx = findings.firstIndex(where: { $0.id == updated.id }) {
+            findings[idx] = updated
+        }
     }
 
     private var scanTypeTitle: String {

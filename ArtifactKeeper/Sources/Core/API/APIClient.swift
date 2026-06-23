@@ -690,6 +690,27 @@ actor APIClient {
         return data.items.map { ScanFinding(from: $0) }
     }
 
+    /// Acknowledge a finding with a reason (POST /api/v1/security/findings/{id}/acknowledge).
+    /// Returns the updated finding so the caller can refresh its row in place.
+    func acknowledgeFinding(id: String, reason: String) async throws -> ScanFinding {
+        let client = await sdkClientInstance()
+        let response = try await client.acknowledge_finding(
+            path: .init(id: id),
+            body: .json(.init(reason: reason))
+        )
+        let data = try response.ok.body.json
+        return ScanFinding(from: data)
+    }
+
+    /// Revoke a finding's acknowledgement (DELETE /api/v1/security/findings/{id}/acknowledge).
+    /// Returns the updated finding so the caller can refresh its row in place.
+    func revokeFindingAcknowledgment(id: String) async throws -> ScanFinding {
+        let client = await sdkClientInstance()
+        let response = try await client.revoke_acknowledgment(path: .init(id: id))
+        let data = try response.ok.body.json
+        return ScanFinding(from: data)
+    }
+
     // MARK: SBOM (SDK-backed)
 
     /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).

@@ -123,4 +123,28 @@ struct SecurityDispatchTests {
         #expect(pathComponent(rec?.path) == "/api/v1/sbom/sbom-3/components")
         #expect(rec?.operationID == "get_sbom_components")
     }
+
+    @Test func acknowledgeFindingHitsAcknowledgePath() async throws {
+        let (api, transport) = await makeClient()
+
+        // Decode of the canned body is irrelevant: the transport records the request
+        // before the body is decoded, so `try?` keeps the dispatch assertions meaningful.
+        _ = try? await api.acknowledgeFinding(id: "find-2", reason: "false positive")
+
+        let rec = transport.last
+        #expect(rec?.method == "POST")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/findings/find-2/acknowledge")
+        #expect(rec?.operationID == "acknowledge_finding")
+    }
+
+    @Test func revokeFindingAcknowledgmentHitsAcknowledgePath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.revokeFindingAcknowledgment(id: "find-2")
+
+        let rec = transport.last
+        #expect(rec?.method == "DELETE")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/findings/find-2/acknowledge")
+        #expect(rec?.operationID == "revoke_acknowledgment")
+    }
 }
