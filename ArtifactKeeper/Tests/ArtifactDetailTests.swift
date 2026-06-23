@@ -257,4 +257,13 @@ struct ArtifactDetailViewModelTests {
 
         #expect(called.paths.isEmpty)
     }
+
+    @Test @MainActor func downloadURLBuildsRepositoryDownloadPath() async {
+        let client = makeArtifactTestClient(baseURL: "https://reg.example.com")
+        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: client)
+
+        let url = await vm.downloadURL(repoKey: "maven-local", path: "com/x/1.0/x.jar")
+
+        #expect(url?.absoluteString == "https://reg.example.com/api/v1/repositories/maven-local/artifacts/com/x/1.0/x.jar/download")
+    }
 }

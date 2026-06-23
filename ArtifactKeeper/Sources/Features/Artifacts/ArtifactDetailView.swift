@@ -76,11 +76,34 @@ struct ArtifactDetailView: View {
                 if let stats = viewModel.stats { statsSection(stats) }
                 if let metadata = viewModel.metadata { metadataSection(metadata) }
                 labelsSection
+                downloadSection(detail)
             }
             .refreshable { await viewModel.load() }
         } else {
             ContentUnavailableView("No Artifact", systemImage: "shippingbox")
         }
+    }
+
+    // Simple download affordance: opens the artifact's download URL in the system
+    // browser. No streaming/download-manager infra; the heavier upload/chunked
+    // flows are deferred to a later wave.
+    private func downloadSection(_ detail: ArtifactDetail) -> some View {
+        Section {
+            Button {
+                Task { await openDownload(detail) }
+            } label: {
+                Label("Download in Browser", systemImage: "arrow.down.circle")
+            }
+        }
+    }
+
+    private func openDownload(_ detail: ArtifactDetail) async {
+        guard let url = await viewModel.downloadURL(repoKey: repoKey, path: detail.path) else { return }
+        #if os(iOS)
+        await UIApplication.shared.open(url)
+        #elseif os(macOS)
+        await MainActor.run { _ = NSWorkspace.shared.open(url) }
+        #endif
     }
 
     private func infoSection(_ detail: ArtifactDetail) -> some View {

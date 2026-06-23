@@ -49,6 +49,12 @@ final class ArtifactDetailViewModel: ObservableObject {
         isLoading = false
     }
 
+    /// Build the browser download URL for this artifact's path. Returns nil when
+    /// no server is configured.
+    func downloadURL(repoKey: String, path: String) async -> URL? {
+        await api.buildDownloadURL(repoKey: repoKey, artifactPath: path)
+    }
+
     /// Reload only the label set, used after add/delete.
     func reloadLabels() async {
         labels = (try? await api.listArtifactLabels(id: artifactId)) ?? labels
