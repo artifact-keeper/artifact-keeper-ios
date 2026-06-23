@@ -21,8 +21,14 @@ class AuthManager: ObservableObject {
     /// active server connection so that token lookup is always correct.
     private var currentServerURL: String
 
-    init() {
-        self.currentServerURL = UserDefaults.standard.string(forKey: APIClient.serverURLKey) ?? ""
+    /// The defaults store the server URL is read from. Injectable so tests can
+    /// supply an isolated suite instead of sharing `.standard`, which races
+    /// across parallel test suites.
+    private let defaults: UserDefaults
+
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        self.currentServerURL = defaults.string(forKey: APIClient.serverURLKey) ?? ""
     }
 
     // MARK: - Session Restoration
@@ -204,7 +210,7 @@ class AuthManager: ObservableObject {
     func handleLoginSuccess(accessToken: String, refreshToken: String?, mustChange: Bool) async {
         // Ensure we have the current server URL.
         let serverURL = currentServerURL.isEmpty
-            ? (UserDefaults.standard.string(forKey: APIClient.serverURLKey) ?? "")
+            ? (defaults.string(forKey: APIClient.serverURLKey) ?? "")
             : currentServerURL
         currentServerURL = serverURL
 

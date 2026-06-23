@@ -50,6 +50,23 @@ enum JWTTestHelper {
     }
 }
 
+// MARK: - Isolated Defaults Helper
+
+/// Builds an AuthManager bound to a private, in-memory UserDefaults suite so the
+/// server-URL handoff a test exercises cannot race other parallel suites that
+/// mutate `UserDefaults.standard`. Each call uses a unique suite name and clears
+/// it, isolating the `serverURLKey` the way per-session keys isolate the mock.
+@MainActor
+private func makeIsolatedAuth(serverURL: String?) -> AuthManager {
+    let suiteName = "auth-tests-\(UUID().uuidString)"
+    let defaults = UserDefaults(suiteName: suiteName)!
+    defaults.removePersistentDomain(forName: suiteName)
+    if let serverURL {
+        defaults.set(serverURL, forKey: APIClient.serverURLKey)
+    }
+    return AuthManager(defaults: defaults)
+}
+
 // MARK: - AuthManager.decodeJWT Tests
 
 @Suite("AuthManager decodeJWT Tests")
@@ -358,9 +375,9 @@ struct AuthManagerExtendedStateTests {
     }
 
     @Test @MainActor func restoreSessionReturnsEarlyWithEmptyServerURL() async {
-        // Clear any stored server URL
-        UserDefaults.standard.removeObject(forKey: APIClient.serverURLKey)
-        let auth = AuthManager()
+        // Isolated empty defaults so a parallel test setting serverURLKey on
+        // .standard cannot hand this AuthManager a non-empty server URL.
+        let auth = makeIsolatedAuth(serverURL: nil)
         // This should return early since currentServerURL is empty
         await auth.restoreSession()
         #expect(auth.isAuthenticated == false)
@@ -368,8 +385,7 @@ struct AuthManagerExtendedStateTests {
     }
 
     @Test @MainActor func refreshTokenReturnsFalseWithEmptyServerURL() async {
-        UserDefaults.standard.removeObject(forKey: APIClient.serverURLKey)
-        let auth = AuthManager()
+        let auth = makeIsolatedAuth(serverURL: nil)
         let result = await auth.refreshToken()
         #expect(result == false)
     }
@@ -606,12 +622,7 @@ struct AuthManagerExtendedStateTests {
 
     @Test @MainActor func handleLoginSuccessFallsBackToUserDefaultsServerURL() async {
         let server = "https://login-fallback-\(UUID().uuidString).example.com"
-        defer {
-            KeychainManager.deleteTokens(serverURL: server)
-            UserDefaults.standard.removeObject(forKey: APIClient.serverURLKey)
-        }
-
-        UserDefaults.standard.set(server, forKey: APIClient.serverURLKey)
+        defer { KeychainManager.deleteTokens(serverURL: server) }
 
         let futureExp = Date().timeIntervalSince1970 + 3600
         guard let jwt = JWTTestHelper.makeUserJWT(exp: futureExp) else {
@@ -619,9 +630,11 @@ struct AuthManagerExtendedStateTests {
             return
         }
 
-        // Create AuthManager but do NOT call updateServerURL
-        // so currentServerURL is set from UserDefaults in init
-        let auth = AuthManager()
+        // Create AuthManager bound to an isolated defaults suite holding the
+        // server URL, and do NOT call updateServerURL, so currentServerURL is
+        // set from defaults in init. The isolated suite keeps this from racing
+        // other parallel tests that mutate UserDefaults.standard.
+        let auth = makeIsolatedAuth(serverURL: server)
 
         await auth.handleLoginSuccess(
             accessToken: jwt,
@@ -636,15 +649,12 @@ struct AuthManagerExtendedStateTests {
 
     @Test @MainActor func handleLoginSuccessWithEmptyServerURLFallsBackToUserDefaults() async {
         let server = "https://empty-url-\(UUID().uuidString).example.com"
-        defer {
-            KeychainManager.deleteTokens(serverURL: server)
-            UserDefaults.standard.removeObject(forKey: APIClient.serverURLKey)
-        }
+        defer { KeychainManager.deleteTokens(serverURL: server) }
 
-        // Set a server URL in UserDefaults, then create auth with empty currentServerURL
-        UserDefaults.standard.set(server, forKey: APIClient.serverURLKey)
-        let auth = AuthManager()
-        // Force currentServerURL to empty
+        // Server URL lives in an isolated defaults suite; force currentServerURL
+        // empty so handleLoginSuccess must fall back to that suite. Isolation
+        // keeps this from racing other parallel tests on UserDefaults.standard.
+        let auth = makeIsolatedAuth(serverURL: server)
         auth.updateServerURL("")
 
         let futureExp = Date().timeIntervalSince1970 + 3600
