@@ -154,6 +154,7 @@
 		D40943078196189E5E593C67 /* SDKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */; };
 		D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
 		D6794B241227A7A33DE011F3 /* ArtifactKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D217BC8D6B2994A881C4E04E /* ArtifactKeeperApp.swift */; };
+		D6F8DEBE6DBFB0A7A1F1EB1F /* APIPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */; };
 		D7AD6E41B44AF34DF7994C57 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81FFEFE5A4DE0397D840007 /* KeychainManager.swift */; };
 		D7ED286EF2FA5A473F566856 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
 		D8EFAA62D159A5DD32A18FC2 /* TOTPVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4EEF15843269173A9B772 /* TOTPVerificationView.swift */; };
@@ -172,6 +173,7 @@
 		F37EAD999EEE9694758BBE8D /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A15E45652EBB4DD2505127F /* WelcomeView.swift */; };
 		F5CE55686817D88933AC4AC1 /* AuthManagerExtendedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */; };
 		F790A545605AFA178BEEA506 /* WebhooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8063DEF3B0228C26496797B7 /* WebhooksView.swift */; };
+		FABB8132DF5CEA339A9B769A /* APIPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */; };
 		FB1F242DC31148C08DA16397 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
 		FCA0BB626B22F06543044B90 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */; };
 		FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942CFADFFB28FA592F32CAB1 /* ModelTests.swift */; };
@@ -272,6 +274,7 @@
 		E8A1E349FB6E5B428703A548 /* AdminSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminSectionView.swift; sourceTree = "<group>"; };
 		E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManagerExtendedTests.swift; sourceTree = "<group>"; };
 		ECFEA6435742230170CF65E1 /* PromotionHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionHistoryView.swift; sourceTree = "<group>"; };
+		EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIPathRegressionTests.swift; sourceTree = "<group>"; };
 		F0896BDB350847081B1C7EA3 /* EditRepositorySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditRepositorySheet.swift; sourceTree = "<group>"; };
 		F130C4E4EC403EC23594AE44 /* PeersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeersView.swift; sourceTree = "<group>"; };
 		F73AE1952EFB3C338C7D0771 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -348,6 +351,7 @@
 				71D58BAA440C3500A2CBD775 /* APIClientExtendedTests.swift */,
 				785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */,
 				1901D688CCAD3DE71AA681AC /* APIClientTests.swift */,
+				EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */,
 				C8A1761272FDDB00A7D41243 /* ArtifactKeeperTests.swift */,
 				E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */,
 				F84212AD84A94810D2C23339 /* AuthManagerTests.swift */,
@@ -760,6 +764,7 @@
 				85BE46E9B704E5E25509D2FC /* APIClientExtendedTests.swift in Sources */,
 				FB1F242DC31148C08DA16397 /* APIClientNetworkTests.swift in Sources */,
 				AD2DBF5F7973BE47E351CC36 /* APIClientTests.swift in Sources */,
+				D6F8DEBE6DBFB0A7A1F1EB1F /* APIPathRegressionTests.swift in Sources */,
 				571951B0A6024875CE31B544 /* ArtifactKeeperTests.swift in Sources */,
 				A1A538DE905D6AF031923CF5 /* AuthManagerExtendedTests.swift in Sources */,
 				43CD93CC42B93AE1999FA8B9 /* AuthManagerTests.swift in Sources */,
@@ -852,6 +857,7 @@
 				EDB2B15C2187E730405D2B4F /* APIClientExtendedTests.swift in Sources */,
 				189014CE0807785BF1C97AF6 /* APIClientNetworkTests.swift in Sources */,
 				7B983BDEC8F0E8548B9E7E5E /* APIClientTests.swift in Sources */,
+				FABB8132DF5CEA339A9B769A /* APIPathRegressionTests.swift in Sources */,
 				17488E98D524FCAB892BAAC5 /* ArtifactKeeperTests.swift in Sources */,
 				F5CE55686817D88933AC4AC1 /* AuthManagerExtendedTests.swift in Sources */,
 				653D84744E6345714FCE559A /* AuthManagerTests.swift in Sources */,

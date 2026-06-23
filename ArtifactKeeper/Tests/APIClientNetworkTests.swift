@@ -875,16 +875,27 @@ struct APIClientNetworkTests {
         #expect(profile.displayName == "New Name")
     }
 
+    // Token tests target the unified 1.2.1 surface: list via /api/v1/users/{id}/tokens
+    // (preceded by a /api/v1/auth/me call to resolve the user id), create via
+    // /api/v1/auth/tokens, delete via /api/v1/auth/tokens/{id}.
+
     @Test func listApiKeysCallsRequest() async throws {
         let client = makeTestClient()
 
         MockURLProtocol.requestHandler = { request in
-            #expect(request.url?.path == "/api/v1/profile/api-keys")
+            let path = request.url?.path
+            if path == "/api/v1/auth/me" {
+                let me = """
+                {"id": "u1", "username": "testuser", "email": "a@b.c", "is_admin": false, "totp_enabled": false}
+                """
+                return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(me.utf8))
+            }
+            #expect(path == "/api/v1/users/u1/tokens")
             let json = """
             {
-                "api_keys": [
+                "items": [
                     {
-                        "id": "k1", "name": "CI Key", "key_prefix": "ak_",
+                        "id": "k1", "name": "CI Key", "token_prefix": "ak_",
                         "created_at": "2024-01-01T00:00:00Z", "expires_at": null,
                         "last_used_at": null, "scopes": ["read"]
                     }
@@ -910,15 +921,9 @@ struct APIClientNetworkTests {
 
         MockURLProtocol.requestHandler = { request in
             #expect(request.httpMethod == "POST")
+            #expect(request.url?.path == "/api/v1/auth/tokens")
             let json = """
-            {
-                "api_key": {
-                    "id": "k2", "name": "Deploy", "key_prefix": "ak_",
-                    "created_at": "2024-01-01T00:00:00Z", "expires_at": null,
-                    "last_used_at": null, "scopes": ["write"]
-                },
-                "key": "ak_full_key_value"
-            }
+            {"id": "k2", "name": "Deploy", "token": "ak_full_key_value"}
             """
             let response = HTTPURLResponse(
                 url: request.url!,
@@ -938,7 +943,7 @@ struct APIClientNetworkTests {
 
         MockURLProtocol.requestHandler = { request in
             #expect(request.httpMethod == "DELETE")
-            #expect(request.url?.path == "/api/v1/profile/api-keys/key-123")
+            #expect(request.url?.path == "/api/v1/auth/tokens/key-123")
             let response = HTTPURLResponse(
                 url: request.url!,
                 statusCode: 204,
@@ -955,10 +960,17 @@ struct APIClientNetworkTests {
         let client = makeTestClient()
 
         MockURLProtocol.requestHandler = { request in
-            #expect(request.url?.path == "/api/v1/profile/access-tokens")
+            let path = request.url?.path
+            if path == "/api/v1/auth/me" {
+                let me = """
+                {"id": "u2", "username": "testuser", "email": "a@b.c", "is_admin": false, "totp_enabled": false}
+                """
+                return (HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data(me.utf8))
+            }
+            #expect(path == "/api/v1/users/u2/tokens")
             let json = """
             {
-                "access_tokens": [
+                "items": [
                     {
                         "id": "t1", "name": "Read Token", "token_prefix": "at_",
                         "created_at": "2024-01-01T00:00:00Z", "expires_at": null,
@@ -986,15 +998,9 @@ struct APIClientNetworkTests {
 
         MockURLProtocol.requestHandler = { request in
             #expect(request.httpMethod == "POST")
+            #expect(request.url?.path == "/api/v1/auth/tokens")
             let json = """
-            {
-                "access_token": {
-                    "id": "t2", "name": "CI Token", "token_prefix": "at_",
-                    "created_at": "2024-01-01T00:00:00Z", "expires_at": null,
-                    "last_used_at": null, "scopes": ["read", "write"]
-                },
-                "token": "at_full_token_value"
-            }
+            {"id": "t2", "name": "CI Token", "token": "at_full_token_value"}
             """
             let response = HTTPURLResponse(
                 url: request.url!,
@@ -1014,7 +1020,7 @@ struct APIClientNetworkTests {
 
         MockURLProtocol.requestHandler = { request in
             #expect(request.httpMethod == "DELETE")
-            #expect(request.url?.path == "/api/v1/profile/access-tokens/token-456")
+            #expect(request.url?.path == "/api/v1/auth/tokens/token-456")
             let response = HTTPURLResponse(
                 url: request.url!,
                 statusCode: 204,

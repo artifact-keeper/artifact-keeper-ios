@@ -273,3 +273,39 @@ struct CreateAccessTokenResponse: Codable, Sendable {
         case token
     }
 }
+
+// MARK: - Unified API Tokens (1.2.1)
+
+// The 1.2.1 spec replaced the separate /profile/api-keys and /profile/access-tokens
+// surfaces with a single token API: list at /api/v1/users/{id}/tokens, create at
+// /api/v1/auth/tokens, delete at /api/v1/auth/tokens/{token_id}. These types decode
+// that surface; APIClient maps them back to the ApiKey/AccessToken view types so the
+// existing Profile screens are unchanged.
+
+struct ApiTokenResponse: Codable, Sendable {
+    let id: String
+    let name: String
+    let tokenPrefix: String
+    let scopes: [String]
+    let createdAt: String
+    let expiresAt: String?
+    let lastUsedAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, scopes
+        case tokenPrefix = "token_prefix"
+        case createdAt = "created_at"
+        case expiresAt = "expires_at"
+        case lastUsedAt = "last_used_at"
+    }
+}
+
+struct ApiTokenListResponse: Codable, Sendable {
+    let items: [ApiTokenResponse]
+}
+
+struct ApiTokenCreatedResponse: Codable, Sendable {
+    let id: String
+    let name: String
+    let token: String
+}
