@@ -7,6 +7,8 @@ struct WebhooksView: View {
     @State private var showingAddWebhook = false
     @State private var testingWebhookId: String?
     @State private var testResult: (success: Bool, message: String)?
+    // Newly rotated secret to show once (it is not retrievable later).
+    @State private var rotatedSecret: RotateWebhookSecretResponse?
 
     private let apiClient = APIClient.shared
 
@@ -38,6 +40,7 @@ struct WebhooksView: View {
                                     isTesting: testingWebhookId == webhook.id,
                                     onToggle: { await toggleWebhook(webhook) },
                                     onTest: { await testWebhook(webhook) },
+                                    onRotateSecret: { await rotateSecret(webhook) },
                                     onDelete: { await deleteWebhook(webhook) }
                                 )
                             }
@@ -85,6 +88,11 @@ struct WebhooksView: View {
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)
                     #endif
+            }
+        }
+        .sheet(item: $rotatedSecret) { secret in
+            NavigationStack {
+                RotatedSecretView(secret: secret)
             }
         }
     }
@@ -135,6 +143,18 @@ struct WebhooksView: View {
         testingWebhookId = nil
     }
 
+    private func rotateSecret(_ webhook: Webhook) async {
+        do {
+            let response: RotateWebhookSecretResponse = try await apiClient.request(
+                "/api/v1/webhooks/\(webhook.id)/rotate-secret",
+                method: "POST"
+            )
+            rotatedSecret = response
+        } catch {
+            testResult = (success: false, message: "Failed to rotate secret: \(error.localizedDescription)")
+        }
+    }
+
     private func deleteWebhook(_ webhook: Webhook) async {
         do {
             try await apiClient.requestVoid(
@@ -153,9 +173,11 @@ struct WebhookRow: View {
     let isTesting: Bool
     let onToggle: () async -> Void
     let onTest: () async -> Void
+    let onRotateSecret: () async -> Void
     let onDelete: () async -> Void
 
     @State private var showingDeleteConfirm = false
+    @State private var showingRotateConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -200,6 +222,14 @@ struct WebhookRow: View {
                     }
                 }
             }
+
+            NavigationLink {
+                WebhookDeliveriesView(webhook: webhook)
+            } label: {
+                Label("Delivery History", systemImage: "clock.arrow.circlepath")
+                    .font(.caption)
+            }
+            .padding(.top, 2)
         }
         .padding(.vertical, 4)
         .swipeActions(edge: .trailing) {
@@ -225,6 +255,9 @@ struct WebhookRow: View {
             Button { Task { await onTest() } } label: {
                 Label("Send Test", systemImage: "paperplane")
             }
+            Button { showingRotateConfirm = true } label: {
+                Label("Rotate Secret", systemImage: "key.horizontal")
+            }
             Divider()
             Button(role: .destructive) { showingDeleteConfirm = true } label: {
                 Label("Delete", systemImage: "trash")
@@ -235,6 +268,12 @@ struct WebhookRow: View {
             Button("Delete", role: .destructive) { Task { await onDelete() } }
         } message: {
             Text("Delete \"\(webhook.name)\"? This cannot be undone.")
+        }
+        .alert("Rotate Signing Secret", isPresented: $showingRotateConfirm) {
+            Button("Cancel", role: .cancel) {}
+            Button("Rotate") { Task { await onRotateSecret() } }
+        } message: {
+            Text("Generate a new signing secret for \"\(webhook.name)\"? The current secret keeps working for a short grace period.")
         }
     }
 }
@@ -375,5 +414,179 @@ struct AddWebhookView: View {
             errorMessage = "Failed to create webhook: \(error.localizedDescription)"
         }
         isSaving = false
+    }
+}
+
+// MARK: - Rotated Secret Sheet
+
+/// Shows a freshly rotated signing secret once. The plaintext secret is not
+/// retrievable after this sheet is dismissed.
+struct RotatedSecretView: View {
+    let secret: RotateWebhookSecretResponse
+
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        Form {
+            Section {
+                Text(secret.secret)
+                    .font(.body.monospaced())
+                    .textSelection(.enabled)
+            } header: {
+                Text("New Signing Secret")
+            } footer: {
+                Text("Copy this now. It will not be shown again. The previous secret keeps working until \(secret.previousSecretExpiresAt).")
+            }
+        }
+        .navigationTitle("Secret Rotated")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Done") { dismiss() }
+            }
+        }
+    }
+}
+
+// MARK: - Webhook Delivery History
+
+/// Lists recent delivery attempts for a webhook and allows redelivering one.
+struct WebhookDeliveriesView: View {
+    let webhook: Webhook
+
+    @State private var deliveries: [WebhookDelivery] = []
+    @State private var isLoading = true
+    @State private var errorMessage: String?
+    @State private var redeliveringId: String?
+    @State private var actionMessage: String?
+
+    private let apiClient = APIClient.shared
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Loading deliveries...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let error = errorMessage {
+                ContentUnavailableView(
+                    "Deliveries Unavailable",
+                    systemImage: "clock.badge.exclamationmark",
+                    description: Text(error)
+                )
+            } else if deliveries.isEmpty {
+                ContentUnavailableView(
+                    "No Deliveries",
+                    systemImage: "clock",
+                    description: Text("This webhook has not delivered any events yet.")
+                )
+            } else {
+                List {
+                    if let actionMessage {
+                        Section {
+                            Text(actionMessage)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    ForEach(deliveries) { delivery in
+                        DeliveryRow(
+                            delivery: delivery,
+                            isRedelivering: redeliveringId == delivery.id,
+                            onRedeliver: { await redeliver(delivery) }
+                        )
+                    }
+                }
+                .listStyle(.plain)
+            }
+        }
+        .navigationTitle("Deliveries")
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .refreshable { await loadDeliveries() }
+        .task { await loadDeliveries() }
+    }
+
+    private func loadDeliveries() async {
+        isLoading = deliveries.isEmpty
+        do {
+            let response: WebhookDeliveryListResponse = try await apiClient.request(
+                "/api/v1/webhooks/\(webhook.id)/deliveries"
+            )
+            deliveries = response.items
+            errorMessage = nil
+        } catch {
+            if deliveries.isEmpty {
+                errorMessage = "Could not load delivery history."
+            }
+        }
+        isLoading = false
+    }
+
+    private func redeliver(_ delivery: WebhookDelivery) async {
+        redeliveringId = delivery.id
+        defer { redeliveringId = nil }
+        do {
+            let _: WebhookDelivery = try await apiClient.request(
+                "/api/v1/webhooks/\(webhook.id)/deliveries/\(delivery.id)/redeliver",
+                method: "POST"
+            )
+            actionMessage = "Redelivery queued for \(delivery.event)."
+            await loadDeliveries()
+        } catch {
+            actionMessage = "Redelivery failed: \(error.localizedDescription)"
+        }
+    }
+}
+
+struct DeliveryRow: View {
+    let delivery: WebhookDelivery
+    let isRedelivering: Bool
+    let onRedeliver: () async -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 8) {
+                Image(systemName: delivery.success ? "checkmark.circle.fill" : "xmark.circle.fill")
+                    .foregroundStyle(delivery.success ? .green : .red)
+                    .font(.caption)
+                Text(delivery.event.replacingOccurrences(of: "_", with: " "))
+                    .font(.subheadline.weight(.medium))
+                Spacer()
+                if let status = delivery.responseStatus {
+                    Text("HTTP \(status)")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            HStack(spacing: 8) {
+                Text(delivery.createdAt)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                if delivery.attempts > 1 {
+                    Text("\(delivery.attempts) attempts")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(.vertical, 2)
+        .swipeActions(edge: .trailing) {
+            Button {
+                Task { await onRedeliver() }
+            } label: {
+                Label("Redeliver", systemImage: "arrow.clockwise")
+            }
+            .tint(.blue)
+            .disabled(isRedelivering)
+        }
+        .contextMenu {
+            Button { Task { await onRedeliver() } } label: {
+                Label("Redeliver", systemImage: "arrow.clockwise")
+            }
+        }
     }
 }
