@@ -523,6 +523,31 @@ actor APIClient {
         try await requestVoid("/api/v1/artifacts/\(id)/labels/\(key)", method: "DELETE")
     }
 
+    // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
+
+    /// Fetch the repository tree at a given path. Pass an empty path for the root.
+    /// Raw file content (GET /api/v1/tree/content) is octet-stream and deferred to
+    /// a download/preview flow; this returns the directory/file node listing only.
+    func getRepositoryTree(repoKey: String, path: String = "") async throws -> [TreeNode] {
+        var components = "repository_key=\(Self.queryEncoded(repoKey))"
+        if !path.isEmpty {
+            components += "&path=\(Self.queryEncoded(path))"
+        }
+        let response: TreeResponse = try await request("/api/v1/tree?\(components)")
+        return response.nodes
+    }
+
+    // MARK: Package Versions (1.2.1: GET /api/v1/packages/{id}/versions)
+
+    func getPackageVersions(packageId: String) async throws -> [PackageVersion] {
+        let response: PackageVersionsResponse = try await request("/api/v1/packages/\(packageId)/versions")
+        return response.versions
+    }
+
+    private static func queryEncoded(_ value: String) -> String {
+        value.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? value
+    }
+
     // MARK: Virtual Repository Members
 
     func listVirtualMembers(repoKey: String) async throws -> [VirtualMember] {

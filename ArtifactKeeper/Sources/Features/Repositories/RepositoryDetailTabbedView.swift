@@ -19,6 +19,7 @@ struct RepositoryDetailTabbedView: View {
 
     private var availableTabs: [(id: String, title: String)] {
         var tabs: [(id: String, title: String)] = [("artifacts", "Artifacts")]
+        tabs.append(("browse", "Browse"))
         tabs.append(("setup", "Setup"))
         if authManager.isAuthenticated {
             tabs.append(("upload", "Upload"))
@@ -179,6 +180,8 @@ struct RepositoryDetailTabbedView: View {
         switch selectedTab {
         case "artifacts":
             artifactsTab
+        case "browse":
+            RepositoryTreeView(repoKey: repoKey, title: "Browse")
         case "setup":
             if let repo {
                 SetupInstructionsView(repo: repo)

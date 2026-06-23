@@ -28,9 +28,11 @@
 		152D6AC4ACB54B60335AAA44 /* TelemetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4252913A5015A9448F73683 /* TelemetryView.swift */; };
 		17488E98D524FCAB892BAAC5 /* ArtifactKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A1761272FDDB00A7D41243 /* ArtifactKeeperTests.swift */; };
 		189014CE0807785BF1C97AF6 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
+		1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */; };
 		1AB249F434755BECF4124CA8 /* SetupInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */; };
 		1EB081D63A5092425E75A0B0 /* RepositoryDetailTabbedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEF3A0FA55ECC63DDC8899F /* RepositoryDetailTabbedView.swift */; };
 		2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
+		21792E2823728B81B6E3E621 /* RepositoryTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D78FD253D2202880EF013 /* RepositoryTreeView.swift */; };
 		22DD061A91C6E4E41682EC60 /* SetupInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */; };
 		22E710F949296F2C4F470275 /* AdminSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A1E349FB6E5B428703A548 /* AdminSectionView.swift */; };
 		238DBF144A2302C11DE50388 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7812397531D2CD01F4488BC6 /* ChangePasswordView.swift */; };
@@ -57,6 +59,7 @@
 		43CD93CC42B93AE1999FA8B9 /* AuthManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84212AD84A94810D2C23339 /* AuthManagerTests.swift */; };
 		475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
 		47DFA7F8B01E5A21906642A2 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9DDB4F8B15C1FB99A2843 /* Package.swift */; };
+		4BA74F65F09BD28BC25CC705 /* RepositoryTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */; };
 		4BB5107B04DD21BF5EC76FB0 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
 		4BE83BE4509F6A9FBAC7EA93 /* RepoSecurityConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746DB83A1B571F5CDFDD791E /* RepoSecurityConfigView.swift */; };
 		4EAE9C1A06FF203ED9F5CC77 /* TOTPVerificationViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E81B31BCEB8455ABE51CD8D /* TOTPVerificationViewTests.swift */; };
@@ -124,6 +127,7 @@
 		9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
 		9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */; };
 		A1A538DE905D6AF031923CF5 /* AuthManagerExtendedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */; };
+		A6FE919357227C480B8571C0 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
 		ABC754B5DC49717B25A912DB /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59705D3B5F2000ACABB8A48 /* Auth.swift */; };
 		AD2DBF5F7973BE47E351CC36 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
 		AF076028A446FB1E28446D96 /* DtDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59106973EB99FD9424D44224 /* DtDashboardView.swift */; };
@@ -142,6 +146,7 @@
 		B7F76BE14A732DCCD7EDF405 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81FFEFE5A4DE0397D840007 /* KeychainManager.swift */; };
 		B85DD5AD52ECDF8AF03AD72F /* SbomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACFAEE53DF20945E710A82E /* SbomView.swift */; };
 		B88EC39592199C1C4E1FB621 /* PackagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C67E4A61ED479E094891F7 /* PackagesView.swift */; };
+		BCD82AAFB0CAB353C5CABAD2 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
 		C003F153FD58DC40599D6AA3 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */; };
 		C0067BC56E14F7597CD91596 /* IntegrationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */; };
 		C02053BA07DD2669117F0E0C /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
@@ -165,6 +170,7 @@
 		D7AD6E41B44AF34DF7994C57 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81FFEFE5A4DE0397D840007 /* KeychainManager.swift */; };
 		D7ED286EF2FA5A473F566856 /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
 		D8EFAA62D159A5DD32A18FC2 /* TOTPVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DB4EEF15843269173A9B772 /* TOTPVerificationView.swift */; };
+		D8F9FA74088D3D69CED04355 /* RepositoryTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D78FD253D2202880EF013 /* RepositoryTreeView.swift */; };
 		DD14915474376F9ECAB7D78B /* Repository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75FB2391848A9D7A02E4F7DC /* Repository.swift */; };
 		DD9C336F7D973FA27ACD095E /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155377690C14964BAFBAF481 /* ProfileView.swift */; };
 		DF321600060A4DA7993785FF /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE59905B179E64919791A7 /* Admin.swift */; };
@@ -222,8 +228,10 @@
 		3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntegrationSectionView.swift; sourceTree = "<group>"; };
 		3D8118DAD8066C9D0EED317C /* Security.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Security.swift; sourceTree = "<group>"; };
 		3E81B31BCEB8455ABE51CD8D /* TOTPVerificationViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPVerificationViewTests.swift; sourceTree = "<group>"; };
+		435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeTests.swift; sourceTree = "<group>"; };
 		43C4236474392052DD29004F /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		4F60553EA149CE733245164B /* StagingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingDetailView.swift; sourceTree = "<group>"; };
+		517D78FD253D2202880EF013 /* RepositoryTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeView.swift; sourceTree = "<group>"; };
 		5897003BAFB18AFF0865CCEC /* VirtualMembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMembersView.swift; sourceTree = "<group>"; };
 		58F4BB814BCEC4170B1CA727 /* SetupInstructionsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupInstructionsViewTests.swift; sourceTree = "<group>"; };
 		59106973EB99FD9424D44224 /* DtDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DtDashboardView.swift; sourceTree = "<group>"; };
@@ -252,6 +260,7 @@
 		8343AC1EF5CDAEE5D335C0F0 /* ArtifactKeeperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ArtifactKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingSectionView.swift; sourceTree = "<group>"; };
 		85C67E4A61ED479E094891F7 /* PackagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagesView.swift; sourceTree = "<group>"; };
+		862E1C3205340290276A9B75 /* RepositoryTree.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTree.swift; sourceTree = "<group>"; };
 		888D1A2EB554E8903CED4CF3 /* DashboardViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardViewTests.swift; sourceTree = "<group>"; };
 		8DF4F010E1DD1DC5415E7F11 /* Sbom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Sbom.swift; sourceTree = "<group>"; };
 		8F34D6E71603103BC21FD8EA /* PromotionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionSheet.swift; sourceTree = "<group>"; };
@@ -371,6 +380,7 @@
 				888D1A2EB554E8903CED4CF3 /* DashboardViewTests.swift */,
 				AAB8A8A8F6AD6C323EAF2022 /* KeychainManagerTests.swift */,
 				942CFADFFB28FA592F32CAB1 /* ModelTests.swift */,
+				435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */,
 				65F26A3F934E811A6A5B6FCF /* ServerManagerTests.swift */,
 				58F4BB814BCEC4170B1CA727 /* SetupInstructionsViewTests.swift */,
 				3E81B31BCEB8455ABE51CD8D /* TOTPVerificationViewTests.swift */,
@@ -428,6 +438,7 @@
 				C7CA7F1FBDE367A6D4052F47 /* Promotion.swift */,
 				ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */,
 				75FB2391848A9D7A02E4F7DC /* Repository.swift */,
+				862E1C3205340290276A9B75 /* RepositoryTree.swift */,
 				8DF4F010E1DD1DC5415E7F11 /* Sbom.swift */,
 				3D8118DAD8066C9D0EED317C /* Security.swift */,
 				36F508C0FBF498EB51BC64EE /* VirtualMember.swift */,
@@ -460,6 +471,7 @@
 			children = (
 				F289613B7B5E1B85C3F9E832 /* ArtifactDetailView.swift */,
 				6FE37B413A2C453F93480A64 /* ArtifactDetailViewModel.swift */,
+				517D78FD253D2202880EF013 /* RepositoryTreeView.swift */,
 			);
 			path = Artifacts;
 			sourceTree = "<group>";
@@ -796,6 +808,7 @@
 				99C3358F603E8600CA038F75 /* DashboardViewTests.swift in Sources */,
 				ECE469E91BEE0E35EB258F98 /* KeychainManagerTests.swift in Sources */,
 				FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */,
+				1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */,
 				71DE9560CF0DC604499711B9 /* ServerManagerTests.swift in Sources */,
 				1364B70A29503AEFDA4B3FB5 /* SetupInstructionsViewTests.swift in Sources */,
 				4EAE9C1A06FF203ED9F5CC77 /* TOTPVerificationViewTests.swift in Sources */,
@@ -853,6 +866,8 @@
 				CBA92159E5A5DFC00F6CBC28 /* RepositoriesView.swift in Sources */,
 				CB9F64C28FEBB032DD2210F6 /* Repository.swift in Sources */,
 				576ECFCB3DD22323E6DF2217 /* RepositoryDetailTabbedView.swift in Sources */,
+				BCD82AAFB0CAB353C5CABAD2 /* RepositoryTree.swift in Sources */,
+				D8F9FA74088D3D69CED04355 /* RepositoryTreeView.swift in Sources */,
 				D40943078196189E5E593C67 /* SDKClient.swift in Sources */,
 				D3653822D6C8332BC92D8642 /* SSOView.swift in Sources */,
 				B6A7958608DE308DD63F5435 /* Sbom.swift in Sources */,
@@ -893,6 +908,7 @@
 				3366AEE087831CF15004691F /* DashboardViewTests.swift in Sources */,
 				6D8FA2A9093D692547570860 /* KeychainManagerTests.swift in Sources */,
 				83D01D48B7B7C3739E1344B3 /* ModelTests.swift in Sources */,
+				4BA74F65F09BD28BC25CC705 /* RepositoryTreeTests.swift in Sources */,
 				76A035773BD7C7A5065F5E65 /* ServerManagerTests.swift in Sources */,
 				738EFB98489D855A1E2FFE8B /* SetupInstructionsViewTests.swift in Sources */,
 				67018A342717D2F56ADA6F58 /* TOTPVerificationViewTests.swift in Sources */,
@@ -950,6 +966,8 @@
 				3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */,
 				DD14915474376F9ECAB7D78B /* Repository.swift in Sources */,
 				1EB081D63A5092425E75A0B0 /* RepositoryDetailTabbedView.swift in Sources */,
+				A6FE919357227C480B8571C0 /* RepositoryTree.swift in Sources */,
+				21792E2823728B81B6E3E621 /* RepositoryTreeView.swift in Sources */,
 				3E86A76D6A7C20EB5128C9B9 /* SDKClient.swift in Sources */,
 				99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */,
 				596F4AA252F5DB25B76106B8 /* Sbom.swift in Sources */,
