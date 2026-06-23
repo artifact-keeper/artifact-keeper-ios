@@ -343,7 +343,7 @@ struct RepositoryDetailView: View {
             await loadData()
         }
         .sheet(item: $selectedArtifact) { artifact in
-            ArtifactDetailSheet(artifact: artifact, repoKey: repoKey)
+            ArtifactDetailView(artifactId: artifact.id, repoKey: repoKey)
         }
         .sheet(item: $securityArtifact) { artifact in
             NavigationStack {
@@ -445,86 +445,6 @@ struct ArtifactRow: View {
             }
         }
         .padding(.vertical, 2)
-    }
-}
-
-// MARK: - Artifact Detail Sheet
-
-struct ArtifactDetailSheet: View {
-    let artifact: Artifact
-    let repoKey: String
-    @Environment(\.dismiss) private var dismiss
-
-    private let apiClient = APIClient.shared
-
-    private func formatBytes(_ bytes: Int64) -> String {
-        let formatter = ByteCountFormatter()
-        formatter.countStyle = .file
-        return formatter.string(fromByteCount: bytes)
-    }
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Artifact Info") {
-                    LabeledContent("Name", value: artifact.name)
-                    LabeledContent("Path", value: artifact.path)
-                    if let version = artifact.version {
-                        LabeledContent("Version", value: version)
-                    }
-                    LabeledContent("Content Type", value: artifact.contentType ?? "unknown")
-                    LabeledContent("Size", value: formatBytes(artifact.sizeBytes))
-                    LabeledContent("Downloads", value: "\(artifact.downloadCount)")
-                }
-
-                if let checksum = artifact.checksumSha256, !checksum.isEmpty {
-                    Section("Checksums") {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("SHA-256")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            Text(checksum)
-                                .font(.system(.caption, design: .monospaced))
-                                .textSelection(.enabled)
-                        }
-                    }
-                }
-
-                Section {
-                    Button {
-                        openDownloadURL()
-                    } label: {
-                        HStack {
-                            Image(systemName: "safari")
-                            Text("Download in Browser")
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Artifact Details")
-            #if os(iOS)
-            .navigationBarTitleDisplayMode(.inline)
-            #endif
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-
-    private func openDownloadURL() {
-        Task {
-            if let url = await apiClient.buildDownloadURL(repoKey: repoKey, artifactPath: artifact.path) {
-                #if os(iOS)
-                await UIApplication.shared.open(url)
-                #elseif os(macOS)
-                await MainActor.run { _ = NSWorkspace.shared.open(url) }
-                #endif
-            }
-        }
     }
 }
 

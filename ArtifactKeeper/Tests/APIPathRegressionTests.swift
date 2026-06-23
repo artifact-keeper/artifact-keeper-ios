@@ -29,27 +29,18 @@ private func okResponse(_ url: URL, _ body: String, status: Int = 200) -> (HTTPU
     return (response, Data(body.utf8))
 }
 
-/// Build an APIClient backed by MockURLProtocol. Defined locally because the
-/// equivalent helper in APIClientNetworkTests.swift is file-private.
-private func makeTokenTestClient(baseURL: String = "https://test-api.example.com") -> APIClient {
-    let config = URLSessionConfiguration.ephemeral
-    config.protocolClasses = [MockURLProtocol.self]
-    config.timeoutIntervalForRequest = 5
-    let session = URLSession(configuration: config)
-    return APIClient(baseURL: baseURL, session: session)
+/// Build a per-test MockSession (APIClient + isolated handler slot).
+private func makeTokenTestSession(baseURL: String = "https://test-api.example.com") -> MockSession {
+    MockSession(baseURL: baseURL)
 }
 
-@Suite("API Token Path Regression Tests", .serialized)
+@Suite("API Token Path Regression Tests")
 struct APITokenPathRegressionTests {
 
-    init() {
-        MockURLProtocol.reset()
-    }
-
     @Test func listApiKeysTargetsUserTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             let path = request.url!.path
             recorder.record(path)
             if path == "/api/v1/auth/me" {
@@ -60,23 +51,23 @@ struct APITokenPathRegressionTests {
             return okResponse(request.url!, "{\"items\": []}")
         }
 
-        _ = try await client.listApiKeys()
+        _ = try await mock.client.listApiKeys()
 
         #expect(recorder.paths.contains("/api/v1/users/user-7/tokens"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))
     }
 
     @Test func createApiKeyTargetsAuthTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             recorder.record(request.url!.path)
             return okResponse(request.url!, """
             {"id": "tok-1", "name": "ci", "token": "ak_secretvalue"}
             """, status: 201)
         }
 
-        let result = try await client.createApiKey(name: "ci", scopes: ["read"], expiresInDays: 90)
+        let result = try await mock.client.createApiKey(name: "ci", scopes: ["read"], expiresInDays: 90)
 
         #expect(recorder.paths.contains("/api/v1/auth/tokens"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))
@@ -84,23 +75,23 @@ struct APITokenPathRegressionTests {
     }
 
     @Test func deleteApiKeyTargetsAuthTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             recorder.record(request.url!.path)
             return okResponse(request.url!, "")
         }
 
-        try await client.deleteApiKey("tok-9")
+        try await mock.client.deleteApiKey("tok-9")
 
         #expect(recorder.paths.contains("/api/v1/auth/tokens/tok-9"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))
     }
 
     @Test func listAccessTokensTargetsUserTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             let path = request.url!.path
             recorder.record(path)
             if path == "/api/v1/auth/me" {
@@ -111,23 +102,23 @@ struct APITokenPathRegressionTests {
             return okResponse(request.url!, "{\"items\": []}")
         }
 
-        _ = try await client.listAccessTokens()
+        _ = try await mock.client.listAccessTokens()
 
         #expect(recorder.paths.contains("/api/v1/users/user-9/tokens"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))
     }
 
     @Test func createAccessTokenTargetsAuthTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             recorder.record(request.url!.path)
             return okResponse(request.url!, """
             {"id": "tok-2", "name": "deploy", "token": "ak_secretvalue2"}
             """, status: 201)
         }
 
-        let result = try await client.createAccessToken(name: "deploy", scopes: ["write"], expiresInDays: nil)
+        let result = try await mock.client.createAccessToken(name: "deploy", scopes: ["write"], expiresInDays: nil)
 
         #expect(recorder.paths.contains("/api/v1/auth/tokens"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))
@@ -135,14 +126,14 @@ struct APITokenPathRegressionTests {
     }
 
     @Test func deleteAccessTokenTargetsAuthTokensPath() async throws {
-        let client = makeTokenTestClient()
+        let mock = makeTokenTestSession()
         let recorder = PathRecorder()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             recorder.record(request.url!.path)
             return okResponse(request.url!, "")
         }
 
-        try await client.deleteAccessToken("tok-5")
+        try await mock.client.deleteAccessToken("tok-5")
 
         #expect(recorder.paths.contains("/api/v1/auth/tokens/tok-5"))
         #expect(!recorder.paths.contains(where: { $0.contains("/profile/") }))

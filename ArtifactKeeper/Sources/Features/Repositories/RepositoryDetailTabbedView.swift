@@ -63,7 +63,7 @@ struct RepositoryDetailTabbedView: View {
             await loadData()
         }
         .sheet(item: $selectedArtifact) { artifact in
-            ArtifactDetailSheet(artifact: artifact, repoKey: repoKey)
+            ArtifactDetailView(artifactId: artifact.id, repoKey: repoKey)
         }
         .sheet(item: $securityArtifact) { artifact in
             NavigationStack {
