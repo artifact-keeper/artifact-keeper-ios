@@ -141,3 +141,42 @@ struct RotateWebhookSecretResponse: Codable, Identifiable, Sendable {
         case previousSecretExpiresAt = "previous_secret_expires_at"
     }
 }
+
+// MARK: - Plugins (WASM format plugins)
+
+/// An installed WASM plugin. The free-form `config_schema` object is intentionally
+/// not decoded: the list/detail UI surfaces identity, type, status and timing.
+struct Plugin: Codable, Identifiable, Sendable {
+    let id: String
+    let name: String
+    let displayName: String
+    let version: String
+    let status: String
+    let pluginType: String
+    let description: String?
+    let author: String?
+    let homepage: String?
+    let installedAt: String
+    let enabledAt: String?
+
+    /// Plugins report status as a string; treat anything other than an explicit
+    /// disabled/inactive state as enabled for the toggle control.
+    var isEnabled: Bool {
+        switch status.lowercased() {
+        case "disabled", "inactive", "stopped": return false
+        default: return true
+        }
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, name, version, status, description, author, homepage
+        case displayName = "display_name"
+        case pluginType = "plugin_type"
+        case installedAt = "installed_at"
+        case enabledAt = "enabled_at"
+    }
+}
+
+struct PluginListResponse: Codable, Sendable {
+    let items: [Plugin]
+}
