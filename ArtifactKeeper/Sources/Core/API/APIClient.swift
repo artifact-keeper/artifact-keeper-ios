@@ -320,42 +320,95 @@ actor APIClient {
         )
     }
 
-    // MARK: API Keys (profile endpoints not in SDK, kept as raw requests)
+    // MARK: API Tokens (unified 1.2.1 surface)
+    //
+    // 1.2.1 removed /api/v1/profile/api-keys and /profile/access-tokens in favor of a
+    // single token API. Listing is per user (/api/v1/users/{id}/tokens), create is
+    // /api/v1/auth/tokens, delete is /api/v1/auth/tokens/{token_id}. The two Profile
+    // tabs (API keys, access tokens) both map onto this one surface; responses are
+    // adapted back to the existing ApiKey/AccessToken view types.
+
+    /// Resolve the current user's id via /api/v1/auth/me. Required because token
+    /// listing is scoped to a user id in 1.2.1.
+    private func currentUserId() async throws -> String {
+        let me: ProfileResponse = try await request("/api/v1/auth/me")
+        return me.id
+    }
 
     func listApiKeys() async throws -> [ApiKey] {
-        let response: ApiKeysListResponse = try await request("/api/v1/profile/api-keys")
-        return response.apiKeys
+        let userId = try await currentUserId()
+        let response: ApiTokenListResponse = try await request("/api/v1/users/\(userId)/tokens")
+        return response.items.map { token in
+            ApiKey(
+                id: token.id,
+                name: token.name,
+                keyPrefix: token.tokenPrefix,
+                createdAt: token.createdAt,
+                expiresAt: token.expiresAt,
+                lastUsedAt: token.lastUsedAt,
+                scopes: token.scopes
+            )
+        }
     }
 
     func createApiKey(name: String, scopes: [String], expiresInDays: Int?) async throws -> CreateApiKeyResponse {
-        try await request(
-            "/api/v1/profile/api-keys",
+        let created: ApiTokenCreatedResponse = try await request(
+            "/api/v1/auth/tokens",
             method: "POST",
             body: CreateApiKeyRequest(name: name, expiresInDays: expiresInDays, scopes: scopes)
         )
+        let apiKey = ApiKey(
+            id: created.id,
+            name: created.name,
+            keyPrefix: String(created.token.prefix(8)),
+            createdAt: "",
+            expiresAt: nil,
+            lastUsedAt: nil,
+            scopes: scopes
+        )
+        return CreateApiKeyResponse(apiKey: apiKey, key: created.token)
     }
 
     func deleteApiKey(_ id: String) async throws {
-        try await requestVoid("/api/v1/profile/api-keys/\(id)", method: "DELETE")
+        try await requestVoid("/api/v1/auth/tokens/\(id)", method: "DELETE")
     }
 
-    // MARK: Access Tokens (profile endpoints not in SDK, kept as raw requests)
-
     func listAccessTokens() async throws -> [AccessToken] {
-        let response: AccessTokensListResponse = try await request("/api/v1/profile/access-tokens")
-        return response.accessTokens
+        let userId = try await currentUserId()
+        let response: ApiTokenListResponse = try await request("/api/v1/users/\(userId)/tokens")
+        return response.items.map { token in
+            AccessToken(
+                id: token.id,
+                name: token.name,
+                tokenPrefix: token.tokenPrefix,
+                createdAt: token.createdAt,
+                expiresAt: token.expiresAt,
+                lastUsedAt: token.lastUsedAt,
+                scopes: token.scopes
+            )
+        }
     }
 
     func createAccessToken(name: String, scopes: [String], expiresInDays: Int?) async throws -> CreateAccessTokenResponse {
-        try await request(
-            "/api/v1/profile/access-tokens",
+        let created: ApiTokenCreatedResponse = try await request(
+            "/api/v1/auth/tokens",
             method: "POST",
             body: CreateAccessTokenRequest(name: name, expiresInDays: expiresInDays, scopes: scopes)
         )
+        let accessToken = AccessToken(
+            id: created.id,
+            name: created.name,
+            tokenPrefix: String(created.token.prefix(8)),
+            createdAt: "",
+            expiresAt: nil,
+            lastUsedAt: nil,
+            scopes: scopes
+        )
+        return CreateAccessTokenResponse(accessToken: accessToken, token: created.token)
     }
 
     func deleteAccessToken(_ id: String) async throws {
-        try await requestVoid("/api/v1/profile/access-tokens/\(id)", method: "DELETE")
+        try await requestVoid("/api/v1/auth/tokens/\(id)", method: "DELETE")
     }
 
     // MARK: Staging Repositories (staging endpoints not in SDK, kept as raw requests)
