@@ -715,6 +715,53 @@ actor APIClient {
         return data.items.map { ScanFinding(from: $0) }
     }
 
+    /// Security overview counts (GET /api/v1/security/dashboard).
+    func getSecurityDashboard() async throws -> SecurityDashboard {
+        let client = await sdkClientInstance()
+        let response = try await client.get_dashboard()
+        let data = try response.ok.body.json
+        return SecurityDashboard(from: data)
+    }
+
+    /// Per-repository security scores (GET /api/v1/security/scores).
+    func getSecurityScores() async throws -> [RepoSecurityScore] {
+        let client = await sdkClientInstance()
+        let response = try await client.get_all_scores()
+        let data = try response.ok.body.json
+        return data.map { RepoSecurityScore(from: $0) }
+    }
+
+    /// Acknowledge a finding with a reason (POST /api/v1/security/findings/{id}/acknowledge).
+    /// Returns the updated finding.
+    func acknowledgeFinding(id: String, reason: String) async throws -> ScanFinding {
+        let client = await sdkClientInstance()
+        let response = try await client.acknowledge_finding(
+            path: .init(id: id),
+            body: .json(.init(reason: reason))
+        )
+        let data = try response.ok.body.json
+        return ScanFinding(from: data)
+    }
+
+    /// Revoke a finding's acknowledgment (DELETE /api/v1/security/findings/{id}/acknowledge).
+    /// Returns the updated finding.
+    func revokeFindingAcknowledgment(id: String) async throws -> ScanFinding {
+        let client = await sdkClientInstance()
+        let response = try await client.revoke_acknowledgment(path: .init(id: id))
+        let data = try response.ok.body.json
+        return ScanFinding(from: data)
+    }
+
+    /// Trigger a scan for an artifact or repository (POST /api/v1/security/scan).
+    func triggerScan(artifactId: String? = nil, repositoryId: String? = nil) async throws -> TriggerScanResult {
+        let client = await sdkClientInstance()
+        let response = try await client.trigger_scan(
+            body: .json(.init(artifact_id: artifactId, repository_id: repositoryId))
+        )
+        let data = try response.ok.body.json
+        return TriggerScanResult(from: data)
+    }
+
     // MARK: SBOM (SDK-backed)
 
     /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).

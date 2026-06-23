@@ -4,10 +4,13 @@ import SwiftUI
 //
 // These cover the per-artifact half of the Security section that the repository-scoped
 // views in SecurityView.swift do not:
-//   - ArtifactScanResultsView: scans for one artifact          (list_artifact_scans)
-//   - ArtifactScanDetailView:  scan metadata + its findings    (get_scan, list_findings)
+//   - ArtifactScanResultsView: scans for one artifact, rescan  (list_artifact_scans,
+//                                                                trigger_scan)
+//   - ArtifactScanDetailView:  scan findings, acknowledge      (list_findings,
+//                                                                acknowledge_finding,
+//                                                                revoke_acknowledgment)
 //   - ArtifactSbomView:        SBOM summary + components        (get_sbom_by_artifact,
-//                                                                get_sbom, get_sbom_components)
+//                                                                get_sbom_components)
 //
 // They reuse the shared row/badge components (ScanResultRow, SeverityPill, FindingRow,
 // GradeBadge) defined in SecurityView.swift and the SDK-backed APIClient methods.
@@ -71,6 +74,8 @@ struct ArtifactScanResultsView: View {
     @State private var scans: [ScanResult] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var isScanning = false
+    @State private var banner: String?
 
     private let apiClient = APIClient.shared
 
@@ -88,15 +93,33 @@ struct ArtifactScanResultsView: View {
                     Button("Retry") { Task { await loadScans() } }
                 }
             } else if scans.isEmpty {
-                ContentUnavailableView(
-                    "No Scans",
-                    systemImage: "checkmark.shield",
-                    description: Text("This artifact has not been scanned yet.")
-                )
+                ContentUnavailableView {
+                    Label("No Scans", systemImage: "checkmark.shield")
+                } description: {
+                    Text("This artifact has not been scanned yet.")
+                } actions: {
+                    Button {
+                        Task { await triggerScan() }
+                    } label: {
+                        Label("Scan Now", systemImage: "ladybug")
+                    }
+                    .disabled(isScanning)
+                }
             } else {
-                List(scans) { scan in
-                    NavigationLink(destination: ArtifactScanDetailView(scan: scan)) {
-                        ScanResultRow(scan: scan)
+                List {
+                    if let banner {
+                        Section {
+                            Label(banner, systemImage: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    Section {
+                        ForEach(scans) { scan in
+                            NavigationLink(destination: ArtifactScanDetailView(scan: scan)) {
+                                ScanResultRow(scan: scan)
+                            }
+                        }
                     }
                 }
                 .listStyle(.plain)
@@ -106,6 +129,20 @@ struct ArtifactScanResultsView: View {
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    Task { await triggerScan() }
+                } label: {
+                    if isScanning {
+                        ProgressView()
+                    } else {
+                        Label("Rescan", systemImage: "arrow.clockwise")
+                    }
+                }
+                .disabled(isScanning)
+            }
+        }
         .refreshable { await loadScans() }
         .task { await loadScans() }
     }
@@ -122,6 +159,18 @@ struct ArtifactScanResultsView: View {
         }
         isLoading = false
     }
+
+    private func triggerScan() async {
+        isScanning = true
+        defer { isScanning = false }
+        do {
+            let result = try await apiClient.triggerScan(artifactId: artifactId)
+            banner = result.message
+            await loadScans()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
 
 // MARK: - Artifact Scan Detail
@@ -133,6 +182,8 @@ struct ArtifactScanDetailView: View {
     @State private var findings: [ScanFinding] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
+    @State private var actionError: String?
+    @State private var acknowledgingFinding: ScanFinding?
 
     private let apiClient = APIClient.shared
 
@@ -165,6 +216,23 @@ struct ArtifactScanDetailView: View {
                         Section("Findings (\(findings.count))") {
                             ForEach(findings) { finding in
                                 FindingRow(finding: finding)
+                                    .swipeActions(edge: .trailing) {
+                                        if finding.isAcknowledged {
+                                            Button {
+                                                Task { await revoke(finding) }
+                                            } label: {
+                                                Label("Revoke", systemImage: "arrow.uturn.backward")
+                                            }
+                                            .tint(.orange)
+                                        } else {
+                                            Button {
+                                                acknowledgingFinding = finding
+                                            } label: {
+                                                Label("Acknowledge", systemImage: "checkmark.circle")
+                                            }
+                                            .tint(.green)
+                                        }
+                                    }
                             }
                         }
                     }
@@ -178,6 +246,19 @@ struct ArtifactScanDetailView: View {
         #endif
         .refreshable { await loadFindings() }
         .task { await loadFindings() }
+        .sheet(item: $acknowledgingFinding) { finding in
+            AcknowledgeFindingSheet(finding: finding) { reason in
+                await acknowledge(finding, reason: reason)
+            }
+        }
+        .alert("Action Failed", isPresented: Binding(
+            get: { actionError != nil },
+            set: { if !$0 { actionError = nil } }
+        )) {
+            Button("OK", role: .cancel) { actionError = nil }
+        } message: {
+            Text(actionError ?? "")
+        }
     }
 
     private var scanTypeTitle: String {
@@ -253,6 +334,94 @@ struct ArtifactScanDetailView: View {
             }
         }
         isLoading = false
+    }
+
+    private func acknowledge(_ finding: ScanFinding, reason: String) async {
+        do {
+            let updated = try await apiClient.acknowledgeFinding(id: finding.id, reason: reason)
+            replace(updated)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    private func revoke(_ finding: ScanFinding) async {
+        do {
+            let updated = try await apiClient.revokeFindingAcknowledgment(id: finding.id)
+            replace(updated)
+        } catch {
+            actionError = error.localizedDescription
+        }
+    }
+
+    /// Replace a finding in place so the row reflects the new acknowledgment state
+    /// without a full reload.
+    private func replace(_ updated: ScanFinding) {
+        if let index = findings.firstIndex(where: { $0.id == updated.id }) {
+            findings[index] = updated
+        }
+    }
+}
+
+// MARK: - Acknowledge Finding Sheet
+
+/// Prompts for an acknowledgment reason before acknowledging a finding.
+struct AcknowledgeFindingSheet: View {
+    let finding: ScanFinding
+    let onSubmit: (String) async -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var reason = ""
+    @State private var isSubmitting = false
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    Text(finding.title)
+                        .font(.headline)
+                    if let cve = finding.cveId, !cve.isEmpty {
+                        Text(cve)
+                            .font(.caption.monospaced())
+                            .foregroundStyle(.secondary)
+                    }
+                } header: {
+                    Text("Finding")
+                }
+
+                Section {
+                    TextField("Reason", text: $reason, axis: .vertical)
+                        .lineLimit(3...6)
+                } header: {
+                    Text("Acknowledgment Reason")
+                } footer: {
+                    Text("Explain why this finding is accepted (for example, false positive or mitigated).")
+                }
+            }
+            .navigationTitle("Acknowledge")
+            #if os(iOS)
+            .navigationBarTitleDisplayMode(.inline)
+            #endif
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Acknowledge") {
+                        isSubmitting = true
+                        Task {
+                            await onSubmit(reason.trimmingCharacters(in: .whitespacesAndNewlines))
+                            isSubmitting = false
+                            dismiss()
+                        }
+                    }
+                    .disabled(reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting)
+                }
+            }
+        }
+        #if os(macOS)
+        .frame(minWidth: 380, minHeight: 280)
+        #endif
     }
 }
 

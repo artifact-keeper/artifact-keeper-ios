@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct SecurityDashboardContentView: View {
+    @State private var dashboard: SecurityDashboard?
     @State private var scores: [RepoSecurityScore] = []
     @State private var repoNames: [String: String] = [:]
     @State private var isLoading = true
@@ -14,7 +15,7 @@ struct SecurityDashboardContentView: View {
         Group {
             if isLoading {
                 ProgressView("Loading security data...")
-            } else if scores.isEmpty && dtStatus?.enabled != true && cveTrends == nil {
+            } else if dashboard == nil && scores.isEmpty && dtStatus?.enabled != true && cveTrends == nil {
                 ContentUnavailableView(
                     "No Security Data",
                     systemImage: "shield.slash",
@@ -22,6 +23,12 @@ struct SecurityDashboardContentView: View {
                 )
             } else {
                 List {
+                    if let dashboard {
+                        Section {
+                            SecurityOverviewCard(dashboard: dashboard)
+                        }
+                    }
+
                     if let trends = cveTrends {
                         Section {
                             CveTrendsSummaryCard(trends: trends)
@@ -68,9 +75,17 @@ struct SecurityDashboardContentView: View {
     }
 
     private func loadData() async {
-        isLoading = scores.isEmpty && dtStatus == nil
+        isLoading = dashboard == nil && scores.isEmpty && dtStatus == nil
+
+        // Top-level overview counts. Independent so a failure hides only this card.
         do {
-            async let scoresResult: [RepoSecurityScore] = apiClient.request("/api/v1/security/scores")
+            dashboard = try await apiClient.getSecurityDashboard()
+        } catch {
+            // Dashboard not available — hide the overview card.
+        }
+
+        do {
+            async let scoresResult = apiClient.getSecurityScores()
             async let reposResult: RepositoryListResponse = apiClient.request("/api/v1/repositories?per_page=200")
 
             let (s, r) = try await (scoresResult, reposResult)
@@ -479,10 +494,72 @@ struct SecurityScoreRow: View {
 
             Spacer()
 
-            Text("Score: \(score.score)")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            VStack(alignment: .trailing, spacing: 2) {
+                Text("Score: \(score.score)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                if let acknowledged = score.acknowledgedCount, acknowledged > 0 {
+                    Text("\(acknowledged) ack'd")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
+    }
+}
+
+// MARK: - Security Overview Card
+
+/// Top-level security counts from the dashboard endpoint.
+struct SecurityOverviewCard: View {
+    let dashboard: SecurityDashboard
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Image(systemName: "shield.lefthalf.filled")
+                    .font(.title3)
+                    .foregroundStyle(.blue)
+                Text("Security Overview")
+                    .font(.headline)
+            }
+
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                metric("Scans", "\(dashboard.totalScans)", color: .blue)
+                metric("Findings", "\(dashboard.totalFindings)", color: .secondary)
+                metric("Scanned Repos", "\(dashboard.reposWithScanning)", color: .blue)
+                metric("Critical", "\(dashboard.criticalFindings)", color: .red)
+                metric("High", "\(dashboard.highFindings)", color: .orange)
+                metric("Blocked", "\(dashboard.policyViolationsBlocked)", color: .purple)
+            }
+
+            HStack(spacing: 12) {
+                Label("\(dashboard.reposGradeA) grade A", systemImage: "checkmark.seal.fill")
+                    .font(.caption)
+                    .foregroundStyle(.green)
+                Label("\(dashboard.reposGradeF) grade F", systemImage: "exclamationmark.triangle.fill")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func metric(_ label: String, _ value: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Text(value)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(color)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label): \(value)")
     }
 }
 

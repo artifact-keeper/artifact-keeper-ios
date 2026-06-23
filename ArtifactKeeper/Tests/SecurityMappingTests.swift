@@ -237,4 +237,101 @@ struct SecurityMappingTests {
         #expect(model.generatorVersion == "1.0")
         #expect(model.generatedAt == Self.fixedIso)
     }
+
+    // MARK: - SecurityDashboard
+
+    @Test func securityDashboardMapsAllFields() {
+        let sdk = Components.Schemas.DashboardResponse(
+            critical_findings: 4,
+            high_findings: 9,
+            policy_violations_blocked: 2,
+            repos_grade_a: 5,
+            repos_grade_f: 1,
+            repos_with_scanning: 8,
+            total_findings: 30,
+            total_scans: 100
+        )
+
+        let model = SecurityDashboard(from: sdk)
+
+        #expect(model.criticalFindings == 4)
+        #expect(model.highFindings == 9)
+        #expect(model.policyViolationsBlocked == 2)
+        #expect(model.reposGradeA == 5)
+        #expect(model.reposGradeF == 1)
+        #expect(model.reposWithScanning == 8)
+        #expect(model.totalFindings == 30)
+        #expect(model.totalScans == 100)
+    }
+
+    // MARK: - RepoSecurityScore (from ScoreResponse)
+
+    @Test func securityScoreMapsAllFields() {
+        let sdk = Components.Schemas.ScoreResponse(
+            acknowledged_count: 3,
+            calculated_at: Self.fixedDate,
+            critical_count: 1,
+            grade: "B",
+            high_count: 2,
+            id: "score-1",
+            last_scan_at: Self.fixedDate,
+            low_count: 4,
+            medium_count: 5,
+            repository_id: "repo-1",
+            score: 82,
+            total_findings: 12
+        )
+
+        let model = RepoSecurityScore(from: sdk)
+
+        #expect(model.id == "score-1")
+        #expect(model.repositoryId == "repo-1")
+        #expect(model.grade == "B")
+        #expect(model.score == 82)
+        #expect(model.criticalCount == 1)
+        #expect(model.highCount == 2)
+        #expect(model.mediumCount == 5)
+        #expect(model.lowCount == 4)
+        #expect(model.totalFindings == 12)
+        #expect(model.acknowledgedCount == 3)
+        #expect(model.lastScanAt == Self.fixedIso)
+        #expect(model.calculatedAt == Self.fixedIso)
+    }
+
+    @Test func securityScoreMapsNilLastScan() {
+        let sdk = Components.Schemas.ScoreResponse(
+            acknowledged_count: 0,
+            calculated_at: Self.fixedDate,
+            critical_count: 0,
+            grade: "A",
+            high_count: 0,
+            id: "score-2",
+            last_scan_at: nil,
+            low_count: 0,
+            medium_count: 0,
+            repository_id: "repo-2",
+            score: 100,
+            total_findings: 0
+        )
+
+        let model = RepoSecurityScore(from: sdk)
+
+        #expect(model.lastScanAt == nil)
+        #expect(model.grade == "A")
+        #expect(model.score == 100)
+    }
+
+    // MARK: - TriggerScanResult
+
+    @Test func triggerScanResultMaps() {
+        let sdk = Components.Schemas.TriggerScanResponse(
+            artifacts_queued: 7,
+            message: "Queued 7 artifacts for scanning"
+        )
+
+        let model = TriggerScanResult(from: sdk)
+
+        #expect(model.artifactsQueued == 7)
+        #expect(model.message == "Queued 7 artifacts for scanning")
+    }
 }
