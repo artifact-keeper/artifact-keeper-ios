@@ -13,12 +13,8 @@ private func artifactOk(_ url: URL, _ body: String, status: Int = 200) -> (HTTPU
     return (response, Data(body.utf8))
 }
 
-private func makeArtifactTestClient(baseURL: String = "https://test-api.example.com") -> APIClient {
-    let config = URLSessionConfiguration.ephemeral
-    config.protocolClasses = [MockURLProtocol.self]
-    config.timeoutIntervalForRequest = 5
-    let session = URLSession(configuration: config)
-    return APIClient(baseURL: baseURL, session: session)
+private func makeArtifactTestSession(baseURL: String = "https://test-api.example.com") -> MockSession {
+    MockSession(baseURL: baseURL)
 }
 
 // Thread-safe path collector for assertions across multiple requests.
@@ -29,14 +25,13 @@ private final class ArtifactPathLog: @unchecked Sendable {
     var paths: [String] { lock.lock(); defer { lock.unlock() }; return values }
 }
 
-@Suite("Artifact Detail API Tests", .serialized)
+@Suite("Artifact Detail API Tests")
 struct ArtifactDetailAPITests {
-    init() { MockURLProtocol.reset() }
 
     @Test func getArtifactDetailHitsArtifactPathAndDecodes() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             return artifactOk(request.url!, """
             {
@@ -48,7 +43,7 @@ struct ArtifactDetailAPITests {
             """)
         }
 
-        let detail = try await client.getArtifactDetail(id: "art-1")
+        let detail = try await mock.client.getArtifactDetail(id: "art-1")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1"))
         #expect(detail.id == "art-1")
@@ -59,16 +54,16 @@ struct ArtifactDetailAPITests {
     }
 
     @Test func getArtifactMetadataHitsMetadataPath() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             return artifactOk(request.url!, """
             {"artifact_id": "art-1", "format": "maven", "metadata": {"group": "com.x"}, "properties": {"build": 42}}
             """)
         }
 
-        let meta = try await client.getArtifactMetadata(id: "art-1")
+        let meta = try await mock.client.getArtifactMetadata(id: "art-1")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/metadata"))
         #expect(meta.format == "maven")
@@ -77,16 +72,16 @@ struct ArtifactDetailAPITests {
     }
 
     @Test func getArtifactStatsHitsStatsPath() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             return artifactOk(request.url!, """
             {"artifact_id": "art-1", "download_count": 12, "first_downloaded": "2026-01-02T00:00:00Z", "last_downloaded": "2026-03-01T00:00:00Z"}
             """)
         }
 
-        let stats = try await client.getArtifactStats(id: "art-1")
+        let stats = try await mock.client.getArtifactStats(id: "art-1")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/stats"))
         #expect(stats.downloadCount == 12)
@@ -94,16 +89,16 @@ struct ArtifactDetailAPITests {
     }
 
     @Test func listArtifactLabelsHitsLabelsPathAndDecodes() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             return artifactOk(request.url!, """
             {"items": [{"id": "l1", "artifact_id": "art-1", "key": "env", "value": "prod", "created_at": "2026-01-01T00:00:00Z"}], "total": 1}
             """)
         }
 
-        let labels = try await client.listArtifactLabels(id: "art-1")
+        let labels = try await mock.client.listArtifactLabels(id: "art-1")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/labels"))
         #expect(labels.count == 1)
@@ -112,9 +107,9 @@ struct ArtifactDetailAPITests {
     }
 
     @Test func addArtifactLabelPostsToKeyedPath() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             #expect(request.httpMethod == "POST")
             return artifactOk(request.url!, """
@@ -122,7 +117,7 @@ struct ArtifactDetailAPITests {
             """, status: 201)
         }
 
-        let label = try await client.addArtifactLabel(id: "art-1", key: "team", value: "platform")
+        let label = try await mock.client.addArtifactLabel(id: "art-1", key: "team", value: "platform")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/labels/team"))
         #expect(label.key == "team")
@@ -130,9 +125,9 @@ struct ArtifactDetailAPITests {
     }
 
     @Test func setArtifactLabelsPutsToLabelsPath() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             #expect(request.httpMethod == "PUT")
             return artifactOk(request.url!, """
@@ -140,34 +135,33 @@ struct ArtifactDetailAPITests {
             """)
         }
 
-        let labels = try await client.setArtifactLabels(id: "art-1", labels: [ArtifactLabelEntry(key: "tier", value: "gold")])
+        let labels = try await mock.client.setArtifactLabels(id: "art-1", labels: [ArtifactLabelEntry(key: "tier", value: "gold")])
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/labels"))
         #expect(labels.first?.key == "tier")
     }
 
     @Test func deleteArtifactLabelDeletesKeyedPath() async throws {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let log = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             log.add(request.url!.path)
             #expect(request.httpMethod == "DELETE")
             return artifactOk(request.url!, "")
         }
 
-        try await client.deleteArtifactLabel(id: "art-1", key: "env")
+        try await mock.client.deleteArtifactLabel(id: "art-1", key: "env")
 
         #expect(log.paths.contains("/api/v1/artifacts/art-1/labels/env"))
     }
 }
 
-@Suite("Artifact Detail ViewModel Tests", .serialized)
+@Suite("Artifact Detail ViewModel Tests")
 struct ArtifactDetailViewModelTests {
-    init() { MockURLProtocol.reset() }
 
     @Test @MainActor func loadPopulatesDetailMetadataStatsAndLabels() async {
-        let client = makeArtifactTestClient()
-        MockURLProtocol.requestHandler = { request in
+        let mock = makeArtifactTestSession()
+        mock.handler = { request in
             let path = request.url!.path
             if path == "/api/v1/artifacts/art-9" {
                 return artifactOk(request.url!, """
@@ -192,7 +186,7 @@ struct ArtifactDetailViewModelTests {
             """)
         }
 
-        let vm = ArtifactDetailViewModel(artifactId: "art-9", api: client)
+        let vm = ArtifactDetailViewModel(artifactId: "art-9", api: mock.client)
         await vm.load()
 
         #expect(vm.detail?.id == "art-9")
@@ -204,12 +198,12 @@ struct ArtifactDetailViewModelTests {
     }
 
     @Test @MainActor func loadSetsErrorWhenDetailFails() async {
-        let client = makeArtifactTestClient()
-        MockURLProtocol.requestHandler = { request in
+        let mock = makeArtifactTestSession()
+        mock.handler = { request in
             return artifactOk(request.url!, "{\"error\":\"not found\"}", status: 404)
         }
 
-        let vm = ArtifactDetailViewModel(artifactId: "missing", api: client)
+        let vm = ArtifactDetailViewModel(artifactId: "missing", api: mock.client)
         await vm.load()
 
         #expect(vm.detail == nil)
@@ -218,9 +212,9 @@ struct ArtifactDetailViewModelTests {
     }
 
     @Test @MainActor func addLabelReloadsLabelSet() async {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let postCount = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             postCount.add(request.httpMethod ?? "")
             if request.httpMethod == "POST" {
                 return artifactOk(request.url!, """
@@ -236,7 +230,7 @@ struct ArtifactDetailViewModelTests {
             """)
         }
 
-        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: client)
+        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: mock.client)
         await vm.addLabel(key: "team", value: "platform")
 
         #expect(vm.labels.count == 2)
@@ -245,22 +239,22 @@ struct ArtifactDetailViewModelTests {
     }
 
     @Test @MainActor func addLabelIgnoresBlankKey() async {
-        let client = makeArtifactTestClient()
+        let mock = makeArtifactTestSession()
         let called = ArtifactPathLog()
-        MockURLProtocol.requestHandler = { request in
+        mock.handler = { request in
             called.add(request.url!.path)
             return artifactOk(request.url!, "{}")
         }
 
-        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: client)
+        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: mock.client)
         await vm.addLabel(key: "   ", value: "x")
 
         #expect(called.paths.isEmpty)
     }
 
     @Test @MainActor func downloadURLBuildsRepositoryDownloadPath() async {
-        let client = makeArtifactTestClient(baseURL: "https://reg.example.com")
-        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: client)
+        let mock = makeArtifactTestSession(baseURL: "https://reg.example.com")
+        let vm = ArtifactDetailViewModel(artifactId: "art-1", api: mock.client)
 
         let url = await vm.downloadURL(repoKey: "maven-local", path: "com/x/1.0/x.jar")
 
