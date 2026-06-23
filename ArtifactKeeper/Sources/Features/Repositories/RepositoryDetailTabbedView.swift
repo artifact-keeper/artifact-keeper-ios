@@ -67,7 +67,7 @@ struct RepositoryDetailTabbedView: View {
         }
         .sheet(item: $securityArtifact) { artifact in
             NavigationStack {
-                SbomView(artifactId: artifact.id, artifactName: artifact.name)
+                ArtifactSecurityHub(artifactId: artifact.id, artifactName: artifact.name)
                     .navigationTitle(artifact.name)
                     #if os(iOS)
                     .navigationBarTitleDisplayMode(.inline)

@@ -43,6 +43,23 @@ actor APIClient {
         self.decoder = JSONDecoder()
     }
 
+    /// Test-only override for the generated SDK client. When set, SDK-backed methods use
+    /// this client instead of the shared one, so a mock transport can assert the request
+    /// path and method (operation dispatch) without hitting the network.
+    private var injectedSDKClient: ArtifactKeeperClient.Client?
+
+    /// Inject a generated SDK client for tests. Production code never calls this.
+    func setSDKClientForTesting(_ client: ArtifactKeeperClient.Client) {
+        self.injectedSDKClient = client
+    }
+
+    /// The SDK client SDK-backed methods should use: the injected one in tests, otherwise
+    /// the shared client.
+    private func sdkClientInstance() async -> ArtifactKeeperClient.Client {
+        if let injectedSDKClient { return injectedSDKClient }
+        return await sdkClient.client
+    }
+
     func setToken(_ token: String?) {
         self.accessToken = token
         Task { await sdkClient.setToken(token) }
@@ -647,6 +664,50 @@ actor APIClient {
             throw APIError.httpError(statusCode: httpResponse.statusCode, data: data)
         }
         return try decoder.decode(Artifact.self, from: data)
+    }
+
+    // MARK: Security Scans & Findings (SDK-backed)
+
+    /// List scans for a single artifact (GET /api/v1/security/artifacts/{artifact_id}/scans).
+    func listArtifactScans(artifactId: String) async throws -> [ScanResult] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_artifact_scans(
+            path: .init(artifact_id: artifactId),
+            query: .init(per_page: 200)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanResult(from: $0) }
+    }
+
+    /// List findings for a scan (GET /api/v1/security/scans/{id}/findings).
+    func listFindings(scanId: String) async throws -> [ScanFinding] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_findings(
+            path: .init(id: scanId),
+            query: .init(per_page: 200)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanFinding(from: $0) }
+    }
+
+    // MARK: SBOM (SDK-backed)
+
+    /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).
+    func getSbomByArtifact(artifactId: String) async throws -> SbomSummary {
+        let client = await sdkClientInstance()
+        let response = try await client.get_sbom_by_artifact(
+            path: .init(artifact_id: artifactId)
+        )
+        let data = try response.ok.body.json
+        return SbomSummary(from: data)
+    }
+
+    /// List the components in a SBOM (GET /api/v1/sbom/{id}/components).
+    func getSbomComponents(sbomId: String) async throws -> [SbomComponent] {
+        let client = await sdkClientInstance()
+        let response = try await client.get_sbom_components(path: .init(id: sbomId))
+        let data = try response.ok.body.json
+        return data.map { SbomComponent(from: $0) }
     }
 
     // MARK: Repository Security Config
