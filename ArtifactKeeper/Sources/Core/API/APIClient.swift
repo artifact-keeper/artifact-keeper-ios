@@ -464,6 +464,48 @@ actor APIClient {
         return response.items
     }
 
+    // MARK: Artifact Detail (1.2.1: /api/v1/artifacts/{id} + /metadata, /stats, /labels)
+
+    func getArtifactDetail(id: String) async throws -> ArtifactDetail {
+        try await request("/api/v1/artifacts/\(id)")
+    }
+
+    func getArtifactMetadata(id: String) async throws -> ArtifactMetadata {
+        try await request("/api/v1/artifacts/\(id)/metadata")
+    }
+
+    func getArtifactStats(id: String) async throws -> ArtifactStats {
+        try await request("/api/v1/artifacts/\(id)/stats")
+    }
+
+    func listArtifactLabels(id: String) async throws -> [ArtifactLabel] {
+        let response: ArtifactLabelsListResponse = try await request("/api/v1/artifacts/\(id)/labels")
+        return response.items
+    }
+
+    /// Replace the full label set on an artifact.
+    func setArtifactLabels(id: String, labels: [ArtifactLabelEntry]) async throws -> [ArtifactLabel] {
+        let response: ArtifactLabelsListResponse = try await request(
+            "/api/v1/artifacts/\(id)/labels",
+            method: "PUT",
+            body: SetArtifactLabelsRequest(labels: labels)
+        )
+        return response.items
+    }
+
+    /// Add or update a single label by key.
+    func addArtifactLabel(id: String, key: String, value: String?) async throws -> ArtifactLabel {
+        try await request(
+            "/api/v1/artifacts/\(id)/labels/\(key)",
+            method: "POST",
+            body: AddArtifactLabelRequest(value: value)
+        )
+    }
+
+    func deleteArtifactLabel(id: String, key: String) async throws {
+        try await requestVoid("/api/v1/artifacts/\(id)/labels/\(key)", method: "DELETE")
+    }
+
     // MARK: Virtual Repository Members
 
     func listVirtualMembers(repoKey: String) async throws -> [VirtualMember] {
