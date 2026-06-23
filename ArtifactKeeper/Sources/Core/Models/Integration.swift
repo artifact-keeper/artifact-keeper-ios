@@ -100,3 +100,44 @@ struct TestWebhookResponse: Codable, Sendable {
         case error
     }
 }
+
+/// A single webhook delivery attempt. The raw `payload` object is intentionally
+/// not decoded: the history UI surfaces the event, outcome and timing, not the body.
+struct WebhookDelivery: Codable, Identifiable, Sendable {
+    let id: String
+    let webhookId: String
+    let event: String
+    let success: Bool
+    let attempts: Int
+    let responseStatus: Int?
+    let responseBody: String?
+    let createdAt: String
+    let deliveredAt: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id, event, success, attempts
+        case webhookId = "webhook_id"
+        case responseStatus = "response_status"
+        case responseBody = "response_body"
+        case createdAt = "created_at"
+        case deliveredAt = "delivered_at"
+    }
+}
+
+struct WebhookDeliveryListResponse: Codable, Sendable {
+    let items: [WebhookDelivery]
+    let total: Int
+}
+
+struct RotateWebhookSecretResponse: Codable, Identifiable, Sendable {
+    let id: String
+    let secret: String
+    let secretDigest: String
+    let previousSecretExpiresAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id, secret
+        case secretDigest = "secret_digest"
+        case previousSecretExpiresAt = "previous_secret_expires_at"
+    }
+}
