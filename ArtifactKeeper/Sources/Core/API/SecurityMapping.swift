@@ -117,6 +117,49 @@ extension SbomSummary {
     }
 }
 
+extension RepoSecurityScore {
+    init(from sdk: Components.Schemas.ScoreResponse) {
+        self.init(
+            id: sdk.id,
+            repositoryId: sdk.repository_id,
+            grade: sdk.grade,
+            score: Int(sdk.score),
+            criticalCount: Int(sdk.critical_count),
+            highCount: Int(sdk.high_count),
+            mediumCount: Int(sdk.medium_count),
+            lowCount: Int(sdk.low_count),
+            totalFindings: Int(sdk.total_findings),
+            acknowledgedCount: Int(sdk.acknowledged_count),
+            lastScanAt: sdk.last_scan_at.map(SecurityMapping.isoString),
+            calculatedAt: SecurityMapping.isoString(sdk.calculated_at)
+        )
+    }
+}
+
+extension SecurityDashboard {
+    init(from sdk: Components.Schemas.DashboardResponse) {
+        self.init(
+            reposWithScanning: Int(sdk.repos_with_scanning),
+            totalScans: Int(sdk.total_scans),
+            totalFindings: Int(sdk.total_findings),
+            criticalFindings: Int(sdk.critical_findings),
+            highFindings: Int(sdk.high_findings),
+            policyViolationsBlocked: Int(sdk.policy_violations_blocked),
+            reposGradeA: Int(sdk.repos_grade_a),
+            reposGradeF: Int(sdk.repos_grade_f)
+        )
+    }
+}
+
+extension TriggerScanResult {
+    init(from sdk: Components.Schemas.TriggerScanResponse) {
+        self.init(
+            artifactsQueued: Int(sdk.artifacts_queued),
+            message: sdk.message
+        )
+    }
+}
+
 // MARK: - Date Formatting
 
 enum SecurityMapping {

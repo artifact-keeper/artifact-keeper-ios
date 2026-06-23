@@ -107,7 +107,13 @@ struct RepoSecurityScore: Codable, Identifiable, Hashable, Sendable {
     let highCount: Int
     let mediumCount: Int
     let lowCount: Int
-    
+    // 1.2.1 ScoreResponse adds these fields. Optional so existing decode sites and the
+    // Hashable/Identifiable conformances stay backward compatible.
+    var totalFindings: Int?
+    var acknowledgedCount: Int?
+    var lastScanAt: String?
+    var calculatedAt: String?
+
     enum CodingKeys: String, CodingKey {
         case id, grade, score
         case repositoryId = "repository_id"
@@ -115,5 +121,57 @@ struct RepoSecurityScore: Codable, Identifiable, Hashable, Sendable {
         case highCount = "high_count"
         case mediumCount = "medium_count"
         case lowCount = "low_count"
+        case totalFindings = "total_findings"
+        case acknowledgedCount = "acknowledged_count"
+        case lastScanAt = "last_scan_at"
+        case calculatedAt = "calculated_at"
     }
+
+    init(
+        id: String,
+        repositoryId: String,
+        grade: String,
+        score: Int,
+        criticalCount: Int,
+        highCount: Int,
+        mediumCount: Int,
+        lowCount: Int,
+        totalFindings: Int? = nil,
+        acknowledgedCount: Int? = nil,
+        lastScanAt: String? = nil,
+        calculatedAt: String? = nil
+    ) {
+        self.id = id
+        self.repositoryId = repositoryId
+        self.grade = grade
+        self.score = score
+        self.criticalCount = criticalCount
+        self.highCount = highCount
+        self.mediumCount = mediumCount
+        self.lowCount = lowCount
+        self.totalFindings = totalFindings
+        self.acknowledgedCount = acknowledgedCount
+        self.lastScanAt = lastScanAt
+        self.calculatedAt = calculatedAt
+    }
+}
+
+// MARK: - Security Dashboard (1.2.1 DashboardResponse)
+
+struct SecurityDashboard: Sendable, Equatable {
+    let reposWithScanning: Int
+    let totalScans: Int
+    let totalFindings: Int
+    let criticalFindings: Int
+    let highFindings: Int
+    let policyViolationsBlocked: Int
+    let reposGradeA: Int
+    let reposGradeF: Int
+}
+
+// MARK: - Trigger Scan (1.2.1 TriggerScanResponse)
+
+struct TriggerScanResult: Sendable, Equatable {
+    let artifactsQueued: Int
+    let message: String
 }

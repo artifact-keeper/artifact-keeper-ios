@@ -49,7 +49,7 @@ final class RecordingTransport: ClientTransport, @unchecked Sendable {
         switch operationID {
         case "list_artifact_scans", "list_findings":
             return #"{"items":[],"total":0}"#
-        case "get_sbom_components":
+        case "get_sbom_components", "get_all_scores":
             return "[]"
         default:
             return "{}"
@@ -122,5 +122,64 @@ struct SecurityDispatchTests {
         #expect(rec?.method == "GET")
         #expect(pathComponent(rec?.path) == "/api/v1/sbom/sbom-3/components")
         #expect(rec?.operationID == "get_sbom_components")
+    }
+
+    // MARK: - Dashboard cluster
+
+    @Test func getSecurityDashboardHitsDashboardPath() async throws {
+        let (api, transport) = await makeClient()
+
+        // The canned body does not decode into DashboardResponse; the request is recorded
+        // before decode, so `try?` keeps the dispatch assertions meaningful.
+        _ = try? await api.getSecurityDashboard()
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/dashboard")
+        #expect(rec?.operationID == "get_dashboard")
+    }
+
+    @Test func getSecurityScoresHitsScoresPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try await api.getSecurityScores()
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/scores")
+        #expect(rec?.operationID == "get_all_scores")
+    }
+
+    @Test func acknowledgeFindingHitsAcknowledgePath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.acknowledgeFinding(id: "find-1", reason: "false positive")
+
+        let rec = transport.last
+        #expect(rec?.method == "POST")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/findings/find-1/acknowledge")
+        #expect(rec?.operationID == "acknowledge_finding")
+    }
+
+    @Test func revokeAcknowledgmentHitsAcknowledgePath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.revokeFindingAcknowledgment(id: "find-2")
+
+        let rec = transport.last
+        #expect(rec?.method == "DELETE")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/findings/find-2/acknowledge")
+        #expect(rec?.operationID == "revoke_acknowledgment")
+    }
+
+    @Test func triggerScanHitsScanPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.triggerScan(artifactId: "art-1")
+
+        let rec = transport.last
+        #expect(rec?.method == "POST")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/scan")
+        #expect(rec?.operationID == "trigger_scan")
     }
 }
