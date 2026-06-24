@@ -1,14 +1,16 @@
 import SwiftUI
 
-/// Lists installed WASM format plugins and supports enable/disable/reload.
-/// Installation (upload/git/local/zip), uninstall and config authoring are
-/// deferred: they are deep-authoring/upload flows better suited to the web UI.
+/// Lists installed WASM format plugins and supports enable/disable/reload,
+/// install from a Git URL, and uninstall (with confirmation).
+/// Local/zip uploads and config authoring stay deferred: they are upload /
+/// deep-authoring flows better suited to the web UI.
 struct PluginsView: View {
     @State private var plugins: [Plugin] = []
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var mutatingPluginId: String?
     @State private var actionMessage: (success: Bool, text: String)?
+    @State private var showingInstall = false
 
     private let apiClient = APIClient.shared
 
@@ -48,7 +50,8 @@ struct PluginsView: View {
                                 listPlugin: plugin,
                                 isMutating: mutatingPluginId == plugin.id,
                                 onToggle: { await toggle(plugin) },
-                                onReload: { await reload(plugin) }
+                                onReload: { await reload(plugin) },
+                                onUninstall: { await uninstall(plugin) }
                             )
                         } label: {
                             PluginRow(plugin: plugin)
@@ -60,6 +63,23 @@ struct PluginsView: View {
         }
         .refreshable { await loadPlugins() }
         .task { await loadPlugins() }
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    showingInstall = true
+                } label: {
+                    Label("Install from Git", systemImage: "plus")
+                }
+            }
+        }
+        .sheet(isPresented: $showingInstall) {
+            NavigationStack {
+                InstallPluginFromGitView { result in
+                    actionMessage = (true, "Installed \(result.name) \(result.version).")
+                    await loadPlugins()
+                }
+            }
+        }
     }
 
     private func loadPlugins() async {
@@ -104,6 +124,18 @@ struct PluginsView: View {
             await loadPlugins()
         } catch {
             actionMessage = (false, "Failed to reload \(plugin.displayName): \(error.localizedDescription)")
+        }
+    }
+
+    private func uninstall(_ plugin: Plugin) async {
+        mutatingPluginId = plugin.id
+        defer { mutatingPluginId = nil }
+        do {
+            try await apiClient.uninstallPlugin(id: plugin.id)
+            actionMessage = (true, "\(plugin.displayName) uninstalled.")
+            await loadPlugins()
+        } catch {
+            actionMessage = (false, "Failed to uninstall \(plugin.displayName): \(error.localizedDescription)")
         }
     }
 }
@@ -157,9 +189,13 @@ struct PluginDetailView: View {
     let isMutating: Bool
     let onToggle: () async -> Void
     let onReload: () async -> Void
+    let onUninstall: () async -> Void
 
     @State private var fetched: Plugin?
     @State private var loadError: String?
+    @State private var showingUninstallConfirm = false
+
+    @Environment(\.dismiss) private var dismiss
 
     private let apiClient = APIClient.shared
 
@@ -221,6 +257,15 @@ struct PluginDetailView: View {
                 }
                 .disabled(isMutating)
             }
+
+            Section {
+                Button(role: .destructive) {
+                    showingUninstallConfirm = true
+                } label: {
+                    Label("Uninstall", systemImage: "trash")
+                }
+                .disabled(isMutating)
+            }
         }
         .navigationTitle(plugin.displayName)
         #if os(iOS)
@@ -228,6 +273,21 @@ struct PluginDetailView: View {
         #endif
         .task { await loadDetail() }
         .refreshable { await loadDetail() }
+        .confirmationDialog(
+            "Uninstall \(plugin.displayName)?",
+            isPresented: $showingUninstallConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Uninstall", role: .destructive) {
+                Task {
+                    await onUninstall()
+                    dismiss()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This removes the plugin and its format handler from the server. This cannot be undone.")
+        }
     }
 
     private func loadDetail() async {
