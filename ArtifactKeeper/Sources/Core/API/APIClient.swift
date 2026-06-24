@@ -523,6 +523,51 @@ actor APIClient {
         try await requestVoid("/api/v1/artifacts/\(id)/labels/\(key)", method: "DELETE")
     }
 
+    // MARK: Curation (Artifacts, SDK-backed)
+
+    /// List packages awaiting curation in a staging repository
+    /// (GET /api/v1/curation/packages).
+    func listCurationPackages(stagingRepoId: String, status: String? = nil) async throws -> [CurationPackage] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_curation_packages(
+            query: .init(staging_repo_id: stagingRepoId, status: status, limit: 200)
+        )
+        let data = try response.ok.body.json
+        return data.map { CurationPackage(from: $0) }
+    }
+
+    /// Fetch a single curation package (GET /api/v1/curation/packages/{id}).
+    func getCurationPackage(id: String) async throws -> CurationPackage {
+        let client = await sdkClientInstance()
+        let response = try await client.get_curation_package(path: .init(id: id))
+        let data = try response.ok.body.json
+        return CurationPackage(from: data)
+    }
+
+    /// Approve a package (POST /api/v1/curation/packages/{id}/approve).
+    func approveCurationPackage(id: String) async throws -> CurationPackage {
+        let client = await sdkClientInstance()
+        let response = try await client.approve_package(path: .init(id: id))
+        let data = try response.ok.body.json
+        return CurationPackage(from: data)
+    }
+
+    /// Block a package (POST /api/v1/curation/packages/{id}/block).
+    func blockCurationPackage(id: String) async throws -> CurationPackage {
+        let client = await sdkClientInstance()
+        let response = try await client.block_package(path: .init(id: id))
+        let data = try response.ok.body.json
+        return CurationPackage(from: data)
+    }
+
+    /// Curation stats for a staging repository (GET /api/v1/curation/stats).
+    func getCurationStats(stagingRepoId: String) async throws -> CurationStats {
+        let client = await sdkClientInstance()
+        let response = try await client.stats(query: .init(staging_repo_id: stagingRepoId))
+        let data = try response.ok.body.json
+        return CurationStats(from: data)
+    }
+
     // MARK: Plugins (Integration: GET /api/v1/plugins/{id})
 
     /// Fetch a single plugin's current state by id.
