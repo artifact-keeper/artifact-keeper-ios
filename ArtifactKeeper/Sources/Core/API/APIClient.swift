@@ -541,6 +541,40 @@ actor APIClient {
         try await requestVoid("/api/v1/plugins/\(id)", method: "DELETE")
     }
 
+    // MARK: Format Handlers (Integration, SDK-backed)
+
+    /// List all registered format handlers (GET /api/v1/formats).
+    func listFormatHandlers() async throws -> [FormatHandler] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_format_handlers()
+        let data = try response.ok.body.json
+        return data.map { FormatHandler(from: $0) }
+    }
+
+    /// Fetch a single format handler by key (GET /api/v1/formats/{format_key}).
+    func getFormatHandler(formatKey: String) async throws -> FormatHandler {
+        let client = await sdkClientInstance()
+        let response = try await client.get_format_handler(path: .init(format_key: formatKey))
+        let data = try response.ok.body.json
+        return FormatHandler(from: data)
+    }
+
+    /// Enable a format handler (POST /api/v1/formats/{format_key}/enable).
+    func enableFormatHandler(formatKey: String) async throws -> FormatHandler {
+        let client = await sdkClientInstance()
+        let response = try await client.enable_format_handler(path: .init(format_key: formatKey))
+        let data = try response.ok.body.json
+        return FormatHandler(from: data)
+    }
+
+    /// Disable a format handler (POST /api/v1/formats/{format_key}/disable).
+    func disableFormatHandler(formatKey: String) async throws -> FormatHandler {
+        let client = await sdkClientInstance()
+        let response = try await client.disable_format_handler(path: .init(format_key: formatKey))
+        let data = try response.ok.body.json
+        return FormatHandler(from: data)
+    }
+
     // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
 
     /// Fetch the repository tree at a given path. Pass an empty path for the root.
