@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PeersView: View {
     @State private var peers: [Peer] = []
+    @State private var identity: PeerIdentity?
     @State private var isLoading = true
     @State private var errorMessage: String?
     @State private var showingRegisterPeer = false
@@ -30,13 +31,28 @@ struct PeersView: View {
                         Spacer()
                     } else {
                         List {
-                            ForEach(peers) { peer in
-                                PeerRow(peer: peer)
+                            if let identity {
+                                Section("This Instance") {
+                                    LabeledContent("Name", value: identity.name)
+                                    LabeledContent("Peer ID", value: identity.peerId)
+                                    LabeledContent("Endpoint", value: identity.endpointUrl)
+                                        .lineLimit(1)
+                                }
                             }
-                            .onDelete { indexSet in
-                                Task {
-                                    for index in indexSet {
-                                        await deletePeer(peers[index])
+
+                            Section("Peers") {
+                                ForEach(peers) { peer in
+                                    NavigationLink {
+                                        PeerDetailView(listPeer: peer)
+                                    } label: {
+                                        PeerRow(peer: peer)
+                                    }
+                                }
+                                .onDelete { indexSet in
+                                    Task {
+                                        for index in indexSet {
+                                            await deletePeer(peers[index])
+                                        }
                                     }
                                 }
                             }
@@ -90,6 +106,8 @@ struct PeersView: View {
                 errorMessage = "Could not load peers. This feature may not be available on your server."
             }
         }
+        // Identity is best-effort: a failure here should not blank the peer list.
+        identity = try? await apiClient.getPeerIdentity()
         isLoading = false
     }
 
@@ -253,5 +271,112 @@ struct RegisterPeerView: View {
             errorMessage = "Failed to register peer: \(error.localizedDescription)"
         }
         isSaving = false
+    }
+}
+
+// MARK: - Peer Detail
+
+/// Peer detail with a freshly fetched record (GET /api/v1/peers/{id}) and the
+/// peer's connection list (GET /api/v1/peers/{id}/connections).
+struct PeerDetailView: View {
+    let listPeer: Peer
+
+    @State private var fetched: Peer?
+    @State private var connections: [PeerConnection] = []
+    @State private var loadError: String?
+
+    private let apiClient = APIClient.shared
+
+    /// Freshest peer: the by-id fetch if it succeeded, else the list value.
+    private var peer: Peer { fetched ?? listPeer }
+
+    var body: some View {
+        List {
+            if let loadError {
+                Section {
+                    Label(loadError, systemImage: "exclamationmark.triangle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Section("Peer") {
+                LabeledContent("Name", value: peer.name)
+                LabeledContent("Status", value: peer.status.capitalized)
+                LabeledContent("Endpoint", value: peer.endpointUrl).lineLimit(1)
+                if let region = peer.region, !region.isEmpty {
+                    LabeledContent("Region", value: region)
+                }
+                LabeledContent("Cache", value: "\(Int(peer.cacheUsagePercent))% used")
+            }
+
+            Section("Lifecycle") {
+                if let heartbeat = peer.lastHeartbeatAt, !heartbeat.isEmpty {
+                    LabeledContent("Last Heartbeat", value: heartbeat)
+                }
+                if let sync = peer.lastSyncAt, !sync.isEmpty {
+                    LabeledContent("Last Sync", value: sync)
+                }
+                LabeledContent("Registered", value: peer.createdAt)
+            }
+
+            Section("Connections (\(connections.count))") {
+                if connections.isEmpty {
+                    Text("No connections recorded.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(connections) { connection in
+                        PeerConnectionRow(connection: connection)
+                    }
+                }
+            }
+        }
+        .navigationTitle(peer.name)
+        #if os(iOS)
+        .navigationBarTitleDisplayMode(.inline)
+        #endif
+        .task { await load() }
+        .refreshable { await load() }
+    }
+
+    private func load() async {
+        do {
+            fetched = try await apiClient.getPeer(id: listPeer.id)
+            loadError = nil
+        } catch {
+            loadError = "Showing cached details; could not refresh: \(error.localizedDescription)"
+        }
+        // Connections are best-effort and shown separately from the peer record.
+        connections = (try? await apiClient.listPeerConnections(id: listPeer.id)) ?? []
+    }
+}
+
+struct PeerConnectionRow: View {
+    let connection: PeerConnection
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(connection.targetPeerId)
+                    .font(.subheadline.weight(.medium))
+                    .lineLimit(1)
+                Spacer()
+                Text(connection.status.capitalized)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            HStack(spacing: 12) {
+                if let latency = connection.latencyMs {
+                    Label("\(latency) ms", systemImage: "timer")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                Label("\(connection.sharedArtifactsCount) artifacts", systemImage: "shippingbox")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
     }
 }

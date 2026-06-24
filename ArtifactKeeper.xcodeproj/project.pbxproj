@@ -159,6 +159,7 @@
 		B27985BB328A3F0ACCEF2EB5 /* LicensePoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAF919B4CECF39C3787DD94 /* LicensePoliciesView.swift */; };
 		B2BDDB70803CC764E1147668 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
 		B42C3893B88FDD3E8D354DB5 /* DtProjectsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07736CEE9959BC4566162E12 /* DtProjectsView.swift */; };
+		B4D132E4714A2FD2223C12BA /* PeerPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1841ACC5D23588C4D5941ED3 /* PeerPathTests.swift */; };
 		B4D6FB0A72BFCD4B4251E2E2 /* ArtifactsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E44194ACD18BA49B67189B /* ArtifactsSectionView.swift */; };
 		B516A827540A1DDE26F2B9BA /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = F1F1A51E9222F8A1C1F5C1EB /* Dependencies */; };
 		B535272FD68109CDCE673AFC /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = A0A50A1985B1B97F68A946DA /* Alamofire */; };
@@ -217,6 +218,7 @@
 		F37EAD999EEE9694758BBE8D /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A15E45652EBB4DD2505127F /* WelcomeView.swift */; };
 		F5CE55686817D88933AC4AC1 /* AuthManagerExtendedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */; };
 		F790A545605AFA178BEEA506 /* WebhooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8063DEF3B0228C26496797B7 /* WebhooksView.swift */; };
+		F7AA91D695276F372E1B9AAD /* PeerPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1841ACC5D23588C4D5941ED3 /* PeerPathTests.swift */; };
 		FABB8132DF5CEA339A9B769A /* APIPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */; };
 		FB1F242DC31148C08DA16397 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
 		FBB9BAC6869454925F45B080 /* ArtifactDetailTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A41A1778E2034F039852708 /* ArtifactDetailTests.swift */; };
@@ -251,6 +253,7 @@
 		113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupInstructionsView.swift; sourceTree = "<group>"; };
 		1464BFA481535D3C3B4F4CC5 /* GroupsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupsView.swift; sourceTree = "<group>"; };
 		155377690C14964BAFBAF481 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		1841ACC5D23588C4D5941ED3 /* PeerPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeerPathTests.swift; sourceTree = "<group>"; };
 		1901D688CCAD3DE71AA681AC /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
 		1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CveLicensePathTests.swift; sourceTree = "<group>"; };
 		1DB4EEF15843269173A9B772 /* TOTPVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPVerificationView.swift; sourceTree = "<group>"; };
@@ -429,6 +432,7 @@
 				888D1A2EB554E8903CED4CF3 /* DashboardViewTests.swift */,
 				AAB8A8A8F6AD6C323EAF2022 /* KeychainManagerTests.swift */,
 				942CFADFFB28FA592F32CAB1 /* ModelTests.swift */,
+				1841ACC5D23588C4D5941ED3 /* PeerPathTests.swift */,
 				4147C420ECCBB9137917722C /* PluginPathTests.swift */,
 				8211F9D04C3BF74AB42324D9 /* QualityMappingTests.swift */,
 				435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */,
@@ -873,6 +877,7 @@
 				99C3358F603E8600CA038F75 /* DashboardViewTests.swift in Sources */,
 				ECE469E91BEE0E35EB258F98 /* KeychainManagerTests.swift in Sources */,
 				FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */,
+				B4D132E4714A2FD2223C12BA /* PeerPathTests.swift in Sources */,
 				293314A1B0346F707F5B3CE4 /* PluginPathTests.swift in Sources */,
 				E15A1D5EA6FDA4D8DAF42CF7 /* QualityMappingTests.swift in Sources */,
 				1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */,
@@ -989,6 +994,7 @@
 				3366AEE087831CF15004691F /* DashboardViewTests.swift in Sources */,
 				6D8FA2A9093D692547570860 /* KeychainManagerTests.swift in Sources */,
 				83D01D48B7B7C3739E1344B3 /* ModelTests.swift in Sources */,
+				F7AA91D695276F372E1B9AAD /* PeerPathTests.swift in Sources */,
 				B18AAE17086834FBB57455D9 /* PluginPathTests.swift in Sources */,
 				868F52C07277B589BE29205D /* QualityMappingTests.swift in Sources */,
 				4BA74F65F09BD28BC25CC705 /* RepositoryTreeTests.swift in Sources */,

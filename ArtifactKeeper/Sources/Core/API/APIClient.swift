@@ -530,6 +530,23 @@ actor APIClient {
         try await request("/api/v1/plugins/\(id)")
     }
 
+    // MARK: Peers / Federation (Integration)
+
+    /// This instance's own federation identity (GET /api/v1/peers/identity).
+    func getPeerIdentity() async throws -> PeerIdentity {
+        try await request("/api/v1/peers/identity")
+    }
+
+    /// Fetch a single peer by id (GET /api/v1/peers/{id}).
+    func getPeer(id: String) async throws -> Peer {
+        try await request("/api/v1/peers/\(id)")
+    }
+
+    /// List a peer's known connections (GET /api/v1/peers/{id}/connections).
+    func listPeerConnections(id: String) async throws -> [PeerConnection] {
+        try await request("/api/v1/peers/\(id)/connections")
+    }
+
     // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
 
     /// Fetch the repository tree at a given path. Pass an empty path for the root.

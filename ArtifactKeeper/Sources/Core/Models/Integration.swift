@@ -34,6 +34,19 @@ struct PeerListResponse: Codable, Sendable {
     let total: Int
 }
 
+/// This instance's own federation identity (GET /api/v1/peers/identity).
+struct PeerIdentity: Codable, Sendable {
+    let peerId: String
+    let name: String
+    let endpointUrl: String
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case peerId = "peer_id"
+        case endpointUrl = "endpoint_url"
+    }
+}
+
 struct PeerConnection: Codable, Identifiable, Sendable {
     let id: String
     let targetPeerId: String
