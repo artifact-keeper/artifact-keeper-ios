@@ -78,6 +78,39 @@ extension RepoHealth {
     }
 }
 
+extension CheckSummary {
+    init(from sdk: Components.Schemas.CheckSummary) {
+        self.init(
+            checkType: sdk.check_type,
+            status: sdk.status,
+            issuesCount: Int(sdk.issues_count),
+            passed: sdk.passed,
+            score: sdk.score.map(Int.init),
+            completedAt: sdk.completed_at.map(SecurityMapping.isoString)
+        )
+    }
+}
+
+extension ArtifactHealth {
+    init(from sdk: Components.Schemas.ArtifactHealthResponse) {
+        self.init(
+            artifactId: sdk.artifact_id,
+            healthScore: Int(sdk.health_score),
+            healthGrade: sdk.health_grade,
+            totalIssues: Int(sdk.total_issues),
+            criticalIssues: Int(sdk.critical_issues),
+            checksPassed: Int(sdk.checks_passed),
+            checksTotal: Int(sdk.checks_total),
+            securityScore: sdk.security_score.map(Int.init),
+            qualityScore: sdk.quality_score.map(Int.init),
+            metadataScore: sdk.metadata_score.map(Int.init),
+            licenseScore: sdk.license_score.map(Int.init),
+            lastCheckedAt: sdk.last_checked_at.map(SecurityMapping.isoString),
+            checks: sdk.checks.map { CheckSummary(from: $0) }
+        )
+    }
+}
+
 extension HealthDashboard {
     init(from sdk: Components.Schemas.HealthDashboardResponse) {
         self.init(

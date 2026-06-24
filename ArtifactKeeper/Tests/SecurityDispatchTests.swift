@@ -252,4 +252,28 @@ struct SecurityDispatchTests {
         #expect(pathComponent(rec?.path) == "/api/v1/repositories/maven-prod/security/scans")
         #expect(rec?.operationID == "list_repo_scans")
     }
+
+    // MARK: - Quality health drilldowns
+
+    @Test func getRepoHealthHitsRepoHealthPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.getRepoHealth(repoKey: "maven-prod")
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/health/repositories/maven-prod")
+        #expect(rec?.operationID == "get_repo_health")
+    }
+
+    @Test func getArtifactHealthHitsArtifactHealthPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.getArtifactHealth(artifactId: "art-88")
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/health/artifacts/art-88")
+        #expect(rec?.operationID == "get_artifact_health")
+    }
 }

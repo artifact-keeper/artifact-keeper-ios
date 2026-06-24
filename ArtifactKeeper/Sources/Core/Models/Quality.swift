@@ -68,6 +68,36 @@ struct RepoHealth: Codable, Identifiable, Sendable, Equatable {
     var id: String { repositoryId }
 }
 
+/// A single quality check summary inside an artifact health report.
+struct CheckSummary: Codable, Identifiable, Sendable, Equatable {
+    let checkType: String
+    let status: String
+    let issuesCount: Int
+    let passed: Bool?
+    let score: Int?
+    let completedAt: String?
+
+    // Checks have no server id; the check type is unique within a report.
+    var id: String { checkType }
+}
+
+/// Per-artifact health report (GET /api/v1/quality/health/artifacts/{artifact_id}).
+struct ArtifactHealth: Sendable, Equatable {
+    let artifactId: String
+    let healthScore: Int
+    let healthGrade: String
+    let totalIssues: Int
+    let criticalIssues: Int
+    let checksPassed: Int
+    let checksTotal: Int
+    let securityScore: Int?
+    let qualityScore: Int?
+    let metadataScore: Int?
+    let licenseScore: Int?
+    let lastCheckedAt: String?
+    let checks: [CheckSummary]
+}
+
 /// The quality health dashboard (GET /api/v1/quality/health/dashboard).
 struct HealthDashboard: Sendable, Equatable {
     let totalRepositories: Int

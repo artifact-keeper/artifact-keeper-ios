@@ -825,6 +825,22 @@ actor APIClient {
         return HealthDashboard(from: data)
     }
 
+    /// Health for a single repository (GET /api/v1/quality/health/repositories/{key}).
+    func getRepoHealth(repoKey: String) async throws -> RepoHealth {
+        let client = await sdkClientInstance()
+        let response = try await client.get_repo_health(path: .init(key: repoKey))
+        let data = try response.ok.body.json
+        return RepoHealth(from: data)
+    }
+
+    /// Health for a single artifact (GET /api/v1/quality/health/artifacts/{artifact_id}).
+    func getArtifactHealth(artifactId: String) async throws -> ArtifactHealth {
+        let client = await sdkClientInstance()
+        let response = try await client.get_artifact_health(path: .init(artifact_id: artifactId))
+        let data = try response.ok.body.json
+        return ArtifactHealth(from: data)
+    }
+
     // MARK: SBOM (SDK-backed)
 
     /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).
