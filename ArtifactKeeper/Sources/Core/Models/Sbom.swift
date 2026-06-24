@@ -282,6 +282,32 @@ struct CheckLicenseComplianceRequest: Encodable {
     }
 }
 
+/// Body for POST /api/v1/sbom/cve/status/by-artifact/{artifact_id}/by-cve/{cve_id}.
+/// Matches the v1.2.1 UpdateCveStatusRequest schema: required status, optional reason.
+struct UpdateCveStatusRequest: Encodable {
+    let status: String
+    let reason: String?
+}
+
+/// UI affordances for the existing CveStatus wire enum: the picker options the
+/// operator can set on a history record, plus human labels. The raw values are
+/// the wire values the backend accepts for UpdateCveStatusRequest.status.
+extension CveStatus: CaseIterable, Identifiable {
+    static var allCases: [CveStatus] { [.open, .acknowledged, .falsePositive, .fixed] }
+
+    var id: String { rawValue }
+
+    /// Human label for the picker and status badges.
+    var label: String {
+        switch self {
+        case .open: return "Open"
+        case .acknowledged: return "Acknowledged"
+        case .falsePositive: return "False positive"
+        case .fixed: return "Fixed"
+        }
+    }
+}
+
 // MARK: - AnyCodable helper for dynamic JSON
 
 struct AnyCodable: Codable, @unchecked Sendable {

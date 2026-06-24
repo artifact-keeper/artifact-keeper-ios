@@ -94,7 +94,11 @@ struct CveHistoryView: View {
         } else {
             List {
                 ForEach(entries) { entry in
-                    CveHistoryEntryRow(entry: entry)
+                    NavigationLink {
+                        CveHistoryDetailView(entryId: entry.id)
+                    } label: {
+                        CveHistoryEntryRow(entry: entry)
+                    }
                 }
             }
             .listStyle(.plain)

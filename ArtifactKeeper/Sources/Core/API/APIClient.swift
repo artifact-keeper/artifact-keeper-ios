@@ -892,6 +892,24 @@ actor APIClient {
         return try await request("/api/v1/sbom/cve/history/\(encoded)")
     }
 
+    /// Set the triage status of a CVE on an artifact, returning the updated record
+    /// (POST /api/v1/sbom/cve/status/by-artifact/{artifact_id}/by-cve/{cve_id}).
+    func updateCveStatusByArtifactCve(
+        artifactId: String,
+        cveId: String,
+        status: String,
+        reason: String? = nil
+    ) async throws -> CveHistoryEntry {
+        let encodedArtifact = artifactId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? artifactId
+        let encodedCve = cveId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? cveId
+        let body = UpdateCveStatusRequest(status: status, reason: reason)
+        return try await request(
+            "/api/v1/sbom/cve/status/by-artifact/\(encodedArtifact)/by-cve/\(encodedCve)",
+            method: "POST",
+            body: body
+        )
+    }
+
     /// Check a set of licenses against policy (POST /api/v1/sbom/check-compliance).
     func checkLicenseCompliance(licenses: [String], repositoryId: String? = nil) async throws -> LicenseCheckResult {
         let body = CheckLicenseComplianceRequest(licenses: licenses, repositoryId: repositoryId)
