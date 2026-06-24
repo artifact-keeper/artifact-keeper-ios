@@ -921,6 +921,46 @@ actor APIClient {
         )
     }
 
+    // MARK: Repository Tokens (raw requests)
+
+    /// List a repository's access tokens (GET /api/v1/repositories/{key}/tokens).
+    func listRepoTokens(repoKey: String) async throws -> [RepoToken] {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let response: RepoTokenListResponse = try await request("/api/v1/repositories/\(encoded)/tokens")
+        return response.items
+    }
+
+    /// Fetch a single repository token (GET /api/v1/repositories/{key}/tokens/{token_id}).
+    func getRepoToken(repoKey: String, tokenId: String) async throws -> RepoToken {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        return try await request("/api/v1/repositories/\(encoded)/tokens/\(tokenId)")
+    }
+
+    /// Create a repository token (POST /api/v1/repositories/{key}/tokens). The
+    /// returned secret is only available in this response.
+    func createRepoToken(
+        repoKey: String,
+        name: String,
+        scopes: [String],
+        description: String? = nil,
+        expiresInDays: Int? = nil
+    ) async throws -> CreateRepoTokenResponse {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let body = CreateRepoTokenRequest(
+            name: name,
+            scopes: scopes,
+            description: description,
+            expiresInDays: expiresInDays
+        )
+        return try await request("/api/v1/repositories/\(encoded)/tokens", method: "POST", body: body)
+    }
+
+    /// Revoke a repository token (DELETE /api/v1/repositories/{key}/tokens/{token_id}).
+    func revokeRepoToken(repoKey: String, tokenId: String) async throws {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        try await requestVoid("/api/v1/repositories/\(encoded)/tokens/\(tokenId)", method: "DELETE")
+    }
+
     // MARK: - Date Formatting Helper
 
     nonisolated static func formatDate(_ date: Foundation.Date) -> String {
