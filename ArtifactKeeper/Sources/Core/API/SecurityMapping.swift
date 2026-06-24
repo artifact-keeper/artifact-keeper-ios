@@ -160,6 +160,22 @@ extension TriggerScanResult {
     }
 }
 
+extension ScanConfig {
+    init(from sdk: Components.Schemas.ScanConfigResponse) {
+        self.init(
+            id: sdk.id,
+            repositoryId: sdk.repository_id,
+            scanEnabled: sdk.scan_enabled,
+            scanOnUpload: sdk.scan_on_upload,
+            scanOnProxy: sdk.scan_on_proxy,
+            blockOnPolicyViolation: sdk.block_on_policy_violation,
+            severityThreshold: sdk.severity_threshold,
+            createdAt: SecurityMapping.isoString(sdk.created_at),
+            updatedAt: SecurityMapping.isoString(sdk.updated_at)
+        )
+    }
+}
+
 // MARK: - Date Formatting
 
 enum SecurityMapping {

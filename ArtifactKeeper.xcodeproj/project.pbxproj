@@ -31,6 +31,7 @@
 		189014CE0807785BF1C97AF6 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
 		1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */; };
 		1AB249F434755BECF4124CA8 /* SetupInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */; };
+		1CC2147E6995CB8C42B11A2A /* ScanConfigsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */; };
 		1EB081D63A5092425E75A0B0 /* RepositoryDetailTabbedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FEF3A0FA55ECC63DDC8899F /* RepositoryDetailTabbedView.swift */; };
 		2052B7B0961EC927404CD8F1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8267620B852D7914EAD83DAE /* SettingsView.swift */; };
 		21792E2823728B81B6E3E621 /* RepositoryTreeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 517D78FD253D2202880EF013 /* RepositoryTreeView.swift */; };
@@ -133,6 +134,7 @@
 		9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
 		9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */; };
 		A1A538DE905D6AF031923CF5 /* AuthManagerExtendedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */; };
+		A563ADC6B11F45AB50692ABA /* ScanConfigsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */; };
 		A6FE919357227C480B8571C0 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
 		ABC754B5DC49717B25A912DB /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59705D3B5F2000ACABB8A48 /* Auth.swift */; };
 		AD2DBF5F7973BE47E351CC36 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
@@ -294,6 +296,7 @@
 		AACFAEE53DF20945E710A82E /* SbomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SbomView.swift; sourceTree = "<group>"; };
 		AC7BD8467BED7C0A6ECE6DBE /* SecurityMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityMapping.swift; sourceTree = "<group>"; };
 		ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoSecurityConfig.swift; sourceTree = "<group>"; };
+		AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanConfigsView.swift; sourceTree = "<group>"; };
 		B1164C99171DC47A99F71C0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B6F9DDB4F8B15C1FB99A2843 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		BD2E5BB60BE578603D5B6925 /* BuildsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildsView.swift; sourceTree = "<group>"; };
@@ -434,6 +437,7 @@
 				5DAF919B4CECF39C3787DD94 /* LicensePoliciesView.swift */,
 				387B1308AF0F0D5F5C768F13 /* PoliciesView.swift */,
 				AACFAEE53DF20945E710A82E /* SbomView.swift */,
+				AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */,
 				7351368D8EDB157E264ECBBC /* SecurityView.swift */,
 			);
 			path = Security;
@@ -906,6 +910,7 @@
 				D3653822D6C8332BC92D8642 /* SSOView.swift in Sources */,
 				B6A7958608DE308DD63F5435 /* Sbom.swift in Sources */,
 				7795B1C86E7E5530C0ECA6BE /* SbomView.swift in Sources */,
+				1CC2147E6995CB8C42B11A2A /* ScanConfigsView.swift in Sources */,
 				3D57CDAFE896BFB0BB441D87 /* SearchView.swift in Sources */,
 				0FAD280684B34F3ABB6306F5 /* Security.swift in Sources */,
 				EBCF23D7CB615A3242793594 /* SecurityMapping.swift in Sources */,
@@ -1013,6 +1018,7 @@
 				99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */,
 				596F4AA252F5DB25B76106B8 /* Sbom.swift in Sources */,
 				B85DD5AD52ECDF8AF03AD72F /* SbomView.swift in Sources */,
+				A563ADC6B11F45AB50692ABA /* ScanConfigsView.swift in Sources */,
 				098B007AFDBBB928C7FC45AB /* SearchView.swift in Sources */,
 				8F03693614D04D4C4BE9C332 /* Security.swift in Sources */,
 				1710D4535FE4A32357750C7D /* SecurityMapping.swift in Sources */,

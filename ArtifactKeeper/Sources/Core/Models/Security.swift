@@ -175,3 +175,30 @@ struct TriggerScanResult: Sendable, Equatable {
     let artifactsQueued: Int
     let message: String
 }
+
+// MARK: - Scan Configuration (1.2.1 ScanConfigResponse)
+
+/// Per-repository scan configuration returned by `GET /api/v1/security/configs`.
+struct ScanConfig: Codable, Identifiable, Sendable, Equatable {
+    let id: String
+    let repositoryId: String
+    let scanEnabled: Bool
+    let scanOnUpload: Bool
+    let scanOnProxy: Bool
+    let blockOnPolicyViolation: Bool
+    let severityThreshold: String
+    let createdAt: String
+    let updatedAt: String
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case repositoryId = "repository_id"
+        case scanEnabled = "scan_enabled"
+        case scanOnUpload = "scan_on_upload"
+        case scanOnProxy = "scan_on_proxy"
+        case blockOnPolicyViolation = "block_on_policy_violation"
+        case severityThreshold = "severity_threshold"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+    }
+}

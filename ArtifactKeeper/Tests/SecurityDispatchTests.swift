@@ -49,7 +49,7 @@ final class RecordingTransport: ClientTransport, @unchecked Sendable {
         switch operationID {
         case "list_artifact_scans", "list_findings":
             return #"{"items":[],"total":0}"#
-        case "get_sbom_components", "get_all_scores":
+        case "get_sbom_components", "get_all_scores", "list_scan_configs":
             return "[]"
         default:
             return "{}"
@@ -181,5 +181,16 @@ struct SecurityDispatchTests {
         #expect(rec?.method == "POST")
         #expect(pathComponent(rec?.path) == "/api/v1/security/scan")
         #expect(rec?.operationID == "trigger_scan")
+    }
+
+    @Test func listScanConfigsHitsConfigsPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try await api.listScanConfigs()
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/security/configs")
+        #expect(rec?.operationID == "list_scan_configs")
     }
 }
