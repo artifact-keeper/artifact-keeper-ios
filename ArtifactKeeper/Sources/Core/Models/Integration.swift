@@ -180,3 +180,25 @@ struct Plugin: Codable, Identifiable, Sendable {
 struct PluginListResponse: Codable, Sendable {
     let items: [Plugin]
 }
+
+/// Body for POST /api/v1/plugins/install/git.
+struct InstallFromGitRequest: Encodable {
+    let url: String
+    /// Optional git ref (tag, branch, or commit).
+    let ref: String?
+}
+
+/// Response from a plugin install (POST /api/v1/plugins/install/git).
+struct PluginInstallResult: Codable, Sendable {
+    let pluginId: String
+    let name: String
+    let version: String
+    let formatKey: String
+    let message: String
+
+    enum CodingKeys: String, CodingKey {
+        case name, version, message
+        case pluginId = "plugin_id"
+        case formatKey = "format_key"
+    }
+}

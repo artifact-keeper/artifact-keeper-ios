@@ -530,6 +530,17 @@ actor APIClient {
         try await request("/api/v1/plugins/\(id)")
     }
 
+    /// Install a plugin from a Git repository (POST /api/v1/plugins/install/git).
+    func installPluginFromGit(url: String, ref: String? = nil) async throws -> PluginInstallResult {
+        let body = InstallFromGitRequest(url: url, ref: ref)
+        return try await request("/api/v1/plugins/install/git", method: "POST", body: body)
+    }
+
+    /// Uninstall a plugin (DELETE /api/v1/plugins/{id}).
+    func uninstallPlugin(id: String) async throws {
+        try await requestVoid("/api/v1/plugins/\(id)", method: "DELETE")
+    }
+
     // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
 
     /// Fetch the repository tree at a given path. Pass an empty path for the root.

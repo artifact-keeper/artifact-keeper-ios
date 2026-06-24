@@ -104,4 +104,42 @@ struct PluginPathTests {
 
         #expect(log.contains(method: "POST", path: "/api/v1/plugins/plg-1/reload"))
     }
+
+    // The two tests below drive the real production methods (not a hand-built
+    // request) so the path/method assertions guard the actual install/uninstall
+    // call sites used by PluginsView.
+
+    @Test func installFromGitHitsGitInstallPath() async throws {
+        let mock = MockSession(baseURL: "https://test-api.example.com")
+        let log = PluginCallLog()
+        mock.handler = { request in
+            log.add(request.httpMethod ?? "", request.url!.path)
+            return pluginOk(request.url!, """
+            {"plugin_id":"plg-9","name":"Unity Format","version":"1.2.0",
+             "format_key":"unity","message":"installed"}
+            """)
+        }
+
+        let result = try await mock.client.installPluginFromGit(
+            url: "https://github.com/example/unity-plugin.git",
+            ref: "v1.2.0"
+        )
+
+        #expect(log.contains(method: "POST", path: "/api/v1/plugins/install/git"))
+        #expect(result.pluginId == "plg-9")
+        #expect(result.formatKey == "unity")
+    }
+
+    @Test func uninstallPluginHitsPluginByIdPath() async throws {
+        let mock = MockSession(baseURL: "https://test-api.example.com")
+        let log = PluginCallLog()
+        mock.handler = { request in
+            log.add(request.httpMethod ?? "", request.url!.path)
+            return pluginOk(request.url!, "")
+        }
+
+        try await mock.client.uninstallPlugin(id: "plg-7")
+
+        #expect(log.contains(method: "DELETE", path: "/api/v1/plugins/plg-7"))
+    }
 }
