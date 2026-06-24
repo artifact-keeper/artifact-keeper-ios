@@ -541,6 +541,56 @@ actor APIClient {
         try await requestVoid("/api/v1/plugins/\(id)", method: "DELETE")
     }
 
+    // MARK: Migrations (Integration, SDK-backed)
+
+    /// List migration jobs (GET /api/v1/migrations).
+    func listMigrations() async throws -> [MigrationJob] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_migrations()
+        let data = try response.ok.body.json
+        return data.map { MigrationJob(from: $0) }
+    }
+
+    /// Fetch a single migration job (GET /api/v1/migrations/{id}).
+    func getMigration(id: String) async throws -> MigrationJob {
+        let client = await sdkClientInstance()
+        let response = try await client.get_migration(path: .init(id: id))
+        let data = try response.ok.body.json
+        return MigrationJob(from: data)
+    }
+
+    /// Start a migration job (POST /api/v1/migrations/{id}/start).
+    func startMigration(id: String) async throws -> MigrationJob {
+        let client = await sdkClientInstance()
+        let response = try await client.start_migration(path: .init(id: id))
+        let data = try response.ok.body.json
+        return MigrationJob(from: data)
+    }
+
+    /// Pause a running migration job (POST /api/v1/migrations/{id}/pause).
+    func pauseMigration(id: String) async throws -> MigrationJob {
+        let client = await sdkClientInstance()
+        let response = try await client.pause_migration(path: .init(id: id))
+        let data = try response.ok.body.json
+        return MigrationJob(from: data)
+    }
+
+    /// Resume a paused migration job (POST /api/v1/migrations/{id}/resume).
+    func resumeMigration(id: String) async throws -> MigrationJob {
+        let client = await sdkClientInstance()
+        let response = try await client.resume_migration(path: .init(id: id))
+        let data = try response.ok.body.json
+        return MigrationJob(from: data)
+    }
+
+    /// Cancel a migration job (POST /api/v1/migrations/{id}/cancel).
+    func cancelMigration(id: String) async throws -> MigrationJob {
+        let client = await sdkClientInstance()
+        let response = try await client.cancel_migration(path: .init(id: id))
+        let data = try response.ok.body.json
+        return MigrationJob(from: data)
+    }
+
     // MARK: Repository Tree Browse (1.2.1: GET /api/v1/tree)
 
     /// Fetch the repository tree at a given path. Pass an empty path for the root.

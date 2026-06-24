@@ -11,6 +11,7 @@ struct IntegrationSectionView: View {
                     Text("Replication").tag("replication")
                     Text("Webhooks").tag("webhooks")
                     Text("Plugins").tag("plugins")
+                    Text("Migrations").tag("migrations")
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
@@ -28,6 +29,8 @@ struct IntegrationSectionView: View {
                         WebhooksView()
                     case "plugins":
                         PluginsView()
+                    case "migrations":
+                        MigrationsView()
                     default:
                         EmptyView()
                     }
