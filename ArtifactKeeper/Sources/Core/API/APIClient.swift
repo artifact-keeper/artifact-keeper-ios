@@ -722,6 +722,17 @@ actor APIClient {
         return data.items.map { ScanFinding(from: $0) }
     }
 
+    /// List scans for a single repository (GET /api/v1/repositories/{key}/security/scans).
+    func listRepoScans(repoKey: String) async throws -> [ScanResult] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_repo_scans(
+            path: .init(key: repoKey),
+            query: .init(per_page: 100)
+        )
+        let data = try response.ok.body.json
+        return data.items.map { ScanResult(from: $0) }
+    }
+
     /// Security overview counts (GET /api/v1/security/dashboard).
     func getSecurityDashboard() async throws -> SecurityDashboard {
         let client = await sdkClientInstance()

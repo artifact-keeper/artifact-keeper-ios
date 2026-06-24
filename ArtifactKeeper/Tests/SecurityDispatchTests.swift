@@ -47,7 +47,7 @@ final class RecordingTransport: ClientTransport, @unchecked Sendable {
     /// decode failure does not affect the path/method assertions (callers use `try?`).
     private static func cannedBody(for operationID: String) -> String {
         switch operationID {
-        case "list_artifact_scans", "list_findings":
+        case "list_artifact_scans", "list_findings", "list_repo_scans":
             return #"{"items":[],"total":0}"#
         case "get_sbom_components", "get_all_scores", "list_scan_configs", "list_gates":
             return "[]"
@@ -238,5 +238,18 @@ struct SecurityDispatchTests {
         #expect(rec?.method == "GET")
         #expect(pathComponent(rec?.path) == "/api/v1/quality/health/dashboard")
         #expect(rec?.operationID == "get_health_dashboard")
+    }
+
+    // MARK: - Repository-scoped scans
+
+    @Test func listRepoScansHitsRepoScansPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try await api.listRepoScans(repoKey: "maven-prod")
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/repositories/maven-prod/security/scans")
+        #expect(rec?.operationID == "list_repo_scans")
     }
 }
