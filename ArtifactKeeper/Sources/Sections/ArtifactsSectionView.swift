@@ -16,6 +16,7 @@ struct ArtifactsSectionView: View {
                     Text("Packages").tag("packages")
                     Text("Builds").tag("builds")
                     Text("Search").tag("search")
+                    Text("Curation").tag("curation")
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
@@ -36,6 +37,8 @@ struct ArtifactsSectionView: View {
                         BuildsContentView()
                     case "search":
                         SearchContentView()
+                    case "curation":
+                        CurationView()
                     default:
                         EmptyView()
                     }
