@@ -777,6 +777,43 @@ actor APIClient {
         return data.map { ScanConfig(from: $0) }
     }
 
+    // MARK: Quality Gates & Health (SDK-backed)
+
+    /// List quality gate definitions (GET /api/v1/quality/gates).
+    func listQualityGates() async throws -> [QualityGate] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_gates()
+        let data = try response.ok.body.json
+        return data.map { QualityGate(from: $0) }
+    }
+
+    /// Fetch a single quality gate (GET /api/v1/quality/gates/{id}).
+    func getQualityGate(id: String) async throws -> QualityGate {
+        let client = await sdkClientInstance()
+        let response = try await client.get_gate(path: .init(id: id))
+        let data = try response.ok.body.json
+        return QualityGate(from: data)
+    }
+
+    /// Evaluate gates against an artifact (POST /api/v1/quality/gates/evaluate/{artifact_id}).
+    func evaluateGate(artifactId: String, repositoryId: String? = nil) async throws -> GateEvaluation {
+        let client = await sdkClientInstance()
+        let response = try await client.evaluate_gate(
+            path: .init(artifact_id: artifactId),
+            query: .init(repository_id: repositoryId)
+        )
+        let data = try response.ok.body.json
+        return GateEvaluation(from: data)
+    }
+
+    /// Fetch the quality health dashboard (GET /api/v1/quality/health/dashboard).
+    func getHealthDashboard() async throws -> HealthDashboard {
+        let client = await sdkClientInstance()
+        let response = try await client.get_health_dashboard()
+        let data = try response.ok.body.json
+        return HealthDashboard(from: data)
+    }
+
     // MARK: SBOM (SDK-backed)
 
     /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).
