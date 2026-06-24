@@ -49,7 +49,8 @@ final class RecordingTransport: ClientTransport, @unchecked Sendable {
         switch operationID {
         case "list_artifact_scans", "list_findings", "list_repo_scans":
             return #"{"items":[],"total":0}"#
-        case "get_sbom_components", "get_all_scores", "list_scan_configs", "list_gates":
+        case "get_sbom_components", "get_all_scores", "list_scan_configs", "list_gates",
+             "list_format_handlers":
             return "[]"
         default:
             return "{}"
