@@ -32,11 +32,21 @@ enum PolicyAction: String, Codable, CaseIterable, Sendable {
     }
 }
 
-enum CveStatus: String, Codable, Sendable {
+enum CveStatus: String, Codable, Sendable, CaseIterable {
     case open
     case fixed
     case acknowledged
     case falsePositive = "false_positive"
+
+    /// Human-readable label for pickers and badges.
+    var label: String {
+        switch self {
+        case .open: return "Open"
+        case .fixed: return "Fixed"
+        case .acknowledged: return "Acknowledged"
+        case .falsePositive: return "False Positive"
+        }
+    }
 }
 
 // MARK: - SBOM Document
@@ -280,6 +290,12 @@ struct CheckLicenseComplianceRequest: Encodable {
         case licenses
         case repositoryId = "repository_id"
     }
+}
+
+/// Body for POST /api/v1/sbom/cve/status/by-artifact/{artifact_id}/by-cve/{cve_id}.
+struct UpdateCveStatusRequest: Encodable {
+    let status: String
+    let reason: String?
 }
 
 // MARK: - AnyCodable helper for dynamic JSON

@@ -94,7 +94,11 @@ struct CveHistoryView: View {
         } else {
             List {
                 ForEach(entries) { entry in
-                    CveHistoryEntryRow(entry: entry)
+                    NavigationLink {
+                        CveHistoryDetailView(listEntry: entry)
+                    } label: {
+                        CveHistoryEntryRow(entry: entry)
+                    }
                 }
             }
             .listStyle(.plain)
@@ -128,7 +132,7 @@ private struct CveHistoryEntryRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 8) {
-                Link(entry.cveId, destination: URL(string: "https://nvd.nist.gov/vuln/detail/\(entry.cveId)")!)
+                Text(entry.cveId)
                     .font(.subheadline.weight(.semibold))
                 if let severity = entry.severity {
                     Text(severity.uppercased())

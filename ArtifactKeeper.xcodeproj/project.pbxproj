@@ -68,6 +68,7 @@
 		435F616F353CDF139BE4859E /* ArtifactDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F289613B7B5E1B85C3F9E832 /* ArtifactDetailView.swift */; };
 		43CD93CC42B93AE1999FA8B9 /* AuthManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F84212AD84A94810D2C23339 /* AuthManagerTests.swift */; };
 		45EF793A77005F62C4263D1E /* WebhookPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D532EA4136F5C5CF5548AE /* WebhookPathTests.swift */; };
+		463C7D9720887BA8C9449710 /* CveHistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B8C85944DE179E8F1750EF /* CveHistoryDetailView.swift */; };
 		475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
 		47DFA7F8B01E5A21906642A2 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F9DDB4F8B15C1FB99A2843 /* Package.swift */; };
 		4A9D08A77DCBD1954B4CB334 /* Quality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28281FCD705C9F9F4DF23AF7 /* Quality.swift */; };
@@ -112,6 +113,7 @@
 		78A16F7733A939DF72627EAA /* OperationsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6A94422BAD7B966077C0D9 /* OperationsSectionView.swift */; };
 		7926AACBA3FC6E057D5340FE /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C4236474392052DD29004F /* DashboardView.swift */; };
 		797AE3D1C3726C2AAA195E4D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3E2D65A21BA60C8957EE36 /* ContentView.swift */; };
+		7A98B50F5AFC9B536392E6AB /* CveHistoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B8C85944DE179E8F1750EF /* CveHistoryDetailView.swift */; };
 		7B983BDEC8F0E8548B9E7E5E /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
 		7C9F12D37482E704E49A3814 /* HealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AB45AA08A0DE4EA42BC041 /* HealthDashboardView.swift */; };
 		7D990B45FF3ECE2858347141 /* CveLicensePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */; };
@@ -353,6 +355,7 @@
 		F8761FACD0287EF99C0A1E50 /* UsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersView.swift; sourceTree = "<group>"; };
 		F8A6FF4BFFCF392A815F6E11 /* SecurityDispatchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityDispatchTests.swift; sourceTree = "<group>"; };
 		F9415E01C2D644848CDBB4D0 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		F9B8C85944DE179E8F1750EF /* CveHistoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CveHistoryDetailView.swift; sourceTree = "<group>"; };
 		FCA65CF7CCFDB01286A0C408 /* Integration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Integration.swift; sourceTree = "<group>"; };
 		FD29BEA4F2708262CE34F2E3 /* SecuritySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecuritySectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -461,6 +464,7 @@
 			isa = PBXGroup;
 			children = (
 				26F832901A43DC98CC288AA4 /* ArtifactSecurityView.swift */,
+				F9B8C85944DE179E8F1750EF /* CveHistoryDetailView.swift */,
 				50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */,
 				59106973EB99FD9424D44224 /* DtDashboardView.swift */,
 				07736CEE9959BC4566162E12 /* DtProjectsView.swift */,
@@ -911,6 +915,7 @@
 				EBBA4D16B78FD192D954563C /* BuildsView.swift in Sources */,
 				E4618623F8473A8661B7CC6F /* ChangePasswordView.swift in Sources */,
 				797AE3D1C3726C2AAA195E4D /* ContentView.swift in Sources */,
+				7A98B50F5AFC9B536392E6AB /* CveHistoryDetailView.swift in Sources */,
 				941BDA39A576A8603BE0E7F7 /* CveHistoryView.swift in Sources */,
 				7926AACBA3FC6E057D5340FE /* DashboardView.swift in Sources */,
 				0050E6CD740666B06CF4F1F6 /* DependencyTrack.swift in Sources */,
@@ -1028,6 +1033,7 @@
 				0AB4F8101A72D6C81B34D496 /* BuildsView.swift in Sources */,
 				238DBF144A2302C11DE50388 /* ChangePasswordView.swift in Sources */,
 				EA935E6E499F8A518FCBA8C3 /* ContentView.swift in Sources */,
+				463C7D9720887BA8C9449710 /* CveHistoryDetailView.swift in Sources */,
 				19F5B56288A694863407E57B /* CveHistoryView.swift in Sources */,
 				04E9EC2157EA947C8B9FE159 /* DashboardView.swift in Sources */,
 				D36FF1BE98A8940CC8E38C27 /* DependencyTrack.swift in Sources */,

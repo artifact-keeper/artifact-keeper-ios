@@ -87,6 +87,75 @@ struct CveLicensePathTests {
         #expect(methodBox.methods.contains("POST"))
         #expect(result.compliant)
     }
+
+    @Test func updateCveStatusTargetsByArtifactByCvePath() async throws {
+        let mock = MockSession(baseURL: "https://test-api.example.com")
+        let recorder = PathRecorder()
+        let methodBox = MethodRecorder()
+        let bodyBox = BodyRecorder()
+        mock.handler = { request in
+            recorder.record(request.url!.path)
+            methodBox.record(request.httpMethod ?? "")
+            if let stream = request.httpBodyStream {
+                bodyBox.record(BodyRecorder.readStream(stream))
+            } else if let body = request.httpBody {
+                bodyBox.record(String(data: body, encoding: .utf8) ?? "")
+            }
+            return self.okResponse(request.url!, """
+            {
+              "id": "hist-3",
+              "artifact_id": "art-1",
+              "cve_id": "CVE-2024-9999",
+              "first_detected_at": "2024-01-01T00:00:00Z",
+              "last_detected_at": "2024-01-02T00:00:00Z",
+              "status": "acknowledged",
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-02T00:00:00Z"
+            }
+            """)
+        }
+
+        let updated = try await mock.client.updateCveStatusByArtifactCve(
+            artifactId: "art-1",
+            cveId: "CVE-2024-9999",
+            status: "acknowledged",
+            reason: "investigated"
+        )
+
+        #expect(recorder.paths.contains("/api/v1/sbom/cve/status/by-artifact/art-1/by-cve/CVE-2024-9999"))
+        #expect(methodBox.methods.contains("POST"))
+        #expect(updated.status == "acknowledged")
+        #expect(bodyBox.bodies.first?.contains("acknowledged") == true)
+        #expect(bodyBox.bodies.first?.contains("investigated") == true)
+    }
+}
+
+/// Records request body strings across a sequence of requests.
+final class BodyRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _bodies: [String] = []
+    func record(_ body: String) {
+        lock.lock(); defer { lock.unlock() }
+        _bodies.append(body)
+    }
+    var bodies: [String] {
+        lock.lock(); defer { lock.unlock() }
+        return _bodies
+    }
+
+    static func readStream(_ stream: InputStream) -> String {
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        let size = 4096
+        var buffer = [UInt8](repeating: 0, count: size)
+        while stream.hasBytesAvailable {
+            let read = stream.read(&buffer, maxLength: size)
+            if read <= 0 { break }
+            data.append(buffer, count: read)
+        }
+        return String(data: data, encoding: .utf8) ?? ""
+    }
 }
 
 /// Records the HTTP methods seen across a sequence of requests.
