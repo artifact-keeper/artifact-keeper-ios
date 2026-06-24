@@ -769,6 +769,14 @@ actor APIClient {
         return TriggerScanResult(from: data)
     }
 
+    /// List per-repository scan configurations (GET /api/v1/security/configs).
+    func listScanConfigs() async throws -> [ScanConfig] {
+        let client = await sdkClientInstance()
+        let response = try await client.list_scan_configs()
+        let data = try response.ok.body.json
+        return data.map { ScanConfig(from: $0) }
+    }
+
     // MARK: SBOM (SDK-backed)
 
     /// Fetch the SBOM summary for an artifact (GET /api/v1/sbom/by-artifact/{artifact_id}).

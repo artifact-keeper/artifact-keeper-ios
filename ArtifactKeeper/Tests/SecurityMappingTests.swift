@@ -334,4 +334,34 @@ struct SecurityMappingTests {
         #expect(model.artifactsQueued == 7)
         #expect(model.message == "Queued 7 artifacts for scanning")
     }
+
+    // MARK: - ScanConfig
+
+    @Test func scanConfigMaps() {
+        let created = Date(timeIntervalSince1970: 1_700_000_000)
+        let updated = Date(timeIntervalSince1970: 1_700_086_400)
+        let sdk = Components.Schemas.ScanConfigResponse(
+            block_on_policy_violation: true,
+            created_at: created,
+            id: "cfg-1",
+            repository_id: "repo-9",
+            scan_enabled: true,
+            scan_on_proxy: false,
+            scan_on_upload: true,
+            severity_threshold: "high",
+            updated_at: updated
+        )
+
+        let model = ScanConfig(from: sdk)
+
+        #expect(model.id == "cfg-1")
+        #expect(model.repositoryId == "repo-9")
+        #expect(model.scanEnabled)
+        #expect(model.scanOnUpload)
+        #expect(!model.scanOnProxy)
+        #expect(model.blockOnPolicyViolation)
+        #expect(model.severityThreshold == "high")
+        #expect(model.createdAt == SecurityMapping.isoString(created))
+        #expect(model.updatedAt == SecurityMapping.isoString(updated))
+    }
 }
