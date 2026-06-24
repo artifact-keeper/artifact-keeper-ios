@@ -69,6 +69,52 @@ struct CveLicensePathTests {
         #expect(entry.cveId == "CVE-2024-1234")
     }
 
+    @Test func updateCveStatusTargetsByArtifactByCvePath() async throws {
+        let mock = MockSession(baseURL: "https://test-api.example.com")
+        let recorder = PathRecorder()
+        let methodBox = MethodRecorder()
+        let bodyBox = BodyRecorder()
+        mock.handler = { request in
+            recorder.record(request.url!.path)
+            methodBox.record(request.httpMethod ?? "")
+            // URLProtocol drops httpBody for streamed bodies; read httpBodyStream too.
+            if let data = request.httpBody {
+                bodyBox.record(data)
+            } else if let stream = request.httpBodyStream {
+                bodyBox.record(BodyRecorder.drain(stream))
+            }
+            // Echo a CveHistoryEntry with the new status so the method decodes.
+            return self.okResponse(request.url!, """
+            {
+              "id": "hist-9",
+              "artifact_id": "art-1",
+              "cve_id": "CVE-2024-1234",
+              "first_detected_at": "2024-01-01T00:00:00Z",
+              "last_detected_at": "2024-01-02T00:00:00Z",
+              "status": "acknowledged",
+              "created_at": "2024-01-01T00:00:00Z",
+              "updated_at": "2024-01-02T00:00:00Z"
+            }
+            """)
+        }
+
+        let updated = try await mock.client.updateCveStatusByArtifactCve(
+            artifactId: "art-1",
+            cveId: "CVE-2024-1234",
+            status: "acknowledged",
+            reason: "Mitigated by config"
+        )
+
+        #expect(recorder.paths.contains("/api/v1/sbom/cve/status/by-artifact/art-1/by-cve/CVE-2024-1234"))
+        #expect(methodBox.methods.contains("POST"))
+        #expect(updated.status == "acknowledged")
+
+        let sentBody = try #require(bodyBox.data)
+        let decoded = try JSONSerialization.jsonObject(with: sentBody) as? [String: Any]
+        #expect(decoded?["status"] as? String == "acknowledged")
+        #expect(decoded?["reason"] as? String == "Mitigated by config")
+    }
+
     @Test func checkLicenseComplianceTargetsCheckCompliancePath() async throws {
         let mock = MockSession(baseURL: "https://test-api.example.com")
         let recorder = PathRecorder()
@@ -100,5 +146,34 @@ final class MethodRecorder: @unchecked Sendable {
     var methods: [String] {
         lock.lock(); defer { lock.unlock() }
         return _methods
+    }
+}
+
+/// Captures the request body bytes a method sent, draining a stream if needed.
+final class BodyRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _data: Data?
+    func record(_ data: Data) {
+        lock.lock(); defer { lock.unlock() }
+        _data = data
+    }
+    var data: Data? {
+        lock.lock(); defer { lock.unlock() }
+        return _data
+    }
+
+    /// Reads an open or unopened input stream to completion.
+    static func drain(_ stream: InputStream) -> Data {
+        stream.open()
+        defer { stream.close() }
+        var result = Data()
+        let size = 4096
+        var buffer = [UInt8](repeating: 0, count: size)
+        while stream.hasBytesAvailable {
+            let read = stream.read(&buffer, maxLength: size)
+            if read <= 0 { break }
+            result.append(buffer, count: read)
+        }
+        return result
     }
 }
