@@ -49,7 +49,7 @@ final class RecordingTransport: ClientTransport, @unchecked Sendable {
         switch operationID {
         case "list_artifact_scans", "list_findings":
             return #"{"items":[],"total":0}"#
-        case "get_sbom_components", "get_all_scores", "list_scan_configs":
+        case "get_sbom_components", "get_all_scores", "list_scan_configs", "list_gates":
             return "[]"
         default:
             return "{}"
@@ -192,5 +192,51 @@ struct SecurityDispatchTests {
         #expect(rec?.method == "GET")
         #expect(pathComponent(rec?.path) == "/api/v1/security/configs")
         #expect(rec?.operationID == "list_scan_configs")
+    }
+
+    // MARK: - Quality Gates & Health cluster
+
+    @Test func listQualityGatesHitsGatesPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try await api.listQualityGates()
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/gates")
+        #expect(rec?.operationID == "list_gates")
+    }
+
+    @Test func getQualityGateHitsGateByIdPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.getQualityGate(id: "gate-3")
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/gates/gate-3")
+        #expect(rec?.operationID == "get_gate")
+    }
+
+    @Test func evaluateGateHitsEvaluatePath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.evaluateGate(artifactId: "art-42")
+
+        let rec = transport.last
+        #expect(rec?.method == "POST")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/gates/evaluate/art-42")
+        #expect(rec?.operationID == "evaluate_gate")
+    }
+
+    @Test func getHealthDashboardHitsDashboardPath() async throws {
+        let (api, transport) = await makeClient()
+
+        _ = try? await api.getHealthDashboard()
+
+        let rec = transport.last
+        #expect(rec?.method == "GET")
+        #expect(pathComponent(rec?.path) == "/api/v1/quality/health/dashboard")
+        #expect(rec?.operationID == "get_health_dashboard")
     }
 }

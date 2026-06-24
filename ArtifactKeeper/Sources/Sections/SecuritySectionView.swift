@@ -8,7 +8,7 @@ struct SecuritySectionView: View {
             VStack(spacing: 0) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
-                        ForEach(["dashboard", "scans", "configs", "policies", "licenses"], id: \.self) { tab in
+                        ForEach(["dashboard", "scans", "configs", "gates", "health", "policies", "licenses"], id: \.self) { tab in
                             Button {
                                 selectedTab = tab
                             } label: {
@@ -37,6 +37,10 @@ struct SecuritySectionView: View {
                         SecurityScansContentView()
                     case "configs":
                         ScanConfigsView()
+                    case "gates":
+                        QualityGatesView()
+                    case "health":
+                        HealthDashboardView()
                     case "policies":
                         PoliciesView()
                     case "licenses":
@@ -57,6 +61,8 @@ struct SecuritySectionView: View {
         case "dashboard": return "Dashboard"
         case "scans": return "Scans"
         case "configs": return "Configs"
+        case "gates": return "Gates"
+        case "health": return "Health"
         case "policies": return "Policies"
         case "licenses": return "Licenses"
         default: return tab.capitalized
