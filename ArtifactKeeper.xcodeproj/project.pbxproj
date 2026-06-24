@@ -29,6 +29,7 @@
 		1364B70A29503AEFDA4B3FB5 /* SetupInstructionsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F4BB814BCEC4170B1CA727 /* SetupInstructionsViewTests.swift */; };
 		145F250E51703B74FF907E4A /* PromotionHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECFEA6435742230170CF65E1 /* PromotionHistoryView.swift */; };
 		152D6AC4ACB54B60335AAA44 /* TelemetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4252913A5015A9448F73683 /* TelemetryView.swift */; };
+		16DDCEF3617ECD3C6605FB3F /* RepoLabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461E17565A0483EBEE63E814 /* RepoLabelsView.swift */; };
 		1710D4535FE4A32357750C7D /* SecurityMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7BD8467BED7C0A6ECE6DBE /* SecurityMapping.swift */; };
 		17488E98D524FCAB892BAAC5 /* ArtifactKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A1761272FDDB00A7D41243 /* ArtifactKeeperTests.swift */; };
 		189014CE0807785BF1C97AF6 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
@@ -59,6 +60,7 @@
 		363B3E9588A4895C999757BC /* PackagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C67E4A61ED479E094891F7 /* PackagesView.swift */; };
 		389A90FAD7E4FDA7B8464B92 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F73AE1952EFB3C338C7D0771 /* LoginView.swift */; };
 		38E52404189326A2143B485E /* ArtifactsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38E44194ACD18BA49B67189B /* ArtifactsSectionView.swift */; };
+		3923C69BA5A7368D86E06523 /* RepoLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7AD06C621AD49446B118B7 /* RepoLabel.swift */; };
 		397E6C46FAA21775D022DEA1 /* StagingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 970FC2E2E5418295A48A9B0E /* StagingListView.swift */; };
 		3D57CDAFE896BFB0BB441D87 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72273F4294E6BC2DA2D09609 /* SearchView.swift */; };
 		3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */; };
@@ -93,6 +95,7 @@
 		5EF2BD42EC4E974AAA06824C /* StagingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F60553EA149CE733245164B /* StagingDetailView.swift */; };
 		5F2BF946886E0871236036AC /* ArtifactKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D217BC8D6B2994A881C4E04E /* ArtifactKeeperApp.swift */; };
 		5F75063CEDB21ADEE50D095C /* AdminSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8A1E349FB6E5B428703A548 /* AdminSectionView.swift */; };
+		617879FAF4E26156FE1804C6 /* RepoLabelPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36100E84B8339F5231B27D /* RepoLabelPathTests.swift */; };
 		634179231AD90932820E8519 /* IntegrationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */; };
 		638F88CF707835320776D7D7 /* EditRepositorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0896BDB350847081B1C7EA3 /* EditRepositorySheet.swift */; };
 		63E7289229BE580CA9FC610C /* Artifact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F86EB93D00E4631A8F8F9C /* Artifact.swift */; };
@@ -130,6 +133,7 @@
 		85BE9083FC33581A5290D269 /* SecuritySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD29BEA4F2708262CE34F2E3 /* SecuritySectionView.swift */; };
 		868F52C07277B589BE29205D /* QualityMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8211F9D04C3BF74AB42324D9 /* QualityMappingTests.swift */; };
 		87DFC05DFE36A27A9C5769A6 /* EditRepositorySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0896BDB350847081B1C7EA3 /* EditRepositorySheet.swift */; };
+		8D060D67E74AD287380440D9 /* RepoLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7AD06C621AD49446B118B7 /* RepoLabel.swift */; };
 		8D14D0F52AF6E89139D3264B /* RepoUploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C1CC3C4956018E653EC486 /* RepoUploadView.swift */; };
 		8DA5C4E619111D09EF7AB2B2 /* PromotionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F34D6E71603103BC21FD8EA /* PromotionSheet.swift */; };
 		8E465463A8632687E3C4C423 /* Build.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90190CE35DA804C357A5FFDB /* Build.swift */; };
@@ -157,6 +161,7 @@
 		ABC754B5DC49717B25A912DB /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59705D3B5F2000ACABB8A48 /* Auth.swift */; };
 		AD2DBF5F7973BE47E351CC36 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
 		AEB0A45B1A13C5092BCFECB7 /* LicenseComplianceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E990E8C2CDE26FC5CE3692 /* LicenseComplianceView.swift */; };
+		AEBEECCB96C88385EC14E33C /* RepoLabelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 461E17565A0483EBEE63E814 /* RepoLabelsView.swift */; };
 		AF076028A446FB1E28446D96 /* DtDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59106973EB99FD9424D44224 /* DtDashboardView.swift */; };
 		AFDDA47CBD83C0460C150C5D /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F6787AE2A18008C8EA282F /* MonitoringView.swift */; };
 		B18AAE17086834FBB57455D9 /* PluginPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4147C420ECCBB9137917722C /* PluginPathTests.swift */; };
@@ -175,6 +180,7 @@
 		B85DD5AD52ECDF8AF03AD72F /* SbomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACFAEE53DF20945E710A82E /* SbomView.swift */; };
 		B88EC39592199C1C4E1FB621 /* PackagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C67E4A61ED479E094891F7 /* PackagesView.swift */; };
 		BCD82AAFB0CAB353C5CABAD2 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
+		BD25EF1FE16052A87E77B967 /* RepoLabelPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD36100E84B8339F5231B27D /* RepoLabelPathTests.swift */; };
 		BF54F129B023787CC9A44249 /* SecurityMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF4590E6775407858BBAC86 /* SecurityMappingTests.swift */; };
 		BFCCDACF133F0A2A57BD7EB0 /* RepoToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A519889F51ED6EE8565F5A /* RepoToken.swift */; };
 		C003F153FD58DC40599D6AA3 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */; };
@@ -278,6 +284,8 @@
 		4147C420ECCBB9137917722C /* PluginPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PluginPathTests.swift; sourceTree = "<group>"; };
 		435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeTests.swift; sourceTree = "<group>"; };
 		43C4236474392052DD29004F /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		461E17565A0483EBEE63E814 /* RepoLabelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoLabelsView.swift; sourceTree = "<group>"; };
+		4B7AD06C621AD49446B118B7 /* RepoLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoLabel.swift; sourceTree = "<group>"; };
 		4F60553EA149CE733245164B /* StagingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingDetailView.swift; sourceTree = "<group>"; };
 		50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CveHistoryView.swift; sourceTree = "<group>"; };
 		517D78FD253D2202880EF013 /* RepositoryTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeView.swift; sourceTree = "<group>"; };
@@ -327,6 +335,7 @@
 		AAB8A8A8F6AD6C323EAF2022 /* KeychainManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainManagerTests.swift; sourceTree = "<group>"; };
 		AACFAEE53DF20945E710A82E /* SbomView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SbomView.swift; sourceTree = "<group>"; };
 		AC7BD8467BED7C0A6ECE6DBE /* SecurityMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityMapping.swift; sourceTree = "<group>"; };
+		AD36100E84B8339F5231B27D /* RepoLabelPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoLabelPathTests.swift; sourceTree = "<group>"; };
 		ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoSecurityConfig.swift; sourceTree = "<group>"; };
 		AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanConfigsView.swift; sourceTree = "<group>"; };
 		B1164C99171DC47A99F71C0D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -408,6 +417,7 @@
 			isa = PBXGroup;
 			children = (
 				F0896BDB350847081B1C7EA3 /* EditRepositorySheet.swift */,
+				461E17565A0483EBEE63E814 /* RepoLabelsView.swift */,
 				746DB83A1B571F5CDFDD791E /* RepoSecurityConfigView.swift */,
 				9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */,
 				7FEF3A0FA55ECC63DDC8899F /* RepositoryDetailTabbedView.swift */,
@@ -444,6 +454,7 @@
 				942CFADFFB28FA592F32CAB1 /* ModelTests.swift */,
 				4147C420ECCBB9137917722C /* PluginPathTests.swift */,
 				8211F9D04C3BF74AB42324D9 /* QualityMappingTests.swift */,
+				AD36100E84B8339F5231B27D /* RepoLabelPathTests.swift */,
 				435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */,
 				E18944166743D27AE399CF9C /* RepoTokenPathTests.swift */,
 				F8A6FF4BFFCF392A815F6E11 /* SecurityDispatchTests.swift */,
@@ -511,6 +522,7 @@
 				B6F9DDB4F8B15C1FB99A2843 /* Package.swift */,
 				C7CA7F1FBDE367A6D4052F47 /* Promotion.swift */,
 				28281FCD705C9F9F4DF23AF7 /* Quality.swift */,
+				4B7AD06C621AD49446B118B7 /* RepoLabel.swift */,
 				ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */,
 				75FB2391848A9D7A02E4F7DC /* Repository.swift */,
 				862E1C3205340290276A9B75 /* RepositoryTree.swift */,
@@ -891,6 +903,7 @@
 				FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */,
 				293314A1B0346F707F5B3CE4 /* PluginPathTests.swift in Sources */,
 				E15A1D5EA6FDA4D8DAF42CF7 /* QualityMappingTests.swift in Sources */,
+				BD25EF1FE16052A87E77B967 /* RepoLabelPathTests.swift in Sources */,
 				D4A6CAF3C08F65C6F65E6BA3 /* RepoTokenPathTests.swift in Sources */,
 				1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */,
 				E2678146D7F808D22B485573 /* SecurityDispatchTests.swift in Sources */,
@@ -956,6 +969,8 @@
 				2C4CA9F46F0C6F9AB72EDFE8 /* QualityGatesView.swift in Sources */,
 				914F9F60919A6E3B56627D31 /* QualityMapping.swift in Sources */,
 				D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */,
+				3923C69BA5A7368D86E06523 /* RepoLabel.swift in Sources */,
+				16DDCEF3617ECD3C6605FB3F /* RepoLabelsView.swift in Sources */,
 				9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */,
 				4BE83BE4509F6A9FBAC7EA93 /* RepoSecurityConfigView.swift in Sources */,
 				BFCCDACF133F0A2A57BD7EB0 /* RepoToken.swift in Sources */,
@@ -1011,6 +1026,7 @@
 				83D01D48B7B7C3739E1344B3 /* ModelTests.swift in Sources */,
 				B18AAE17086834FBB57455D9 /* PluginPathTests.swift in Sources */,
 				868F52C07277B589BE29205D /* QualityMappingTests.swift in Sources */,
+				617879FAF4E26156FE1804C6 /* RepoLabelPathTests.swift in Sources */,
 				E186301880C191C66D1775AB /* RepoTokenPathTests.swift in Sources */,
 				4BA74F65F09BD28BC25CC705 /* RepositoryTreeTests.swift in Sources */,
 				2BBCC7E1EFC1A7A5C06BD188 /* SecurityDispatchTests.swift in Sources */,
@@ -1076,6 +1092,8 @@
 				A481D0536AA2B6EEBA080174 /* QualityGatesView.swift in Sources */,
 				0BC68220DEF68CF93D468766 /* QualityMapping.swift in Sources */,
 				475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */,
+				8D060D67E74AD287380440D9 /* RepoLabel.swift in Sources */,
+				AEBEECCB96C88385EC14E33C /* RepoLabelsView.swift in Sources */,
 				B2BDDB70803CC764E1147668 /* RepoSecurityConfig.swift in Sources */,
 				B596C3D83FBAFD453E1E20DD /* RepoSecurityConfigView.swift in Sources */,
 				A0E287A657FD7E9D70925A50 /* RepoToken.swift in Sources */,

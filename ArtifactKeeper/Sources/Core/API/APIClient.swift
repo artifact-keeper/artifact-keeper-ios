@@ -523,6 +523,46 @@ actor APIClient {
         try await requestVoid("/api/v1/artifacts/\(id)/labels/\(key)", method: "DELETE")
     }
 
+    // MARK: Repository Labels (1.2.1: /api/v1/repositories/{key}/labels)
+
+    /// List a repository's labels (GET /api/v1/repositories/{key}/labels).
+    func listRepoLabels(repoKey: String) async throws -> [RepoLabel] {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let response: RepoLabelsListResponse = try await request("/api/v1/repositories/\(encoded)/labels")
+        return response.items
+    }
+
+    /// Replace the full label set on a repository (PUT /api/v1/repositories/{key}/labels).
+    func setRepoLabels(repoKey: String, labels: [RepoLabelEntry]) async throws -> [RepoLabel] {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let response: RepoLabelsListResponse = try await request(
+            "/api/v1/repositories/\(encoded)/labels",
+            method: "PUT",
+            body: SetRepoLabelsRequest(labels: labels)
+        )
+        return response.items
+    }
+
+    /// Add or update a single repository label by key
+    /// (POST /api/v1/repositories/{key}/labels/{label_key}).
+    func addRepoLabel(repoKey: String, key: String, value: String?) async throws -> RepoLabel {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let encodedKey = key.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? key
+        return try await request(
+            "/api/v1/repositories/\(encoded)/labels/\(encodedKey)",
+            method: "POST",
+            body: AddRepoLabelRequest(value: value)
+        )
+    }
+
+    /// Delete a single repository label by key
+    /// (DELETE /api/v1/repositories/{key}/labels/{label_key}).
+    func deleteRepoLabel(repoKey: String, key: String) async throws {
+        let encoded = repoKey.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? repoKey
+        let encodedKey = key.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? key
+        try await requestVoid("/api/v1/repositories/\(encoded)/labels/\(encodedKey)", method: "DELETE")
+    }
+
     // MARK: Plugins (Integration: GET /api/v1/plugins/{id})
 
     /// Fetch a single plugin's current state by id.

@@ -30,6 +30,7 @@ struct RepositoryDetailTabbedView: View {
         if authManager.currentUser?.isAdmin == true {
             tabs.append(("security", "Security"))
             tabs.append(("tokens", "Tokens"))
+            tabs.append(("labels", "Labels"))
         }
         return tabs
     }
@@ -199,6 +200,8 @@ struct RepositoryDetailTabbedView: View {
             RepoSecurityConfigView(repoKey: repoKey)
         case "tokens":
             RepoTokensView(repoKey: repoKey)
+        case "labels":
+            RepoLabelsView(repoKey: repoKey)
         default:
             EmptyView()
         }
