@@ -834,6 +834,32 @@ actor APIClient {
         return data.map { SbomComponent(from: $0) }
     }
 
+    // MARK: CVE History & License Compliance (raw requests, matching SbomView)
+
+    /// CVE history for a single artifact (GET /api/v1/sbom/cve/history/by-artifact/{artifact_id}).
+    func getCveHistoryByArtifact(artifactId: String) async throws -> [CveHistoryEntry] {
+        let encoded = artifactId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? artifactId
+        return try await request("/api/v1/sbom/cve/history/by-artifact/\(encoded)")
+    }
+
+    /// History of a specific CVE across artifacts (GET /api/v1/sbom/cve/history/by-cve/{cve_id}).
+    func getCveHistoryByCve(cveId: String) async throws -> [CveHistoryEntry] {
+        let encoded = cveId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? cveId
+        return try await request("/api/v1/sbom/cve/history/by-cve/\(encoded)")
+    }
+
+    /// A single CVE history record by id (GET /api/v1/sbom/cve/history/{id}).
+    func getCveHistory(id: String) async throws -> CveHistoryEntry {
+        let encoded = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? id
+        return try await request("/api/v1/sbom/cve/history/\(encoded)")
+    }
+
+    /// Check a set of licenses against policy (POST /api/v1/sbom/check-compliance).
+    func checkLicenseCompliance(licenses: [String], repositoryId: String? = nil) async throws -> LicenseCheckResult {
+        let body = CheckLicenseComplianceRequest(licenses: licenses, repositoryId: repositoryId)
+        return try await request("/api/v1/sbom/check-compliance", method: "POST", body: body)
+    }
+
     // MARK: Repository Security Config
 
     func getRepoSecurityConfig(repoKey: String) async throws -> RepoSecurityConfig {

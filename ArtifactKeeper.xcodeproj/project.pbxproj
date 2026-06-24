@@ -13,6 +13,7 @@
 		04B038DD0B0B8611B2FB91F2 /* ArtifactDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE2C5256F844F6279846227 /* ArtifactDetail.swift */; };
 		04D04D992D40CBE4A2A9A8D5 /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F6787AE2A18008C8EA282F /* MonitoringView.swift */; };
 		04E9EC2157EA947C8B9FE159 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C4236474392052DD29004F /* DashboardView.swift */; };
+		062126612F89F0FAE35077F2 /* CveLicensePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */; };
 		083E2EBD72FFCF6E3EDEA31B /* DtDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59106973EB99FD9424D44224 /* DtDashboardView.swift */; };
 		098B007AFDBBB928C7FC45AB /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72273F4294E6BC2DA2D09609 /* SearchView.swift */; };
 		09E8E5F42512233704B3A4F6 /* LicensePoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAF919B4CECF39C3787DD94 /* LicensePoliciesView.swift */; };
@@ -30,6 +31,7 @@
 		1710D4535FE4A32357750C7D /* SecurityMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7BD8467BED7C0A6ECE6DBE /* SecurityMapping.swift */; };
 		17488E98D524FCAB892BAAC5 /* ArtifactKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A1761272FDDB00A7D41243 /* ArtifactKeeperTests.swift */; };
 		189014CE0807785BF1C97AF6 /* APIClientNetworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 785B2E0E832C8B70BD268404 /* APIClientNetworkTests.swift */; };
+		19F5B56288A694863407E57B /* CveHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */; };
 		1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */; };
 		1AB249F434755BECF4124CA8 /* SetupInstructionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */; };
 		1CC2147E6995CB8C42B11A2A /* ScanConfigsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */; };
@@ -110,6 +112,7 @@
 		797AE3D1C3726C2AAA195E4D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B3E2D65A21BA60C8957EE36 /* ContentView.swift */; };
 		7B983BDEC8F0E8548B9E7E5E /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
 		7C9F12D37482E704E49A3814 /* HealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AB45AA08A0DE4EA42BC041 /* HealthDashboardView.swift */; };
+		7D990B45FF3ECE2858347141 /* CveLicensePathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */; };
 		7E2E910B688E7F6C2455AA9A /* VirtualMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5897003BAFB18AFF0865CCEC /* VirtualMembersView.swift */; };
 		7E3F4ECD8B702F2A2DF45974 /* VirtualMembersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5897003BAFB18AFF0865CCEC /* VirtualMembersView.swift */; };
 		8227BD7FC4FA90F1EDDE2662 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79512BEEB0DBDA10DFDCFAAC /* MainTabView.swift */; };
@@ -130,6 +133,7 @@
 		914F9F60919A6E3B56627D31 /* QualityMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF539B04F8B6390EDFE0643B /* QualityMapping.swift */; };
 		93CA8B7CD50723325BB01412 /* StagingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F60553EA149CE733245164B /* StagingDetailView.swift */; };
 		940EE1C50954FCE0AE11F202 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3412EF9765589F0F5C9613ED /* APIClient.swift */; };
+		941BDA39A576A8603BE0E7F7 /* CveHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */; };
 		94F8DAE6FEDABE840D272740 /* AccountToolbarModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A527DEEF9DECA3F2E8EC26 /* AccountToolbarModifier.swift */; };
 		94FC8121D7F395B27138FF6C /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 3706EE4D071525F8E60A5A3B /* Kingfisher */; };
 		95AFE5BD66F78CB88FB2ABA1 /* PeersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F130C4E4EC403EC23594AE44 /* PeersView.swift */; };
@@ -137,6 +141,7 @@
 		983F1AE2C41B80CC7F6F9577 /* OperationsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6A94422BAD7B966077C0D9 /* OperationsSectionView.swift */; };
 		99C3358F603E8600CA038F75 /* DashboardViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888D1A2EB554E8903CED4CF3 /* DashboardViewTests.swift */; };
 		99FEE2AAD62A0388A67BF3C6 /* SSOView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783C66794630C443427F1527 /* SSOView.swift */; };
+		9B8FF89AE8EFBDCEFEA47A94 /* LicenseComplianceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E990E8C2CDE26FC5CE3692 /* LicenseComplianceView.swift */; };
 		9DE03A85868EB62612D588DC /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */; };
 		9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
 		9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */; };
@@ -146,6 +151,7 @@
 		A6FE919357227C480B8571C0 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
 		ABC754B5DC49717B25A912DB /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E59705D3B5F2000ACABB8A48 /* Auth.swift */; };
 		AD2DBF5F7973BE47E351CC36 /* APIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1901D688CCAD3DE71AA681AC /* APIClientTests.swift */; };
+		AEB0A45B1A13C5092BCFECB7 /* LicenseComplianceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E990E8C2CDE26FC5CE3692 /* LicenseComplianceView.swift */; };
 		AF076028A446FB1E28446D96 /* DtDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59106973EB99FD9424D44224 /* DtDashboardView.swift */; };
 		AFDDA47CBD83C0460C150C5D /* MonitoringView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F6787AE2A18008C8EA282F /* MonitoringView.swift */; };
 		B18AAE17086834FBB57455D9 /* PluginPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4147C420ECCBB9137917722C /* PluginPathTests.swift */; };
@@ -239,12 +245,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		05E990E8C2CDE26FC5CE3692 /* LicenseComplianceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseComplianceView.swift; sourceTree = "<group>"; };
 		07736CEE9959BC4566162E12 /* DtProjectsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DtProjectsView.swift; sourceTree = "<group>"; };
 		0F39BE558F8CECE7E094EEC4 /* ArtifactKeeperTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ArtifactKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupInstructionsView.swift; sourceTree = "<group>"; };
 		1464BFA481535D3C3B4F4CC5 /* GroupsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupsView.swift; sourceTree = "<group>"; };
 		155377690C14964BAFBAF481 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		1901D688CCAD3DE71AA681AC /* APIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClientTests.swift; sourceTree = "<group>"; };
+		1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CveLicensePathTests.swift; sourceTree = "<group>"; };
 		1DB4EEF15843269173A9B772 /* TOTPVerificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TOTPVerificationView.swift; sourceTree = "<group>"; };
 		26F832901A43DC98CC288AA4 /* ArtifactSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtifactSecurityView.swift; sourceTree = "<group>"; };
 		28281FCD705C9F9F4DF23AF7 /* Quality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quality.swift; sourceTree = "<group>"; };
@@ -260,6 +268,7 @@
 		435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeTests.swift; sourceTree = "<group>"; };
 		43C4236474392052DD29004F /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		4F60553EA149CE733245164B /* StagingDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StagingDetailView.swift; sourceTree = "<group>"; };
+		50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CveHistoryView.swift; sourceTree = "<group>"; };
 		517D78FD253D2202880EF013 /* RepositoryTreeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepositoryTreeView.swift; sourceTree = "<group>"; };
 		5897003BAFB18AFF0865CCEC /* VirtualMembersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMembersView.swift; sourceTree = "<group>"; };
 		58F4BB814BCEC4170B1CA727 /* SetupInstructionsViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupInstructionsViewTests.swift; sourceTree = "<group>"; };
@@ -416,6 +425,7 @@
 				C8A1761272FDDB00A7D41243 /* ArtifactKeeperTests.swift */,
 				E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */,
 				F84212AD84A94810D2C23339 /* AuthManagerTests.swift */,
+				1C63C47E06CD6C0372C017A2 /* CveLicensePathTests.swift */,
 				888D1A2EB554E8903CED4CF3 /* DashboardViewTests.swift */,
 				AAB8A8A8F6AD6C323EAF2022 /* KeychainManagerTests.swift */,
 				942CFADFFB28FA592F32CAB1 /* ModelTests.swift */,
@@ -448,9 +458,11 @@
 			isa = PBXGroup;
 			children = (
 				26F832901A43DC98CC288AA4 /* ArtifactSecurityView.swift */,
+				50DB58698E8E2409CAFE93AA /* CveHistoryView.swift */,
 				59106973EB99FD9424D44224 /* DtDashboardView.swift */,
 				07736CEE9959BC4566162E12 /* DtProjectsView.swift */,
 				D5AB45AA08A0DE4EA42BC041 /* HealthDashboardView.swift */,
+				05E990E8C2CDE26FC5CE3692 /* LicenseComplianceView.swift */,
 				5DAF919B4CECF39C3787DD94 /* LicensePoliciesView.swift */,
 				387B1308AF0F0D5F5C768F13 /* PoliciesView.swift */,
 				CCFF1C0C6841D1BF61141BD7 /* QualityGatesView.swift */,
@@ -857,6 +869,7 @@
 				571951B0A6024875CE31B544 /* ArtifactKeeperTests.swift in Sources */,
 				A1A538DE905D6AF031923CF5 /* AuthManagerExtendedTests.swift in Sources */,
 				43CD93CC42B93AE1999FA8B9 /* AuthManagerTests.swift in Sources */,
+				062126612F89F0FAE35077F2 /* CveLicensePathTests.swift in Sources */,
 				99C3358F603E8600CA038F75 /* DashboardViewTests.swift in Sources */,
 				ECE469E91BEE0E35EB258F98 /* KeychainManagerTests.swift in Sources */,
 				FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */,
@@ -894,6 +907,7 @@
 				EBBA4D16B78FD192D954563C /* BuildsView.swift in Sources */,
 				E4618623F8473A8661B7CC6F /* ChangePasswordView.swift in Sources */,
 				797AE3D1C3726C2AAA195E4D /* ContentView.swift in Sources */,
+				941BDA39A576A8603BE0E7F7 /* CveHistoryView.swift in Sources */,
 				7926AACBA3FC6E057D5340FE /* DashboardView.swift in Sources */,
 				0050E6CD740666B06CF4F1F6 /* DependencyTrack.swift in Sources */,
 				083E2EBD72FFCF6E3EDEA31B /* DtDashboardView.swift in Sources */,
@@ -904,6 +918,7 @@
 				2EE7333E8775B1BB8124E0B7 /* Integration.swift in Sources */,
 				634179231AD90932820E8519 /* IntegrationSectionView.swift in Sources */,
 				B7F76BE14A732DCCD7EDF405 /* KeychainManager.swift in Sources */,
+				AEB0A45B1A13C5092BCFECB7 /* LicenseComplianceView.swift in Sources */,
 				B27985BB328A3F0ACCEF2EB5 /* LicensePoliciesView.swift in Sources */,
 				431F59BD5A02CA08C396903A /* LoginView.swift in Sources */,
 				8227BD7FC4FA90F1EDDE2662 /* MainTabView.swift in Sources */,
@@ -970,6 +985,7 @@
 				17488E98D524FCAB892BAAC5 /* ArtifactKeeperTests.swift in Sources */,
 				F5CE55686817D88933AC4AC1 /* AuthManagerExtendedTests.swift in Sources */,
 				653D84744E6345714FCE559A /* AuthManagerTests.swift in Sources */,
+				7D990B45FF3ECE2858347141 /* CveLicensePathTests.swift in Sources */,
 				3366AEE087831CF15004691F /* DashboardViewTests.swift in Sources */,
 				6D8FA2A9093D692547570860 /* KeychainManagerTests.swift in Sources */,
 				83D01D48B7B7C3739E1344B3 /* ModelTests.swift in Sources */,
@@ -1007,6 +1023,7 @@
 				0AB4F8101A72D6C81B34D496 /* BuildsView.swift in Sources */,
 				238DBF144A2302C11DE50388 /* ChangePasswordView.swift in Sources */,
 				EA935E6E499F8A518FCBA8C3 /* ContentView.swift in Sources */,
+				19F5B56288A694863407E57B /* CveHistoryView.swift in Sources */,
 				04E9EC2157EA947C8B9FE159 /* DashboardView.swift in Sources */,
 				D36FF1BE98A8940CC8E38C27 /* DependencyTrack.swift in Sources */,
 				AF076028A446FB1E28446D96 /* DtDashboardView.swift in Sources */,
@@ -1017,6 +1034,7 @@
 				5E0D22452C4DCD3E0ECCEED2 /* Integration.swift in Sources */,
 				C0067BC56E14F7597CD91596 /* IntegrationSectionView.swift in Sources */,
 				D7AD6E41B44AF34DF7994C57 /* KeychainManager.swift in Sources */,
+				9B8FF89AE8EFBDCEFEA47A94 /* LicenseComplianceView.swift in Sources */,
 				09E8E5F42512233704B3A4F6 /* LicensePoliciesView.swift in Sources */,
 				389A90FAD7E4FDA7B8464B92 /* LoginView.swift in Sources */,
 				FDD83FAF91847C130D24C7ED /* MainTabView.swift in Sources */,

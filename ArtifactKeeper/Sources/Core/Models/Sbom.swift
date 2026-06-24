@@ -227,16 +227,13 @@ struct LicensePolicy: Codable, Identifiable, Sendable {
     }
 }
 
+/// Result of a license compliance check (POST /api/v1/sbom/check-compliance).
+/// Matches the 1.2.1 `LicenseCheckResult` schema: violations and warnings are
+/// plain strings describing each problem license.
 struct LicenseCheckResult: Codable, Sendable {
     let compliant: Bool
-    let action: String
-    let violations: [LicenseViolation]
+    let violations: [String]
     let warnings: [String]
-}
-
-struct LicenseViolation: Codable, Sendable {
-    let license: String
-    let reason: String
 }
 
 // MARK: - Request Types
@@ -270,6 +267,18 @@ struct CreateLicensePolicyRequest: Encodable {
         case deniedLicenses = "denied_licenses"
         case allowUnknown = "allow_unknown"
         case isEnabled = "is_enabled"
+    }
+}
+
+/// Body for POST /api/v1/sbom/check-compliance: the licenses to check and an
+/// optional repository whose policy should be applied.
+struct CheckLicenseComplianceRequest: Encodable {
+    let licenses: [String]
+    let repositoryId: String?
+
+    enum CodingKeys: String, CodingKey {
+        case licenses
+        case repositoryId = "repository_id"
     }
 }
 
