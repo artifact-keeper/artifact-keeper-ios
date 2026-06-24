@@ -154,4 +154,99 @@ struct QualityMappingTests {
         #expect(mappedRepo.avgSecurityScore == 90)
         #expect(mappedRepo.lastEvaluatedAt == SecurityMapping.isoString(Self.updated))
     }
+
+    @Test func repoHealthMaps() {
+        let sdk = Components.Schemas.RepoHealthResponse(
+            artifacts_evaluated: 12,
+            artifacts_failing: 4,
+            artifacts_passing: 8,
+            avg_license_score: 81,
+            avg_metadata_score: 72,
+            avg_quality_score: 77,
+            avg_security_score: 95,
+            health_grade: "A",
+            health_score: 91,
+            last_evaluated_at: Self.updated,
+            repository_id: "repo-7",
+            repository_key: "npm-prod"
+        )
+
+        let model = RepoHealth(from: sdk)
+
+        #expect(model.repositoryId == "repo-7")
+        #expect(model.repositoryKey == "npm-prod")
+        #expect(model.healthGrade == "A")
+        #expect(model.healthScore == 91)
+        #expect(model.artifactsEvaluated == 12)
+        #expect(model.artifactsPassing == 8)
+        #expect(model.artifactsFailing == 4)
+        #expect(model.avgSecurityScore == 95)
+        #expect(model.avgLicenseScore == 81)
+        #expect(model.lastEvaluatedAt == SecurityMapping.isoString(Self.updated))
+    }
+
+    @Test func checkSummaryMaps() {
+        let sdk = Components.Schemas.CheckSummary(
+            check_type: "security",
+            completed_at: Self.updated,
+            issues_count: 2,
+            passed: false,
+            score: 60,
+            status: "completed"
+        )
+
+        let model = CheckSummary(from: sdk)
+
+        #expect(model.checkType == "security")
+        #expect(model.status == "completed")
+        #expect(model.issuesCount == 2)
+        #expect(model.passed == false)
+        #expect(model.score == 60)
+        #expect(model.completedAt == SecurityMapping.isoString(Self.updated))
+        #expect(model.id == "security")
+    }
+
+    @Test func artifactHealthMaps() throws {
+        let sdk = Components.Schemas.ArtifactHealthResponse(
+            artifact_id: "art-1",
+            checks: [
+                Components.Schemas.CheckSummary(
+                    check_type: "metadata", completed_at: nil, issues_count: 0,
+                    passed: true, score: 100, status: "completed"
+                )
+            ],
+            checks_passed: 3,
+            checks_total: 4,
+            critical_issues: 1,
+            health_grade: "B",
+            health_score: 82,
+            last_checked_at: Self.updated,
+            license_score: 90,
+            metadata_score: 100,
+            quality_score: 70,
+            security_score: 85,
+            total_issues: 5
+        )
+
+        let model = ArtifactHealth(from: sdk)
+
+        #expect(model.artifactId == "art-1")
+        #expect(model.healthScore == 82)
+        #expect(model.healthGrade == "B")
+        #expect(model.totalIssues == 5)
+        #expect(model.criticalIssues == 1)
+        #expect(model.checksPassed == 3)
+        #expect(model.checksTotal == 4)
+        #expect(model.securityScore == 85)
+        #expect(model.qualityScore == 70)
+        #expect(model.metadataScore == 100)
+        #expect(model.licenseScore == 90)
+        #expect(model.lastCheckedAt == SecurityMapping.isoString(Self.updated))
+        #expect(model.checks.count == 1)
+
+        let check = try #require(model.checks.first)
+        #expect(check.checkType == "metadata")
+        #expect(check.passed == true)
+        #expect(check.completedAt == nil)
+    }
 }
