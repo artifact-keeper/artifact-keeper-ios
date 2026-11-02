@@ -24,8 +24,3 @@ pull_request_rules:
           - needs-review
           - major-update
 
-  - name: Clean up merged branches
-    conditions:
-      - merged
-    actions:
-      delete_head_branch: {}
