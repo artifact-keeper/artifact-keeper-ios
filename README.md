@@ -1,5 +1,9 @@
 # Artifact Keeper — iOS / macOS
 
+<p align="center">
+  <img alt="Artifact Keeper" src="https://raw.githubusercontent.com/artifact-keeper/.github/main/brand/banners/github-readme_1600x600.png" width="100%">
+</p>
+
 Native iOS and macOS app for Artifact Keeper, built with SwiftUI and targeting iOS 17+ / macOS 14+.
 
 ## Tech Stack
