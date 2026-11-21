@@ -29,6 +29,7 @@ struct RepositoryDetailTabbedView: View {
         }
         if authManager.currentUser?.isAdmin == true {
             tabs.append(("security", "Security"))
+            tabs.append(("tokens", "Tokens"))
         }
         return tabs
     }
@@ -196,6 +197,8 @@ struct RepositoryDetailTabbedView: View {
             VirtualMembersView(repoKey: repoKey)
         case "security":
             RepoSecurityConfigView(repoKey: repoKey)
+        case "tokens":
+            RepoTokensView(repoKey: repoKey)
         default:
             EmptyView()
         }

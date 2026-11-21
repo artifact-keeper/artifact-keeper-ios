@@ -101,11 +101,13 @@
 		661675A6E9DC360473BAA181 /* ArtifactDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FE2C5256F844F6279846227 /* ArtifactDetail.swift */; };
 		66342C499ECF4ADDCCF83FFC /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 341E812182C7DEF2DE15BDE6 /* AuthManager.swift */; };
 		67018A342717D2F56ADA6F58 /* TOTPVerificationViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E81B31BCEB8455ABE51CD8D /* TOTPVerificationViewTests.swift */; };
+		68E83E7F4B36E0E10E8DEFAD /* RepoTokensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDB3E2C8A9265503ACBEC00 /* RepoTokensView.swift */; };
 		6D02C2A0C45C6E1D0AA70FE2 /* HealthDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5AB45AA08A0DE4EA42BC041 /* HealthDashboardView.swift */; };
 		6D8FA2A9093D692547570860 /* KeychainManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB8A8A8F6AD6C323EAF2022 /* KeychainManagerTests.swift */; };
 		706149420AF74CC3C2F55FDB /* PoliciesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 387B1308AF0F0D5F5C768F13 /* PoliciesView.swift */; };
 		71DE9560CF0DC604499711B9 /* ServerManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F26A3F934E811A6A5B6FCF /* ServerManagerTests.swift */; };
 		71FC30A34A235CFE53B1D1DF /* ArtifactDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F289613B7B5E1B85C3F9E832 /* ArtifactDetailView.swift */; };
+		72090C495549EA95D88EB679 /* RepoTokensView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BDB3E2C8A9265503ACBEC00 /* RepoTokensView.swift */; };
 		738EFB98489D855A1E2FFE8B /* SetupInstructionsViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F4BB814BCEC4170B1CA727 /* SetupInstructionsViewTests.swift */; };
 		76A035773BD7C7A5065F5E65 /* ServerManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65F26A3F934E811A6A5B6FCF /* ServerManagerTests.swift */; };
 		7795B1C86E7E5530C0ECA6BE /* SbomView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AACFAEE53DF20945E710A82E /* SbomView.swift */; };
@@ -147,6 +149,7 @@
 		9DE03A85868EB62612D588DC /* ServerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */; };
 		9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */; };
 		9FBBA3D5EAF49575952C78AD /* OpenAPIURLSession in Frameworks */ = {isa = PBXBuildFile; productRef = F35A063FFE69F8B8A3CD7AEE /* OpenAPIURLSession */; };
+		A0E287A657FD7E9D70925A50 /* RepoToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A519889F51ED6EE8565F5A /* RepoToken.swift */; };
 		A1A538DE905D6AF031923CF5 /* AuthManagerExtendedTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9BB213946F6067DE4267BAB /* AuthManagerExtendedTests.swift */; };
 		A481D0536AA2B6EEBA080174 /* QualityGatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCFF1C0C6841D1BF61141BD7 /* QualityGatesView.swift */; };
 		A563ADC6B11F45AB50692ABA /* ScanConfigsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFB7AD8D8492E7570FDE8A66 /* ScanConfigsView.swift */; };
@@ -173,6 +176,7 @@
 		B88EC39592199C1C4E1FB621 /* PackagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85C67E4A61ED479E094891F7 /* PackagesView.swift */; };
 		BCD82AAFB0CAB353C5CABAD2 /* RepositoryTree.swift in Sources */ = {isa = PBXBuildFile; fileRef = 862E1C3205340290276A9B75 /* RepositoryTree.swift */; };
 		BF54F129B023787CC9A44249 /* SecurityMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAF4590E6775407858BBAC86 /* SecurityMappingTests.swift */; };
+		BFCCDACF133F0A2A57BD7EB0 /* RepoToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28A519889F51ED6EE8565F5A /* RepoToken.swift */; };
 		C003F153FD58DC40599D6AA3 /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9050B925E8CDAB492ED01C01 /* AnalyticsView.swift */; };
 		C0067BC56E14F7597CD91596 /* IntegrationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ADAC51BA77982E3BBFB4403 /* IntegrationSectionView.swift */; };
 		C02053BA07DD2669117F0E0C /* StagingSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 846E4EAE3F90ADE47BE07930 /* StagingSectionView.swift */; };
@@ -192,6 +196,7 @@
 		D36FF1BE98A8940CC8E38C27 /* DependencyTrack.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3514BB30D4591F702FE3C8B /* DependencyTrack.swift */; };
 		D40943078196189E5E593C67 /* SDKClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 974C4288C3D5E8B4C3A1D76E /* SDKClient.swift */; };
 		D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8067728F7917AD61F0DB4037 /* ReplicationView.swift */; };
+		D4A6CAF3C08F65C6F65E6BA3 /* RepoTokenPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18944166743D27AE399CF9C /* RepoTokenPathTests.swift */; };
 		D6794B241227A7A33DE011F3 /* ArtifactKeeperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D217BC8D6B2994A881C4E04E /* ArtifactKeeperApp.swift */; };
 		D6F8DEBE6DBFB0A7A1F1EB1F /* APIPathRegressionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF8D4619ABD35F3059816534 /* APIPathRegressionTests.swift */; };
 		D7AD6E41B44AF34DF7994C57 /* KeychainManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81FFEFE5A4DE0397D840007 /* KeychainManager.swift */; };
@@ -203,6 +208,7 @@
 		DF321600060A4DA7993785FF /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE59905B179E64919791A7 /* Admin.swift */; };
 		DF3A3118CF4C5C19CDC19B56 /* VirtualMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F508C0FBF498EB51BC64EE /* VirtualMember.swift */; };
 		E15A1D5EA6FDA4D8DAF42CF7 /* QualityMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8211F9D04C3BF74AB42324D9 /* QualityMappingTests.swift */; };
+		E186301880C191C66D1775AB /* RepoTokenPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E18944166743D27AE399CF9C /* RepoTokenPathTests.swift */; };
 		E18E74AC77451E6C0022B276 /* Admin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CBE59905B179E64919791A7 /* Admin.swift */; };
 		E2678146D7F808D22B485573 /* SecurityDispatchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A6FF4BFFCF392A815F6E11 /* SecurityDispatchTests.swift */; };
 		E4618623F8473A8661B7CC6F /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7812397531D2CD01F4488BC6 /* ChangePasswordView.swift */; };
@@ -259,6 +265,8 @@
 		26DD24CE59A14232D46D4665 /* InstallPluginFromGitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallPluginFromGitView.swift; sourceTree = "<group>"; };
 		26F832901A43DC98CC288AA4 /* ArtifactSecurityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtifactSecurityView.swift; sourceTree = "<group>"; };
 		28281FCD705C9F9F4DF23AF7 /* Quality.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Quality.swift; sourceTree = "<group>"; };
+		28A519889F51ED6EE8565F5A /* RepoToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoToken.swift; sourceTree = "<group>"; };
+		2BDB3E2C8A9265503ACBEC00 /* RepoTokensView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoTokensView.swift; sourceTree = "<group>"; };
 		3412EF9765589F0F5C9613ED /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		341E812182C7DEF2DE15BDE6 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		36F508C0FBF498EB51BC64EE /* VirtualMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirtualMember.swift; sourceTree = "<group>"; };
@@ -337,6 +345,7 @@
 		D5AB45AA08A0DE4EA42BC041 /* HealthDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthDashboardView.swift; sourceTree = "<group>"; };
 		DC2FE890E60756D1FFA94CD1 /* ArtifactKeeper.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ArtifactKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0A9848E2DD8A8070E5CBBDC /* ServerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerManager.swift; sourceTree = "<group>"; };
+		E18944166743D27AE399CF9C /* RepoTokenPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepoTokenPathTests.swift; sourceTree = "<group>"; };
 		E59705D3B5F2000ACABB8A48 /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		E6A527DEEF9DECA3F2E8EC26 /* AccountToolbarModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountToolbarModifier.swift; sourceTree = "<group>"; };
 		E6D532EA4136F5C5CF5548AE /* WebhookPathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebhookPathTests.swift; sourceTree = "<group>"; };
@@ -402,6 +411,7 @@
 				746DB83A1B571F5CDFDD791E /* RepoSecurityConfigView.swift */,
 				9688E0041F1683C5DDFA6071 /* RepositoriesView.swift */,
 				7FEF3A0FA55ECC63DDC8899F /* RepositoryDetailTabbedView.swift */,
+				2BDB3E2C8A9265503ACBEC00 /* RepoTokensView.swift */,
 				76C1CC3C4956018E653EC486 /* RepoUploadView.swift */,
 				113DC09E3B0845FAD9BDA8F6 /* SetupInstructionsView.swift */,
 				5897003BAFB18AFF0865CCEC /* VirtualMembersView.swift */,
@@ -435,6 +445,7 @@
 				4147C420ECCBB9137917722C /* PluginPathTests.swift */,
 				8211F9D04C3BF74AB42324D9 /* QualityMappingTests.swift */,
 				435C7C6ACC4028C205301D14 /* RepositoryTreeTests.swift */,
+				E18944166743D27AE399CF9C /* RepoTokenPathTests.swift */,
 				F8A6FF4BFFCF392A815F6E11 /* SecurityDispatchTests.swift */,
 				CAF4590E6775407858BBAC86 /* SecurityMappingTests.swift */,
 				65F26A3F934E811A6A5B6FCF /* ServerManagerTests.swift */,
@@ -503,6 +514,7 @@
 				ADB0E30CAAF92793E9ED4168 /* RepoSecurityConfig.swift */,
 				75FB2391848A9D7A02E4F7DC /* Repository.swift */,
 				862E1C3205340290276A9B75 /* RepositoryTree.swift */,
+				28A519889F51ED6EE8565F5A /* RepoToken.swift */,
 				8DF4F010E1DD1DC5415E7F11 /* Sbom.swift */,
 				3D8118DAD8066C9D0EED317C /* Security.swift */,
 				36F508C0FBF498EB51BC64EE /* VirtualMember.swift */,
@@ -879,6 +891,7 @@
 				FD18CC2609F7FF5CA43A5EEC /* ModelTests.swift in Sources */,
 				293314A1B0346F707F5B3CE4 /* PluginPathTests.swift in Sources */,
 				E15A1D5EA6FDA4D8DAF42CF7 /* QualityMappingTests.swift in Sources */,
+				D4A6CAF3C08F65C6F65E6BA3 /* RepoTokenPathTests.swift in Sources */,
 				1A02AD83B2F212120BFC892A /* RepositoryTreeTests.swift in Sources */,
 				E2678146D7F808D22B485573 /* SecurityDispatchTests.swift in Sources */,
 				EC57A5F27A84651FE192BC0A /* SecurityMappingTests.swift in Sources */,
@@ -945,6 +958,8 @@
 				D40F5A35411ACBE8737D54F7 /* ReplicationView.swift in Sources */,
 				9F313A124D557820A4F7F737 /* RepoSecurityConfig.swift in Sources */,
 				4BE83BE4509F6A9FBAC7EA93 /* RepoSecurityConfigView.swift in Sources */,
+				BFCCDACF133F0A2A57BD7EB0 /* RepoToken.swift in Sources */,
+				72090C495549EA95D88EB679 /* RepoTokensView.swift in Sources */,
 				82D32C6CEE6B9A5386787EEF /* RepoUploadView.swift in Sources */,
 				CBA92159E5A5DFC00F6CBC28 /* RepositoriesView.swift in Sources */,
 				CB9F64C28FEBB032DD2210F6 /* Repository.swift in Sources */,
@@ -996,6 +1011,7 @@
 				83D01D48B7B7C3739E1344B3 /* ModelTests.swift in Sources */,
 				B18AAE17086834FBB57455D9 /* PluginPathTests.swift in Sources */,
 				868F52C07277B589BE29205D /* QualityMappingTests.swift in Sources */,
+				E186301880C191C66D1775AB /* RepoTokenPathTests.swift in Sources */,
 				4BA74F65F09BD28BC25CC705 /* RepositoryTreeTests.swift in Sources */,
 				2BBCC7E1EFC1A7A5C06BD188 /* SecurityDispatchTests.swift in Sources */,
 				BF54F129B023787CC9A44249 /* SecurityMappingTests.swift in Sources */,
@@ -1062,6 +1078,8 @@
 				475F7C0CA9365AB11D952814 /* ReplicationView.swift in Sources */,
 				B2BDDB70803CC764E1147668 /* RepoSecurityConfig.swift in Sources */,
 				B596C3D83FBAFD453E1E20DD /* RepoSecurityConfigView.swift in Sources */,
+				A0E287A657FD7E9D70925A50 /* RepoToken.swift in Sources */,
+				68E83E7F4B36E0E10E8DEFAD /* RepoTokensView.swift in Sources */,
 				8D14D0F52AF6E89139D3264B /* RepoUploadView.swift in Sources */,
 				3E092F89AC9B6CA6DC50DAEB /* RepositoriesView.swift in Sources */,
 				DD14915474376F9ECAB7D78B /* Repository.swift in Sources */,
