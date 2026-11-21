@@ -4,6 +4,8 @@
   <img alt="Artifact Keeper" src="https://raw.githubusercontent.com/artifact-keeper/.github/main/brand/banners/github-readme_1600x600.png" width="100%">
 </p>
 
+[![Discord](https://img.shields.io/discord/1527760136456900748?label=Discord&logo=discord&logoColor=white)](https://discord.gg/8T7NW2PeS2)
+
 Native iOS and macOS app for Artifact Keeper, built with SwiftUI and targeting iOS 17+ / macOS 14+.
 
 ## Tech Stack
@@ -348,3 +350,10 @@ graph LR
 4. Build and run for iOS Simulator, device, or macOS (universal app)
 
 On first launch, enter your Artifact Keeper server URL (e.g. `http://localhost:30080` for local development).
+
+## Community
+
+- **Discord**: chat, quick help and per-ecosystem channels at [discord.gg/8T7NW2PeS2](https://discord.gg/8T7NW2PeS2)
+- **GitHub Discussions**: [ideas and Q&A](https://github.com/artifact-keeper/artifact-keeper/discussions)
+- **Issues**: confirmed bugs go in the [issue tracker](https://github.com/artifact-keeper/artifact-keeper-ios/issues)
+- **Security**: report vulnerabilities privately as described in [SECURITY.md](https://github.com/artifact-keeper/artifact-keeper/blob/main/SECURITY.md), never in Discord or public issues
